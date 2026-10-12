@@ -2,6 +2,10 @@ import '../../../../core/utils/typedefs.dart';
 import '../entities/review_entity.dart';
 
 abstract class EstateDetailsRepository {
+  Stream<List<String>> watchFavoriteEstateIds(String userId);
+  ResultVoid addFavorite(String userId, String estateId);
+  ResultVoid removeFavorite(String userId, String estateId);
+
   ResultFuture<List<ReviewEntity>> getReviews(
     String estateId, {
     int limit = 20,

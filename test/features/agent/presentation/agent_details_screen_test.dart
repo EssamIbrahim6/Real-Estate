@@ -24,9 +24,9 @@ void main() {
     await _pumpScreen(tester, cubit);
 
     expect(find.text('Nour Hassan'), findsOneWidget);
-    expect(find.byKey(const Key('agent-profile-image')), findsOneWidget);
+    expect(find.byKey(const Key('person-profile-image')), findsOneWidget);
     final image = tester.widget<Image>(
-      find.byKey(const Key('agent-profile-image')),
+      find.byKey(const Key('person-profile-image')),
     );
     expect((image.image as NetworkImage).url, 'https://example.com/nour.jpg');
     expect(

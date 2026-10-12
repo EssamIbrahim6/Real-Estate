@@ -12,10 +12,12 @@ import '../../../estate/domain/entities/estate_entity.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_error_view.dart';
 import '../../../../core/widgets/app_loading_indicator.dart';
+import '../../../../core/widgets/person_avatar.dart';
 import '../cubit/estate_details_cubit.dart';
 import '../cubit/estate_details_state.dart';
 import 'fullscreen_gallery_screen.dart';
 import '../widgets/estate_map_section.dart';
+import '../widgets/estate_favorite_button.dart';
 import '../widgets/image_gallery.dart';
 import '../widgets/property_info_section.dart';
 import '../widgets/submit_review_bottom_sheet.dart';
@@ -34,6 +36,8 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
   bool _isDescriptionExpanded = false;
   ReviewSubmitStatus _lastReviewStatus = ReviewSubmitStatus.initial;
   ContactAgentStatus _lastContactAgentStatus = ContactAgentStatus.initial;
+  FavoriteActionStatus _lastFavoriteActionStatus = FavoriteActionStatus.initial;
+  String? _lastFavoriteError;
 
   void _openGallery(List<String> images, int initialIndex) {
     context.pushNamed(
@@ -79,13 +83,17 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
 
     if (currentUserUid == null || currentUserUid.isEmpty) return false;
 
-    final ownerIds = [
-      estate.ownerId,
-      estate.userId,
-      estate.createdBy,
-      estate.publisherId,
-      estate.agentUserId,
-    ].whereType<String>().map((value) => value.trim()).where((value) => value.isNotEmpty);
+    final ownerIds =
+        [
+              estate.ownerId,
+              estate.userId,
+              estate.createdBy,
+              estate.publisherId,
+              estate.agentUserId,
+            ]
+            .whereType<String>()
+            .map((value) => value.trim())
+            .where((value) => value.isNotEmpty);
 
     if (ownerIds.contains(currentUserUid)) return true;
     final agentUid = agent?.userId.trim();
@@ -106,13 +114,21 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
             previous.submitStatus != current.submitStatus ||
             previous.submitError != current.submitError ||
             previous.contactAgentStatus != current.contactAgentStatus ||
-            previous.contactAgentError != current.contactAgentError,
+            previous.contactAgentError != current.contactAgentError ||
+            previous.favoriteActionStatus != current.favoriteActionStatus ||
+            previous.favoriteError != current.favoriteError,
         listener: (context, state) {
           final reviewStatusChanged = _lastReviewStatus != state.submitStatus;
           final contactStatusChanged =
               _lastContactAgentStatus != state.contactAgentStatus;
+          final favoriteStatusChanged =
+              _lastFavoriteActionStatus != state.favoriteActionStatus;
+          final favoriteErrorChanged =
+              _lastFavoriteError != state.favoriteError;
           _lastReviewStatus = state.submitStatus;
           _lastContactAgentStatus = state.contactAgentStatus;
+          _lastFavoriteActionStatus = state.favoriteActionStatus;
+          _lastFavoriteError = state.favoriteError;
 
           if (reviewStatusChanged &&
               state.submitStatus == ReviewSubmitStatus.error &&
@@ -137,6 +153,14 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.contactAgentError!),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          } else if ((favoriteStatusChanged || favoriteErrorChanged) &&
+              state.favoriteError != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.favoriteError!),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -410,7 +434,9 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                                   vertical: 8,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.brandGreen.withValues(alpha: 0.12),
+                                  color: AppColors.brandGreen.withValues(
+                                    alpha: 0.12,
+                                  ),
                                   borderRadius: BorderRadius.circular(999),
                                 ),
                                 child: const Text(
@@ -451,22 +477,14 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                                     GestureDetector(
                                       onTap: () => context.pushNamed(
                                         AppRoutes.agentDetailsName,
-                                        pathParameters: {'agentId': state.agent!.id},
+                                        pathParameters: {
+                                          'agentId': state.agent!.id,
+                                        },
                                       ),
-                                      child: CircleAvatar(
+                                      child: PersonAvatar(
+                                        photoUrl: state.agent!.primaryPhotoUrl,
                                         radius: 26,
-                                        backgroundColor: AppColors.brandNavy
-                                            .withValues(alpha: 0.08),
-                                        backgroundImage: state.agent!.primaryPhotoUrl.isNotEmpty
-                                            ? NetworkImage(state.agent!.primaryPhotoUrl)
-                                            : null,
-                                        child: state.agent!.primaryPhotoUrl.isEmpty
-                                            ? const Icon(
-                                                Icons.person,
-                                                color: AppColors.brandNavy,
-                                                size: 28,
-                                              )
-                                            : null,
+                                        iconSize: 28,
                                       ),
                                     ),
                                     horizontalSpace(12),
@@ -665,17 +683,20 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                         onPressed: () => context.pop(),
                       ),
                     ),
-                    CircleAvatar(
-                      backgroundColor: Colors.white,
-                      radius: 20,
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.favorite_border,
-                          color: AppColors.brandNavy,
-                          size: 20,
-                        ),
-                        onPressed: () {},
-                      ),
+                    EstateFavoriteButton(
+                      isFavorite: state.isFavorite,
+                      isLoading:
+                          state.isFavoriteLoading ||
+                          state.favoriteActionStatus ==
+                              FavoriteActionStatus.loading,
+                      onPressed: () {
+                        final cubit = context.read<EstateDetailsCubit>();
+                        if (!cubit.isAuthenticated) {
+                          context.push(AppRoutes.login);
+                          return;
+                        }
+                        cubit.toggleFavorite(estate.id);
+                      },
                     ),
                   ],
                 ),

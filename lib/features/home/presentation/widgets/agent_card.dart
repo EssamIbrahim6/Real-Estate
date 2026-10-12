@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/helpers/spacing.dart';
+import '../../../../core/widgets/person_avatar.dart';
 import '../../../agent/domain/entities/agent_entity.dart';
-import '../../../agent/presentation/widgets/agent_avatar.dart';
 
 class AgentCard extends StatelessWidget {
   final AgentEntity agent;
@@ -28,7 +28,7 @@ class AgentCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: .min,
           children: [
-            AgentAvatar(
+            PersonAvatar(
               photoUrl: agent.primaryPhotoUrl,
               radius: 26,
               iconSize: 28,

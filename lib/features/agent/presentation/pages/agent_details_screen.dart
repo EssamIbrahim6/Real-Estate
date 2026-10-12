@@ -5,10 +5,10 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/helpers/spacing.dart';
 import '../../../../core/router/route_names.dart';
+import '../../../../core/widgets/person_avatar.dart';
 import '../../../../core/widgets/app_loading_indicator.dart';
 import '../../../home/presentation/widgets/estate_card.dart';
 import '../../domain/entities/agent_entity.dart';
-import '../widgets/agent_avatar.dart';
 import '../cubit/agent_details_cubit.dart';
 import '../cubit/agent_details_state.dart';
 
@@ -173,7 +173,7 @@ class _AgentHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          AgentAvatar(
+          PersonAvatar(
             photoUrl: agent.primaryPhotoUrl,
             radius: 42,
             iconSize: 40,

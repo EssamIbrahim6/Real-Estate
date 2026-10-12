@@ -18,6 +18,8 @@ import 'package:real_estate_app/features/chat/presentation/pages/chat_screen.dar
 import 'package:real_estate_app/features/chat/presentation/pages/conversation_screen.dart';
 import 'package:real_estate_app/features/chat/presentation/cubit/chat_cubit.dart';
 import 'package:real_estate_app/features/profile/presentation/pages/profile_screen.dart';
+import 'package:real_estate_app/features/favorites/presentation/cubit/favorites_cubit.dart';
+import 'package:real_estate_app/features/favorites/presentation/pages/favorites_screen.dart';
 import 'package:real_estate_app/features/map/domain/models/map_screen_args.dart';
 import 'package:real_estate_app/features/map/presentation/cubit/map_cubit.dart';
 import 'package:real_estate_app/features/map/presentation/pages/estate_map_screen.dart';
@@ -190,6 +192,14 @@ class AppRouter {
             title: state.uri.queryParameters['title'] ?? 'Agent',
             currentUserUid: FirebaseAuth.instance.currentUser?.uid,
           ),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.favorites,
+        name: 'favorites',
+        builder: (context, state) => BlocProvider(
+          create: (_) => sl<FavoritesCubit>()..loadFavorites(),
+          child: const FavoritesScreen(),
         ),
       ),
       // Support

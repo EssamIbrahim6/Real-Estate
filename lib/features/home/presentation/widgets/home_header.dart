@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/helpers/spacing.dart';
+import '../../../../core/widgets/person_avatar.dart';
 
 class HomeHeader extends StatelessWidget {
   final String? locationName;
@@ -22,19 +23,11 @@ class HomeHeader extends StatelessWidget {
       children: [
         Row(
           children: [
-            CircleAvatar(
+            PersonAvatar(
+              photoUrl: user?.photoURL,
               radius: 22,
+              iconSize: 24,
               backgroundColor: AppColors.inputBackground,
-              backgroundImage: user?.photoURL != null
-                  ? NetworkImage(user!.photoURL!)
-                  : null,
-              child: user?.photoURL == null
-                  ? const Icon(
-                      Icons.person,
-                      color: AppColors.brandNavy,
-                      size: 24,
-                    )
-                  : null,
             ),
             horizontalSpace(12),
             Column(

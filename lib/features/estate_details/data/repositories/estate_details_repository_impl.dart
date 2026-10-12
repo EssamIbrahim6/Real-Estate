@@ -11,6 +11,34 @@ class EstateDetailsRepositoryImpl implements EstateDetailsRepository {
   const EstateDetailsRepositoryImpl(this._remoteDataSource);
 
   @override
+  Stream<List<String>> watchFavoriteEstateIds(String userId) =>
+      _remoteDataSource.watchFavoriteEstateIds(userId);
+
+  @override
+  ResultVoid addFavorite(String userId, String estateId) async {
+    try {
+      await _remoteDataSource.addFavorite(userId, estateId);
+      return (failure: null, isSuccess: true);
+    } on ServerException catch (e) {
+      return (failure: ServerFailure(message: e.message), isSuccess: false);
+    } catch (e) {
+      return (failure: ServerFailure(message: e.toString()), isSuccess: false);
+    }
+  }
+
+  @override
+  ResultVoid removeFavorite(String userId, String estateId) async {
+    try {
+      await _remoteDataSource.removeFavorite(userId, estateId);
+      return (failure: null, isSuccess: true);
+    } on ServerException catch (e) {
+      return (failure: ServerFailure(message: e.message), isSuccess: false);
+    } catch (e) {
+      return (failure: ServerFailure(message: e.toString()), isSuccess: false);
+    }
+  }
+
+  @override
   ResultFuture<List<ReviewEntity>> getReviews(
     String estateId, {
     int limit = 20,

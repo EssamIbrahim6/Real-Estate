@@ -1,10 +1,12 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../features/chat/domain/repositories/chat_repository.dart';
 import '../../../../features/agent/domain/repositories/agent_repository.dart';
 import '../../../../features/estate/domain/entities/estate_entity.dart';
 import '../../../../features/estate/domain/repositories/estate_repository.dart';
-import '../../../../features/chat/domain/repositories/chat_repository.dart';
 import '../../domain/entities/review_entity.dart';
 import '../../domain/repositories/estate_details_repository.dart';
 import 'estate_details_state.dart';
@@ -15,6 +17,7 @@ class EstateDetailsCubit extends Cubit<EstateDetailsState> {
   final EstateDetailsRepository _estateDetailsRepository;
   final FirebaseAuth _firebaseAuth;
   final ChatRepository _chatRepository;
+  StreamSubscription<List<String>>? _favoriteSubscription;
 
   EstateDetailsCubit({
     required EstateRepository estateRepository,
@@ -27,6 +30,125 @@ class EstateDetailsCubit extends Cubit<EstateDetailsState> {
        _estateDetailsRepository = estateDetailsRepository,
        _firebaseAuth = firebaseAuth,
        super(const EstateDetailsState());
+
+  bool get isAuthenticated => _firebaseAuth.currentUser != null;
+
+  Future<void> toggleFavorite(String estateId) async {
+    if (state.favoriteActionStatus == FavoriteActionStatus.loading) return;
+
+    final userId = _firebaseAuth.currentUser?.uid.trim();
+    final normalizedEstateId = estateId.trim();
+    if (userId == null || userId.isEmpty) {
+      emit(
+        state.copyWith(
+          favoriteActionStatus: FavoriteActionStatus.error,
+          favoriteError: 'Sign in to save properties to your favorites.',
+        ),
+      );
+      return;
+    }
+    if (normalizedEstateId.isEmpty) {
+      emit(
+        state.copyWith(
+          favoriteActionStatus: FavoriteActionStatus.error,
+          favoriteError: 'This property could not be saved.',
+        ),
+      );
+      return;
+    }
+
+    final shouldAdd = !state.isFavorite;
+    emit(
+      state.copyWith(
+        favoriteActionStatus: FavoriteActionStatus.loading,
+        favoriteError: null,
+      ),
+    );
+
+    final result = shouldAdd
+        ? await _estateDetailsRepository.addFavorite(userId, normalizedEstateId)
+        : await _estateDetailsRepository.removeFavorite(
+            userId,
+            normalizedEstateId,
+          );
+    if (result.failure != null || !result.isSuccess) {
+      emit(
+        state.copyWith(
+          favoriteActionStatus: FavoriteActionStatus.error,
+          favoriteError:
+              result.failure?.message ?? 'Could not update this favorite.',
+        ),
+      );
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        isFavorite: shouldAdd,
+        favoriteActionStatus: FavoriteActionStatus.success,
+        favoriteError: null,
+      ),
+    );
+  }
+
+  void _watchFavoriteStatus(String estateId) {
+    _favoriteSubscription?.cancel();
+    final userId = _firebaseAuth.currentUser?.uid.trim();
+    if (userId == null || userId.isEmpty) {
+      emit(
+        state.copyWith(
+          isFavorite: false,
+          isFavoriteLoading: false,
+          favoriteError: null,
+          favoriteActionStatus: FavoriteActionStatus.initial,
+        ),
+      );
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        isFavorite: false,
+        isFavoriteLoading: true,
+        favoriteError: null,
+        favoriteActionStatus: FavoriteActionStatus.initial,
+      ),
+    );
+    try {
+      _favoriteSubscription = _estateDetailsRepository
+          .watchFavoriteEstateIds(userId)
+          .listen(
+            (estateIds) => emit(
+              state.copyWith(
+                isFavorite: estateIds.contains(estateId),
+                isFavoriteLoading: false,
+                favoriteError: null,
+              ),
+            ),
+            onError: (Object error) {
+              emit(
+                state.copyWith(
+                  isFavoriteLoading: false,
+                  favoriteError: 'Favorites could not be loaded.',
+                ),
+              );
+            },
+          );
+    } catch (_) {
+      emit(
+        state.copyWith(
+          isFavoriteLoading: false,
+          favoriteError: 'Favorites could not be loaded.',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<void> close() async {
+    await _favoriteSubscription?.cancel();
+    return super.close();
+  }
 
   Future<String?> startConversationWithAgent() async {
     if (state.contactAgentStatus == ContactAgentStatus.loading) return null;
@@ -144,6 +266,7 @@ class EstateDetailsCubit extends Cubit<EstateDetailsState> {
         ),
       );
 
+      _watchFavoriteStatus(initialEstate.id);
       // Parallel background loads for Agent and Reviews
       _loadAgent(initialEstate.agentId);
       loadReviews(estateId);
@@ -189,6 +312,7 @@ class EstateDetailsCubit extends Cubit<EstateDetailsState> {
       ),
     );
 
+    _watchFavoriteStatus(estate.id);
     // Parallel background loads for Agent and Reviews
     _loadAgent(estate.agentId);
     loadReviews(estateId);
