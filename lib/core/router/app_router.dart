@@ -16,6 +16,9 @@ import 'package:real_estate_app/features/chat/presentation/pages/chat_screen.dar
 import 'package:real_estate_app/features/chat/presentation/pages/conversation_screen.dart';
 import 'package:real_estate_app/features/chat/presentation/cubit/chat_cubit.dart';
 import 'package:real_estate_app/features/profile/presentation/pages/profile_screen.dart';
+import 'package:real_estate_app/features/map/domain/models/map_screen_args.dart';
+import 'package:real_estate_app/features/map/presentation/cubit/map_cubit.dart';
+import 'package:real_estate_app/features/map/presentation/pages/estate_map_screen.dart';
 
 import '../di/injection_container.dart';
 import '../navigation/main_navigation_shell.dart';
@@ -327,6 +330,19 @@ class AppRouter {
           return FullscreenGalleryScreen(
             images: request.images,
             initialIndex: request.initialIndex,
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.map,
+        name: 'map',
+        builder: (context, state) {
+          final args = state.extra is MapScreenArgs
+              ? state.extra as MapScreenArgs
+              : null;
+          return BlocProvider(
+            create: (_) => sl<MapCubit>(),
+            child: EstateMapScreen(args: args),
           );
         },
       ),

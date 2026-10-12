@@ -14,6 +14,7 @@ import '../cubit/search_cubit.dart';
 import '../cubit/search_state.dart';
 import '../../domain/entities/search_filter.dart';
 import '../widgets/search_filter_sheet.dart';
+import '../../../map/domain/models/map_screen_args.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -118,7 +119,26 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Search properties')),
+      appBar: AppBar(
+        title: const Text('Search properties'),
+        actions: [
+          BlocBuilder<SearchCubit, SearchState>(
+            builder: (context, state) => IconButton(
+              tooltip: 'View on map',
+              icon: const Icon(Icons.map_outlined),
+              onPressed: () {
+                context.push(
+                  AppRoutes.map,
+                  extra: MapScreenArgs(
+                    estates: state.estates,
+                    title: 'Search Map',
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Padding(

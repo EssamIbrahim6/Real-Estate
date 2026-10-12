@@ -18,6 +18,7 @@ import '../../../../core/widgets/app_loading_indicator.dart';
 import '../../../home/presentation/widgets/estate_card.dart';
 import '../cubit/listing_cubit.dart';
 import '../cubit/listing_state.dart';
+import '../../../map/domain/models/map_screen_args.dart';
 
 /// Category-specific listing screen.
 /// Receives a [ListingRequest] from the GoRouter via [request].
@@ -34,20 +35,34 @@ class CategoryEstatesScreen extends StatelessWidget {
         title: BlocBuilder<ListingCubit, ListingState>(
           builder: (context, state) => Text(state.title),
         ),
+        actions: [
+          BlocBuilder<ListingCubit, ListingState>(
+            builder: (context, state) => IconButton(
+              tooltip: 'View on map',
+              icon: const Icon(Icons.map_outlined),
+              onPressed: () {
+                context.push(
+                  AppRoutes.map,
+                  extra: MapScreenArgs(
+                    estates: state.estates,
+                    title: state.title,
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
       body: BlocBuilder<ListingCubit, ListingState>(
         builder: (context, state) {
           switch (state.status) {
             case ListingStatus.initial:
             case ListingStatus.loading:
-              return const AppLoadingIndicator(
-                message: 'Loading estates...',
-              );
+              return const AppLoadingIndicator(message: 'Loading estates...');
             case ListingStatus.error:
               return AppErrorView(
                 message: state.error ?? 'Failed to load estates.',
-                onRetry: () =>
-                    context.read<ListingCubit>().load(request),
+                onRetry: () => context.read<ListingCubit>().load(request),
               );
             case ListingStatus.success:
               if (state.estates.isEmpty) {

@@ -16,6 +16,7 @@ import '../widgets/estate_map_section.dart';
 import '../widgets/image_gallery.dart';
 import '../widgets/property_info_section.dart';
 import '../widgets/submit_review_bottom_sheet.dart';
+import '../../../map/domain/models/map_screen_args.dart';
 
 class EstateDetailsScreen extends StatefulWidget {
   final String estateId;
@@ -353,7 +354,18 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                             ),
                           ),
                           verticalSpace(10),
-                          EstateMapSection(location: estate.location),
+                          EstateMapSection(
+                            location: estate.location,
+                            onTap: () {
+                              context.push(
+                                AppRoutes.map,
+                                extra: MapScreenArgs(
+                                  targetEstate: estate,
+                                  title: estate.title,
+                                ),
+                              );
+                            },
+                          ),
                           verticalSpace(24),
 
                           // 7. Assigned Agent

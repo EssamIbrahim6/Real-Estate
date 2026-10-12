@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:real_estate_app/seed_agents.dart';
 
 import 'app.dart';
 import 'core/di/injection_container.dart' as di;
