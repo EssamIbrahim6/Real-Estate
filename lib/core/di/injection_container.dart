@@ -5,6 +5,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:real_estate_app/features/agent/data/datasources/agent_remote_data_source.dart';
 import 'package:real_estate_app/features/agent/data/repositories/agent_repository_impl.dart';
 import 'package:real_estate_app/features/agent/domain/repositories/agent_repository.dart';
+import 'package:real_estate_app/features/agent/presentation/cubit/agent_details_cubit.dart';
 import 'package:real_estate_app/features/estate/data/datasources/estate_remote_data_source.dart';
 import 'package:real_estate_app/features/estate/data/repositories/estate_repository_impl.dart';
 import 'package:real_estate_app/features/estate/domain/repositories/estate_repository.dart';
@@ -257,6 +258,13 @@ Future<void> initDependencies() async {
       estateDetailsRepository: sl(),
       firebaseAuth: sl(),
       chatRepository: sl(),
+    ),
+  );
+
+  sl.registerFactory(
+    () => AgentDetailsCubit(
+      agentRepository: sl(),
+      estateRepository: sl(),
     ),
   );
 }

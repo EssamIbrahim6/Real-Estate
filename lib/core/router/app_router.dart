@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:real_estate_app/features/agent/presentation/cubit/agent_details_cubit.dart';
+import 'package:real_estate_app/features/agent/presentation/pages/agent_details_screen.dart';
 import 'package:real_estate_app/features/estate_details/presentation/cubit/estate_details_cubit.dart';
 import 'package:real_estate_app/features/estate_details/presentation/pages/estate_details_screen.dart';
 import 'package:real_estate_app/features/home/presentation/cubit/home_cubit.dart';
@@ -234,6 +236,17 @@ class AppRouter {
         path: AppRoutes.accountSetupSuccess,
         name: 'account-setup-success',
         builder: (context, state) => const AccountSuccessScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.agentDetails,
+        name: AppRoutes.agentDetailsName,
+        builder: (context, state) {
+          final agentId = state.pathParameters['agentId'] ?? '';
+          return BlocProvider(
+            create: (_) => sl<AgentDetailsCubit>()..loadAgentDetails(agentId),
+            child: AgentDetailsScreen(agentId: agentId),
+          );
+        },
       ),
       GoRoute(
         path: '${AppRoutes.propertyDetails}/:estateId',

@@ -28,6 +28,11 @@ class EstateEntity extends Equatable {
   final String listingType;
   final String categoryId;
   final String agentId;
+  final String? ownerId;
+  final String? userId;
+  final String? createdBy;
+  final String? publisherId;
+  final String? agentUserId;
   final EstateLocationEntity location;
   final String coverImage;
   final List<String> images;
@@ -54,6 +59,11 @@ class EstateEntity extends Equatable {
     required this.listingType,
     required this.categoryId,
     required this.agentId,
+    this.ownerId,
+    this.userId,
+    this.createdBy,
+    this.publisherId,
+    this.agentUserId,
     required this.location,
     required this.coverImage,
     required this.images,
@@ -72,6 +82,15 @@ class EstateEntity extends Equatable {
     this.updatedAt,
   });
 
+  String? get primaryOwnerUid {
+    final values = [ownerId, userId, createdBy, publisherId, agentUserId];
+    for (final value in values) {
+      final trimmed = value?.trim();
+      if (trimmed != null && trimmed.isNotEmpty) return trimmed;
+    }
+    return null;
+  }
+
   @override
   List<Object?> get props => [
     id,
@@ -82,6 +101,11 @@ class EstateEntity extends Equatable {
     listingType,
     categoryId,
     agentId,
+    ownerId,
+    userId,
+    createdBy,
+    publisherId,
+    agentUserId,
     location,
     coverImage,
     images,

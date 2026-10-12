@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +7,8 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/helpers/spacing.dart';
 import '../../../../core/router/route_names.dart';
+import '../../../agent/domain/entities/agent_entity.dart';
+import '../../../estate/domain/entities/estate_entity.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_error_view.dart';
 import '../../../../core/widgets/app_loading_indicator.dart';
@@ -64,6 +67,34 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
         ),
       );
     }
+  }
+
+  bool _isOwner(EstateEntity estate, AgentEntity? agent) {
+    String? currentUserUid;
+    try {
+      currentUserUid = FirebaseAuth.instance.currentUser?.uid.trim();
+    } catch (_) {
+      return false;
+    }
+
+    if (currentUserUid == null || currentUserUid.isEmpty) return false;
+
+    final ownerIds = [
+      estate.ownerId,
+      estate.userId,
+      estate.createdBy,
+      estate.publisherId,
+      estate.agentUserId,
+    ].whereType<String>().map((value) => value.trim()).where((value) => value.isNotEmpty);
+
+    if (ownerIds.contains(currentUserUid)) return true;
+    final agentUid = agent?.userId.trim();
+    return agentUid != null &&
+        agentUid.isNotEmpty &&
+        agentUid == currentUserUid &&
+        estate.agentId.trim().isNotEmpty &&
+        (agent?.id.trim() == estate.agentId.trim() ||
+            estate.primaryOwnerUid == currentUserUid);
   }
 
   @override
@@ -129,6 +160,7 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
           }
 
           final estate = state.estate!;
+          final isOwnedByCurrentUser = _isOwner(estate, state.agent);
           final estateImages = ImageGallery.collectImages(
             estate.coverImage,
             estate.images,
@@ -370,6 +402,26 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
 
                           // 7. Assigned Agent
                           if (state.agent != null) ...[
+                            if (isOwnedByCurrentUser) ...[
+                              Container(
+                                margin: const EdgeInsets.only(bottom: 10),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.brandGreen.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: const Text(
+                                  'My Property',
+                                  style: TextStyle(
+                                    color: AppColors.brandGreen,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ],
                             const Text(
                               'Listing Agent',
                               style: TextStyle(
@@ -379,65 +431,85 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                               ),
                             ),
                             verticalSpace(10),
-                            Container(
-                              padding: const EdgeInsets.all(14),
-                              decoration: BoxDecoration(
-                                color: AppColors.surface,
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: AppColors.inputBorder,
-                                ),
+                            InkWell(
+                              borderRadius: BorderRadius.circular(16),
+                              onTap: () => context.pushNamed(
+                                AppRoutes.agentDetailsName,
+                                pathParameters: {'agentId': state.agent!.id},
                               ),
-                              child: Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 26,
-                                    backgroundColor: AppColors.brandNavy
-                                        .withValues(alpha: 0.08),
-                                    child: const Icon(
-                                      Icons.person,
-                                      color: AppColors.brandNavy,
-                                      size: 28,
-                                    ),
+                              child: Container(
+                                padding: const EdgeInsets.all(14),
+                                decoration: BoxDecoration(
+                                  color: AppColors.surface,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: AppColors.inputBorder,
                                   ),
-                                  horizontalSpace(12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Text(
-                                              state.agent!.agencyName,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w700,
+                                ),
+                                child: Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () => context.pushNamed(
+                                        AppRoutes.agentDetailsName,
+                                        pathParameters: {'agentId': state.agent!.id},
+                                      ),
+                                      child: CircleAvatar(
+                                        radius: 26,
+                                        backgroundColor: AppColors.brandNavy
+                                            .withValues(alpha: 0.08),
+                                        backgroundImage: state.agent!.primaryPhotoUrl.isNotEmpty
+                                            ? NetworkImage(state.agent!.primaryPhotoUrl)
+                                            : null,
+                                        child: state.agent!.primaryPhotoUrl.isEmpty
+                                            ? const Icon(
+                                                Icons.person,
                                                 color: AppColors.brandNavy,
-                                              ),
-                                            ),
-                                            if (state.agent!.isVerified) ...[
-                                              horizontalSpace(4),
-                                              const Icon(
-                                                Icons.verified,
-                                                size: 15,
-                                                color: AppColors.brandGreen,
-                                              ),
-                                            ],
-                                          ],
-                                        ),
-                                        verticalSpace(2),
-                                        Text(
-                                          '${state.agent!.yearsOfExperience} years exp • ★ ${state.agent!.rating.toStringAsFixed(1)}',
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: AppColors.textMuted,
-                                          ),
-                                        ),
-                                      ],
+                                                size: 28,
+                                              )
+                                            : null,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                    horizontalSpace(12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  state.agent!.displayName,
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: AppColors.brandNavy,
+                                                  ),
+                                                ),
+                                              ),
+                                              if (state.agent!.isVerified) ...[
+                                                horizontalSpace(4),
+                                                const Icon(
+                                                  Icons.verified,
+                                                  size: 15,
+                                                  color: AppColors.brandGreen,
+                                                ),
+                                              ],
+                                            ],
+                                          ),
+                                          verticalSpace(2),
+                                          Text(
+                                            '${state.agent!.yearsOfExperience} years exp • ★ ${state.agent!.rating.toStringAsFixed(1)}',
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: AppColors.textMuted,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                             verticalSpace(24),
@@ -654,15 +726,24 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                         ),
                         horizontalSpace(12),
                       ],
-                      Expanded(
-                        child: AppButton(
-                          text: 'Contact Agent',
-                          isLoading:
-                              state.contactAgentStatus ==
-                              ContactAgentStatus.loading,
-                          onPressed: _contactAgent,
+                      if (!isOwnedByCurrentUser)
+                        Expanded(
+                          child: AppButton(
+                            text: 'Contact Agent',
+                            isLoading:
+                                state.contactAgentStatus ==
+                                ContactAgentStatus.loading,
+                            onPressed: _contactAgent,
+                          ),
+                        )
+                      else
+                        Expanded(
+                          child: AppButton(
+                            text: 'Your Property',
+                            type: AppButtonType.outlined,
+                            onPressed: null,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),

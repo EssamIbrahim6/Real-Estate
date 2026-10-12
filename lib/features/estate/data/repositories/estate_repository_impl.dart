@@ -66,4 +66,16 @@ class EstateRepositoryImpl implements EstateRepository {
       return (failure: ServerFailure(message: e.toString()), data: null);
     }
   }
+
+  @override
+  ResultFuture<List<EstateEntity>> getEstatesByAgentId(String agentId) async {
+    try {
+      final estates = await _remoteDataSource.getEstatesByAgentId(agentId);
+      return (failure: null, data: estates);
+    } on ServerException catch (e) {
+      return (failure: ServerFailure(message: e.message), data: null);
+    } catch (e) {
+      return (failure: ServerFailure(message: e.toString()), data: null);
+    }
+  }
 }

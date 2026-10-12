@@ -18,6 +18,7 @@ abstract class EstateRemoteDataSource {
     String? listingType,
     bool? isAvailable,
   });
+  Future<List<EstateModel>> getEstatesByAgentId(String agentId);
 }
 
 class EstateRemoteDataSourceImpl implements EstateRemoteDataSource {
@@ -58,6 +59,29 @@ class EstateRemoteDataSourceImpl implements EstateRemoteDataSource {
     } on FirebaseException catch (e) {
       throw ServerException(
         message: e.message ?? 'Failed to load featured estates',
+      );
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<List<EstateModel>> getEstatesByAgentId(String agentId) async {
+    final trimmedAgentId = agentId.trim();
+    if (trimmedAgentId.isEmpty) return const [];
+
+    try {
+      final snapshot = await _firestore
+          .collection('estates')
+          .where('agentId', isEqualTo: trimmedAgentId)
+          .get();
+
+      return snapshot.docs
+          .map((doc) => EstateModel.fromFirestore(doc))
+          .toList();
+    } on FirebaseException catch (e) {
+      throw ServerException(
+        message: e.message ?? 'Failed to load agent estates',
       );
     } catch (e) {
       throw ServerException(message: e.toString());

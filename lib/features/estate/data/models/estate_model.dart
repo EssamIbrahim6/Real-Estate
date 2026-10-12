@@ -48,6 +48,11 @@ class EstateModel extends EstateEntity {
     required super.listingType,
     required super.categoryId,
     required super.agentId,
+    super.ownerId,
+    super.userId,
+    super.createdBy,
+    super.publisherId,
+    super.agentUserId,
     required super.location,
     required super.coverImage,
     required super.images,
@@ -81,6 +86,23 @@ class EstateModel extends EstateEntity {
       listingType: map['listingType'] as String? ?? 'sale',
       categoryId: map['categoryId'] as String? ?? '',
       agentId: map['agentId'] as String? ?? '',
+      ownerId: map['ownerId'] as String? ??
+          map['createdBy'] as String? ??
+          map['publisherId'] as String? ??
+          map['userId'] as String?,
+      userId: map['userId'] as String? ??
+          map['ownerId'] as String? ??
+          map['createdBy'] as String? ??
+          map['publisherId'] as String?,
+      createdBy: map['createdBy'] as String? ??
+          map['ownerId'] as String? ??
+          map['publisherId'] as String? ??
+          map['userId'] as String?,
+      publisherId: map['publisherId'] as String? ??
+          map['ownerId'] as String? ??
+          map['createdBy'] as String? ??
+          map['userId'] as String?,
+      agentUserId: map['agentUserId'] as String? ?? map['agentUid'] as String?,
       location: EstateLocationModel.fromMap(
         map['location'] as Map<String, dynamic>?,
       ),
@@ -118,6 +140,11 @@ class EstateModel extends EstateEntity {
     'listingType': listingType,
     'categoryId': categoryId,
     'agentId': agentId,
+    if (ownerId != null) 'ownerId': ownerId,
+    if (userId != null) 'userId': userId,
+    if (createdBy != null) 'createdBy': createdBy,
+    if (publisherId != null) 'publisherId': publisherId,
+    if (agentUserId != null) 'agentUserId': agentUserId,
     'location': (location is EstateLocationModel)
         ? (location as EstateLocationModel).toMap()
         : {
