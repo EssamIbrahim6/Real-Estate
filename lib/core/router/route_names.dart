@@ -1,0 +1,33 @@
+abstract class AppRoutes {
+  static const String root = '/';
+  static const String splash = '/splash';
+  static const String onBoarding = '/onboarding';
+  static const String welcome = '/welcome';
+  static const String login = '/login';
+  static const String register = '/register';
+  static const String forgotPassword = '/forgot-password';
+  static const String otpVerification = '/otp-verification';
+  static const String faqSupport = '/faq-support';
+  static const String home = '/home';
+  static const String explore = '/explore';
+  static const String search = '/search';
+  static const String favorites = '/favorites';
+  static const String chat = '/chat';
+  static const String chatConversation = '/chat/conversation/:conversationId';
+  static const String chatConversationName = 'chat-conversation';
+  static const String profile = '/profile';
+  static const String propertyDetails = '/property-details';
+  static const String categoryListings = '/categories/:categoryId';
+  static const String listings = '/listings/:type';
+  static const String fullscreenGallery = '/fullscreen-gallery';
+  static const String categoryListingsName = 'category-listings';
+  static const String listingsName = 'listings';
+  static const String fullscreenGalleryName = 'fullscreen-gallery';
+  static const String addProperty = '/add-property';
+  static const String map = '/map';
+  static const String accountSetupLocation = '/account-setup/location';
+  static const String accountSetupPreferences = '/account-setup/preferences';
+  static const String accountSetupPayment = '/account-setup/payment';
+  static const String accountSetupPersonalInfo = '/account-setup/personal-info';
+  static const String accountSetupSuccess = '/account-setup/success';
+}

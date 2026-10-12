@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "300274975557",
+    "project_id": "realestate-167e5",
+    "storage_bucket": "realestate-167e5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:300274975557:android:f05e946ff0020f6cb7342c",
+        "android_client_info": {
+          "package_name": "com.example.real_estate_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZ1nRxqD65rNIzwc0RIUY1lbXrGMC4MFw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
