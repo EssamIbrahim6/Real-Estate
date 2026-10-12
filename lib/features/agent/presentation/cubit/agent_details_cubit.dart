@@ -30,6 +30,8 @@ class AgentDetailsCubit extends Cubit<AgentDetailsState> {
     emit(
       state.copyWith(
         status: AgentDetailsStatus.loading,
+        estates: const [],
+        isEstatesLoading: false,
         error: null,
         estatesError: null,
       ),
@@ -50,20 +52,22 @@ class AgentDetailsCubit extends Cubit<AgentDetailsState> {
       state.copyWith(
         status: AgentDetailsStatus.success,
         agent: agentResult.data,
+        estates: const [],
+        isEstatesLoading: true,
       ),
     );
-    await _loadAgentEstates(normalizedId);
-  }
 
-  Future<void> _loadAgentEstates(String agentId) async {
-    emit(state.copyWith(isEstatesLoading: true, estatesError: null));
-
-    final estatesResult = await _estateRepository.getEstatesByAgentId(agentId);
-    if (estatesResult.failure != null) {
+    final estatesResult = await _estateRepository.getEstatesByAgentId(
+      normalizedId,
+    );
+    if (estatesResult.failure != null || estatesResult.data == null) {
       emit(
         state.copyWith(
           isEstatesLoading: false,
-          estatesError: estatesResult.failure!.message,
+          estates: const [],
+          estatesError:
+              estatesResult.failure?.message ??
+              'Published properties could not be loaded.',
         ),
       );
       return;
@@ -73,6 +77,7 @@ class AgentDetailsCubit extends Cubit<AgentDetailsState> {
       state.copyWith(
         isEstatesLoading: false,
         estates: estatesResult.data ?? const [],
+        estatesError: null,
       ),
     );
   }

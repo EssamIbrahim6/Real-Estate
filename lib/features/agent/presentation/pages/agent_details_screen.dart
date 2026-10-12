@@ -8,6 +8,7 @@ import '../../../../core/router/route_names.dart';
 import '../../../../core/widgets/app_loading_indicator.dart';
 import '../../../home/presentation/widgets/estate_card.dart';
 import '../../domain/entities/agent_entity.dart';
+import '../widgets/agent_avatar.dart';
 import '../cubit/agent_details_cubit.dart';
 import '../cubit/agent_details_state.dart';
 
@@ -56,6 +57,11 @@ class AgentDetailsScreen extends StatelessWidget {
           }
 
           final agent = state.agent!;
+          final publishedEstatesCount = state.isEstatesLoading
+              ? 'Loading...'
+              : state.estatesError != null
+              ? 'Unavailable'
+              : state.estates.length.toString();
           return SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
             child: Column(
@@ -63,7 +69,10 @@ class AgentDetailsScreen extends StatelessWidget {
               children: [
                 _AgentHeader(agent: agent),
                 verticalSpace(20),
-                _InfoCard(agent: agent),
+                _InfoCard(
+                  agent: agent,
+                  publishedEstatesCount: publishedEstatesCount,
+                ),
                 verticalSpace(24),
                 const Text(
                   "Agent's Properties",
@@ -76,6 +85,31 @@ class AgentDetailsScreen extends StatelessWidget {
                 verticalSpace(12),
                 if (state.isEstatesLoading)
                   const Center(child: AppLoadingIndicator())
+                else if (state.estatesError != null)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.inputBorder),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Properties could not be loaded.',
+                          style: TextStyle(color: AppColors.textSecondary),
+                        ),
+                        TextButton(
+                          onPressed: () => context
+                              .read<AgentDetailsCubit>()
+                              .loadAgentDetails(agentId),
+                          child: const Text('Try again'),
+                        ),
+                      ],
+                    ),
+                  )
                 else if (state.estates.isEmpty)
                   Container(
                     width: double.infinity,
@@ -96,7 +130,7 @@ class AgentDetailsScreen extends StatelessWidget {
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
                       itemCount: state.estates.length,
-                      separatorBuilder: (_, __) => horizontalSpace(12),
+                      separatorBuilder: (_, _) => horizontalSpace(12),
                       itemBuilder: (context, index) {
                         final estate = state.estates[index];
                         return SizedBox(
@@ -130,8 +164,6 @@ class _AgentHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final photoUrl = agent.primaryPhotoUrl;
-
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -141,13 +173,10 @@ class _AgentHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          CircleAvatar(
+          AgentAvatar(
+            photoUrl: agent.primaryPhotoUrl,
             radius: 42,
-            backgroundColor: AppColors.brandNavy.withValues(alpha: 0.08),
-            backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
-            child: photoUrl.isEmpty
-                ? const Icon(Icons.person, size: 40, color: AppColors.brandNavy)
-                : null,
+            iconSize: 40,
           ),
           horizontalSpace(16),
           Expanded(
@@ -179,10 +208,14 @@ class _AgentHeader extends StatelessWidget {
                 verticalSpace(6),
                 Row(
                   children: [
-                    const Icon(Icons.star_rounded, size: 18, color: Colors.amber),
+                    const Icon(
+                      Icons.star_rounded,
+                      size: 18,
+                      color: Colors.amber,
+                    ),
                     horizontalSpace(4),
                     Text(
-                      '${agent.rating.toStringAsFixed(1)}',
+                      agent.rating.toStringAsFixed(1),
                       style: const TextStyle(
                         fontWeight: FontWeight.w700,
                         color: AppColors.textSecondary,
@@ -209,8 +242,9 @@ class _AgentHeader extends StatelessWidget {
 
 class _InfoCard extends StatelessWidget {
   final AgentEntity agent;
+  final String publishedEstatesCount;
 
-  const _InfoCard({required this.agent});
+  const _InfoCard({required this.agent, required this.publishedEstatesCount});
 
   @override
   Widget build(BuildContext context) {
@@ -224,7 +258,7 @@ class _InfoCard extends StatelessWidget {
       _InfoRowData(
         Icons.home_work_outlined,
         'Published estates',
-        agent.estatesCount > 0 ? '${agent.estatesCount}' : '0',
+        publishedEstatesCount,
       ),
     ];
 
@@ -263,6 +297,9 @@ class _InfoCard extends StatelessWidget {
                       verticalSpace(4),
                       Text(
                         item.value,
+                        key: item.label == 'Published estates'
+                            ? const Key('published-estates-count')
+                            : null,
                         style: const TextStyle(
                           fontSize: 14,
                           color: AppColors.brandNavy,

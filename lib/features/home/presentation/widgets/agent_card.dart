@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/helpers/spacing.dart';
 import '../../../agent/domain/entities/agent_entity.dart';
+import '../../../agent/presentation/widgets/agent_avatar.dart';
 
 class AgentCard extends StatelessWidget {
   final AgentEntity agent;
@@ -27,14 +28,10 @@ class AgentCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: .min,
           children: [
-            CircleAvatar(
+            AgentAvatar(
+              photoUrl: agent.primaryPhotoUrl,
               radius: 26,
-              backgroundColor: AppColors.brandNavy.withValues(alpha: 0.08),
-              child: const Icon(
-                Icons.person,
-                color: AppColors.brandNavy,
-                size: 28,
-              ),
+              iconSize: 28,
             ),
             verticalSpace(8),
             Row(
@@ -42,7 +39,7 @@ class AgentCard extends StatelessWidget {
               children: [
                 Flexible(
                   child: Text(
-                    agent.agencyName,
+                    agent.displayName,
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,

@@ -22,7 +22,7 @@ class AgentRemoteDataSourceImpl implements AgentRemoteDataSource {
       if (!doc.exists) {
         throw const ServerException(message: 'Agent details not found');
       }
-      return AgentModel.fromFirestore(doc);
+      return await _getAgentWithUserProfile(doc);
     } on FirebaseException catch (e) {
       throw ServerException(message: e.message ?? 'Failed to load agent');
     } catch (e) {
@@ -35,9 +35,9 @@ class AgentRemoteDataSourceImpl implements AgentRemoteDataSource {
     try {
       final snapshot = await _firestore.collection('agents').limit(limit).get();
 
-      final agents = snapshot.docs
-          .map((doc) => AgentModel.fromFirestore(doc))
-          .toList();
+      final agents = await Future.wait(
+        snapshot.docs.map(_getAgentWithUserProfile),
+      );
 
       // Order in memory by rating descending and verified status
       agents.sort((a, b) {
@@ -52,5 +52,22 @@ class AgentRemoteDataSourceImpl implements AgentRemoteDataSource {
     } catch (e) {
       throw ServerException(message: e.toString());
     }
+  }
+
+  Future<AgentModel> _getAgentWithUserProfile(
+    DocumentSnapshot<Map<String, dynamic>> agentDoc,
+  ) async {
+    final agent = AgentModel.fromFirestore(agentDoc);
+    if (agent.name.trim().isNotEmpty && agent.primaryPhotoUrl.isNotEmpty) {
+      return agent;
+    }
+
+    final userId = agent.userId.trim();
+    if (userId.isEmpty) return agent;
+
+    final userDoc = await _firestore.collection('users').doc(userId).get();
+    if (!userDoc.exists) return agent;
+
+    return AgentModel.fromFirestore(agentDoc, userProfile: userDoc.data());
   }
 }

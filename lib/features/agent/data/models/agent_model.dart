@@ -21,28 +21,49 @@ class AgentModel extends AgentEntity {
     super.updatedAt,
   });
 
-  factory AgentModel.fromFirestore(DocumentSnapshot doc) {
+  factory AgentModel.fromFirestore(
+    DocumentSnapshot doc, {
+    Map<String, dynamic>? userProfile,
+  }) {
     final data = doc.data() as Map<String, dynamic>? ?? {};
-    return AgentModel.fromMap(data, doc.id);
+    return AgentModel.fromMap(data, doc.id, userProfile: userProfile);
   }
 
-  factory AgentModel.fromMap(Map<String, dynamic> map, String id) {
-    final rawName = (map['name'] as String?) ??
-        (map['fullName'] as String?) ??
-        (map['agencyName'] as String?) ??
-        'Real Estate Agent';
-    final rawAgencyName = (map['agencyName'] as String?) ?? rawName;
-    final rawPhoto = (map['photoUrl'] as String?) ??
-        (map['photo'] as String?) ??
-        (map['profileImageUrl'] as String?) ??
+  factory AgentModel.fromMap(
+    Map<String, dynamic> map,
+    String id, {
+    Map<String, dynamic>? userProfile,
+  }) {
+    final rawName =
+        _firstNonEmptyString(map, ['name', 'displayName', 'fullName']) ??
+        _firstNonEmptyString(userProfile ?? const {}, [
+          'name',
+          'displayName',
+          'fullName',
+        ]) ??
         '';
-    final rawBio = (map['bio'] as String?) ??
-        (map['description'] as String?) ??
+    final rawAgencyName = _firstNonEmptyString(map, ['agencyName']) ?? '';
+    final rawPhoto =
+        _firstNonEmptyString(map, [
+          'photoUrl',
+          'profileImageUrl',
+          'primaryPhotoUrl',
+          'photo',
+        ]) ??
+        _firstNonEmptyString(userProfile ?? const {}, [
+          'photoUrl',
+          'profileImageUrl',
+          'primaryPhotoUrl',
+          'photo',
+        ]) ??
         '';
+    final rawBio =
+        (map['bio'] as String?) ?? (map['description'] as String?) ?? '';
 
     return AgentModel(
       id: id,
-      userId: (map['userId'] as String?) ??
+      userId:
+          (map['userId'] as String?) ??
           (map['firebaseUserId'] as String?) ??
           '',
       agencyName: rawAgencyName,
@@ -54,7 +75,8 @@ class AgentModel extends AgentEntity {
       yearsOfExperience: (map['yearsOfExperience'] as num?)?.toInt() ?? 0,
       rating: (map['rating'] as num?)?.toDouble() ?? 0.0,
       reviewCount: (map['reviewCount'] as num?)?.toInt() ?? 0,
-      estatesCount: (map['estatesCount'] as num?)?.toInt() ??
+      estatesCount:
+          (map['estatesCount'] as num?)?.toInt() ??
           (map['publishedEstatesCount'] as num?)?.toInt() ??
           0,
       isVerified: map['isVerified'] as bool? ?? false,
@@ -83,6 +105,17 @@ class AgentModel extends AgentEntity {
   static DateTime? _parseDateTime(dynamic value) {
     if (value is Timestamp) return value.toDate();
     if (value is String) return DateTime.tryParse(value);
+    return null;
+  }
+
+  static String? _firstNonEmptyString(
+    Map<String, dynamic> map,
+    List<String> keys,
+  ) {
+    for (final key in keys) {
+      final value = map[key];
+      if (value is String && value.trim().isNotEmpty) return value;
+    }
     return null;
   }
 }

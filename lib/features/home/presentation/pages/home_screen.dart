@@ -166,7 +166,7 @@ class HomeScreen extends StatelessWidget {
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           itemCount: state.topLocations.length,
-                          separatorBuilder: (_, __) => horizontalSpace(12),
+                          separatorBuilder: (_, _) => horizontalSpace(12),
                           itemBuilder: (context, index) {
                             final location = state.topLocations[index];
                             return LocationCard(
@@ -216,13 +216,10 @@ class HomeScreen extends StatelessWidget {
                             final agent = state.topAgents[index];
                             return AgentCard(
                               agent: agent,
-                              onTap: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Agent: ${agent.agencyName}'),
-                                  ),
-                                );
-                              },
+                              onTap: () => context.pushNamed(
+                                AppRoutes.agentDetailsName,
+                                pathParameters: {'agentId': agent.id},
+                              ),
                             );
                           },
                         ),
