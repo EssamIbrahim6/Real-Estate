@@ -77,6 +77,11 @@ Future<void> initDependencies() async {
   // Google Sign In
   sl.registerLazySingleton<GoogleSignIn>(() => GoogleSignIn.instance);
 
+  // Connectivity
+  sl.registerLazySingleton<ConnectivityService>(
+    () => ConnectivityServiceImpl(),
+  );
+
   // ============================================================
   // CLOUDINARY
   // ============================================================
@@ -183,6 +188,9 @@ Future<void> initDependencies() async {
 
   // Support Cubit
   sl.registerFactory(() => SupportCubit());
+  sl.registerFactory(
+    () => ConnectivityCubit(service: sl<ConnectivityService>()),
+  );
   // ============================================================
   // ESTATE DATA SOURCE & REPOSITORY
   // ============================================================

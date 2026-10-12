@@ -25,8 +25,10 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    _currentUserUid =
-        widget.currentUserUid ?? FirebaseAuth.instance.currentUser?.uid;
+    final uid =
+        (widget.currentUserUid ?? FirebaseAuth.instance.currentUser?.uid)
+            ?.trim();
+    _currentUserUid = uid != null && uid.isNotEmpty ? uid : null;
     if (_currentUserUid != null) {
       context.read<ChatCubit>().watchConversations(_currentUserUid);
     }
@@ -48,11 +50,9 @@ class _ChatScreenState extends State<ChatScreen> {
                     return AppErrorView(
                       message:
                           'Could not load conversations. Please try again.',
-                      onRetry: _currentUserUid == null
-                          ? null
-                          : () => context
-                              .read<ChatCubit>()
-                              .watchConversations(_currentUserUid!),
+                      onRetry: () => context
+                          .read<ChatCubit>()
+                          .watchConversations(_currentUserUid),
                     );
                   case ChatLoadStatus.empty:
                     return const _EmptyConversations();

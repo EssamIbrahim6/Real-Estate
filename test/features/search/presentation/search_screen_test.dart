@@ -11,44 +11,54 @@ import 'package:real_estate_app/features/search/presentation/cubit/search_cubit.
 import 'package:real_estate_app/features/search/presentation/pages/search_screen.dart';
 
 void main() {
-  testWidgets('search waits for submit and accepts English and Arabic text', (
-    tester,
-  ) async {
-    final searchRepository = _FakeSearchRepository();
-    final cubit = SearchCubit(
-      searchRepository: searchRepository,
-      categoryRepository: _FakeCategoryRepository(),
-    );
-    addTearDown(cubit.close);
+  testWidgets(
+    'live search debounces input and accepts English and Arabic text',
+    (tester) async {
+      final searchRepository = _FakeSearchRepository();
+      final cubit = SearchCubit(
+        searchRepository: searchRepository,
+        categoryRepository: _FakeCategoryRepository(),
+      );
+      addTearDown(cubit.close);
 
-    await tester.pumpWidget(
-      BlocProvider.value(
-        value: cubit,
-        child: const MaterialApp(home: SearchScreen()),
-      ),
-    );
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: cubit,
+          child: const MaterialApp(home: SearchScreen()),
+        ),
+      );
+      await tester.pumpAndSettle();
 
-    expect(searchRepository.filters, hasLength(1));
-    final searchField = find.byType(TextField);
+      expect(searchRepository.filters, hasLength(1));
+      final searchField = find.byType(TextField);
 
-    await tester.enterText(searchField, 'cairo');
-    await tester.pump();
-    expect(searchRepository.filters, hasLength(1));
-    expect(find.text('Arabic or English?'), findsNothing);
+      await tester.enterText(searchField, 'cairo');
+      await tester.pump();
+      expect(searchRepository.filters, hasLength(1));
+      expect(find.text('Arabic or English?'), findsNothing);
 
-    await tester.testTextInput.receiveAction(TextInputAction.search);
-    await tester.pumpAndSettle();
-    expect(searchRepository.filters.last.query, 'cairo');
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await tester.pumpAndSettle();
+      expect(searchRepository.filters.last.query, 'cairo');
 
-    await tester.enterText(searchField, 'القاهرة');
-    await tester.pump();
-    expect(searchRepository.filters, hasLength(2));
+      await tester.enterText(searchField, 'القاهرة');
+      await tester.pump();
+      expect(searchRepository.filters, hasLength(2));
 
-    await tester.testTextInput.receiveAction(TextInputAction.search);
-    await tester.pumpAndSettle();
-    expect(searchRepository.filters.last.query, 'القاهرة');
-  });
+      await tester.pump(const Duration(milliseconds: 349));
+      expect(searchRepository.filters, hasLength(2));
+      await tester.pump(const Duration(milliseconds: 1));
+      expect(searchRepository.filters.last.query, 'القاهرة');
+
+      await tester.enterText(searchField, '');
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 349));
+      expect(searchRepository.filters, hasLength(3));
+      await tester.pump(const Duration(milliseconds: 1));
+      expect(searchRepository.filters, hasLength(4));
+      expect(searchRepository.filters.last.query, isNull);
+    },
+  );
 }
 
 class _FakeSearchRepository implements SearchRepository {

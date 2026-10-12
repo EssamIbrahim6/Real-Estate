@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../services/connectivity_service.dart';
@@ -24,26 +25,56 @@ class ConnectivityState extends Equatable {
 
 /// Listens to [ConnectivityService] and exposes online/offline state.
 ///
-/// Usage: Provide high in the widget tree (e.g., in [main.dart]) and read
+/// Usage: Provide high in the widget tree (e.g., in [app.dart]) and read
 /// with [BlocBuilder] or [BlocListener] to show a banner or disable actions.
 class ConnectivityCubit extends Cubit<ConnectivityState> {
-  final ConnectivityService _service;
+  final ConnectivityService service;
   StreamSubscription<bool>? _subscription;
+  int _statusGeneration = 0;
 
-  ConnectivityCubit({required ConnectivityService service})
-      : _service = service,
-        super(const ConnectivityState()) {
-    _init();
+  ConnectivityCubit({required this.service})
+    : super(const ConnectivityState()) {
+    unawaited(_init());
   }
 
   Future<void> _init() async {
-    // Run an immediate check so the initial state reflects reality.
-    final connected = await _service.checkConnectivity();
-    if (!isClosed) emit(ConnectivityState(isConnected: connected));
+    try {
+      final generation = _statusGeneration;
+      _subscription = service.onStatusChange.listen(
+        _onStatusChanged,
+        onError: (Object error, StackTrace stackTrace) {
+          _logConnectivityError('status stream', error, stackTrace);
+        },
+      );
 
-    _subscription = _service.onStatusChange.listen((online) {
-      if (!isClosed) emit(ConnectivityState(isConnected: online));
-    });
+      final connected = await service.checkConnectivity();
+      if (!isClosed && generation == _statusGeneration) {
+        _updateStatus(connected);
+      }
+    } catch (error, stackTrace) {
+      _logConnectivityError('initial check', error, stackTrace);
+    }
+  }
+
+  void _onStatusChanged(bool connected) {
+    if (isClosed) return;
+    ++_statusGeneration;
+    _updateStatus(connected);
+  }
+
+  void _updateStatus(bool connected) {
+    if (isClosed || state.isConnected == connected) return;
+    emit(ConnectivityState(isConnected: connected));
+  }
+
+  void _logConnectivityError(
+    String source,
+    Object error,
+    StackTrace stackTrace,
+  ) {
+    if (!kDebugMode) return;
+    debugPrint('Connectivity $source failed: $error');
+    debugPrint('Stack trace:\n$stackTrace');
   }
 
   @override
@@ -52,4 +83,3 @@ class ConnectivityCubit extends Cubit<ConnectivityState> {
     await super.close();
   }
 }
-

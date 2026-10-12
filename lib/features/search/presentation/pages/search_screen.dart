@@ -30,6 +30,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   /// How long to wait after the last keystroke before issuing a search.
   static const _debounceDuration = Duration(milliseconds: 350);
+  bool _suppressQuerySearch = false;
 
   @override
   void initState() {
@@ -54,11 +55,13 @@ class _SearchScreenState extends State<SearchScreen> {
   void _onQueryChanged() {
     // Rebuild to show/hide the clear button immediately.
     setState(() {});
+    if (_suppressQuerySearch) return;
     _debounceTimer?.cancel();
     _debounceTimer = Timer(_debounceDuration, _runSearch);
   }
 
   Future<void> _runSearch() async {
+    _debounceTimer?.cancel();
     if (!mounted) return;
     final current = context.read<SearchCubit>().state.filter;
     final rawQuery = _queryController.text.trim();
@@ -105,7 +108,9 @@ class _SearchScreenState extends State<SearchScreen> {
     if (!mounted || filter == null) return;
     // Cancel any pending debounce — the filter sheet already sets a full filter.
     _debounceTimer?.cancel();
+    _suppressQuerySearch = true;
     _queryController.text = filter.query ?? '';
+    _suppressQuerySearch = false;
     await context.read<SearchCubit>().search(filter);
   }
 
