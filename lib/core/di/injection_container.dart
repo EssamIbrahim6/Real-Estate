@@ -14,6 +14,8 @@ import 'package:real_estate_app/features/estate_details/data/repositories/estate
 import 'package:real_estate_app/features/estate_details/domain/repositories/estate_details_repository.dart';
 import 'package:real_estate_app/features/estate_details/presentation/cubit/estate_details_cubit.dart';
 import 'package:real_estate_app/features/favorites/presentation/cubit/favorites_cubit.dart';
+import 'package:real_estate_app/features/profile/presentation/cubit/profile_cubit.dart';
+import 'package:real_estate_app/features/profile/presentation/cubit/profile_edit_cubit.dart';
 import 'package:real_estate_app/features/category/data/datasources/category_remote_data_source.dart';
 import 'package:real_estate_app/features/category/data/repositories/category_repository_impl.dart';
 import 'package:real_estate_app/features/category/domain/repositories/category_repository.dart';
@@ -272,5 +274,12 @@ Future<void> initDependencies() async {
       estateDetailsRepository: sl(),
       estateRepository: sl(),
     ),
+  );
+
+  sl.registerFactory(
+    () => ProfileCubit(firebaseAuth: sl(), accountSetupRepository: sl()),
+  );
+  sl.registerFactory(
+    () => ProfileEditCubit(firebaseAuth: sl(), accountSetupRepository: sl()),
   );
 }

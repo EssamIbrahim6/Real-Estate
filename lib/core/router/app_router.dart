@@ -18,6 +18,10 @@ import 'package:real_estate_app/features/chat/presentation/pages/chat_screen.dar
 import 'package:real_estate_app/features/chat/presentation/pages/conversation_screen.dart';
 import 'package:real_estate_app/features/chat/presentation/cubit/chat_cubit.dart';
 import 'package:real_estate_app/features/profile/presentation/pages/profile_screen.dart';
+import 'package:real_estate_app/features/profile/presentation/pages/settings_screen.dart';
+import 'package:real_estate_app/features/profile/presentation/pages/edit_profile_screen.dart';
+import 'package:real_estate_app/features/profile/presentation/cubit/profile_cubit.dart';
+import 'package:real_estate_app/features/profile/presentation/cubit/profile_edit_cubit.dart';
 import 'package:real_estate_app/features/favorites/presentation/cubit/favorites_cubit.dart';
 import 'package:real_estate_app/features/favorites/presentation/pages/favorites_screen.dart';
 import 'package:real_estate_app/features/map/domain/models/map_screen_args.dart';
@@ -112,7 +116,9 @@ class AppRouter {
         name: 'forgot-password',
         builder: (context, state) => BlocProvider(
           create: (_) => sl<AuthCubit>(),
-          child: const ForgotPasswordScreen(),
+          child: ForgotPasswordScreen(
+            initialEmail: state.extra as String? ?? '',
+          ),
         ),
       ),
       GoRoute(
@@ -175,7 +181,31 @@ class AppRouter {
               GoRoute(
                 path: AppRoutes.profile,
                 name: 'profile',
-                builder: (context, state) => const ProfileScreen(),
+                builder: (context, state) => MultiBlocProvider(
+                  providers: [
+                    BlocProvider(create: (_) => sl<AuthCubit>()),
+                    BlocProvider(
+                      create: (_) => sl<ProfileCubit>()..loadProfile(),
+                    ),
+                  ],
+                  child: const ProfileScreen(),
+                ),
+              ),
+              GoRoute(
+                path: AppRoutes.settings,
+                name: 'settings',
+                builder: (context, state) => BlocProvider(
+                  create: (_) => sl<AuthCubit>(),
+                  child: SettingsScreen(email: state.extra as String? ?? ''),
+                ),
+              ),
+              GoRoute(
+                path: AppRoutes.editProfile,
+                name: 'edit-profile',
+                builder: (context, state) => BlocProvider(
+                  create: (_) => sl<ProfileEditCubit>()..loadProfile(),
+                  child: const EditProfileScreen(),
+                ),
               ),
             ],
           ),

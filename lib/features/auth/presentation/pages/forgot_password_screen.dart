@@ -12,7 +12,9 @@ import '../widgets/auth_header.dart';
 import '../widgets/auth_text_field.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
-  const ForgotPasswordScreen({super.key});
+  final String initialEmail;
+
+  const ForgotPasswordScreen({super.key, this.initialEmail = ''});
 
   @override
   State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
@@ -22,6 +24,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   bool _emailSent = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.text = widget.initialEmail;
+  }
 
   @override
   void dispose() {
