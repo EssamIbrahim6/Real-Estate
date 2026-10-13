@@ -9,6 +9,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/router/route_names.dart';
 import '../../../../core/widgets/app_error_view.dart';
+import '../../../../core/widgets/app_feedback.dart';
 import '../../../../core/widgets/app_loading_indicator.dart';
 import '../../domain/models/map_screen_args.dart';
 import '../cubit/map_cubit.dart';
@@ -72,11 +73,9 @@ class _EstateMapScreenState extends State<EstateMapScreen> {
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Location services are disabled on this device.'),
-              duration: Duration(seconds: 2),
-            ),
+          AppFeedback.info(
+            context,
+            'Location services are disabled on this device.',
           );
         }
         cubit.setLocatingUser(false);
@@ -91,13 +90,9 @@ class _EstateMapScreenState extends State<EstateMapScreen> {
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Location permission is required to center on your position.',
-              ),
-              duration: Duration(seconds: 2),
-            ),
+          AppFeedback.info(
+            context,
+            'Location permission is required to center on your position.',
           );
         }
         cubit.setLocatingUser(false);
@@ -112,12 +107,7 @@ class _EstateMapScreenState extends State<EstateMapScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Could not determine location: $e'),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        AppFeedback.error(context, 'Could not determine location: $e');
       }
       cubit.setLocatingUser(false);
     }

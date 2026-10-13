@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/router/route_names.dart';
-import '../../../../core/widgets/app_loading_indicator.dart';
+import '../../../../core/widgets/app_skeleton.dart';
 import '../../../home/presentation/widgets/estate_card.dart';
 import '../cubit/favorites_cubit.dart';
 import '../cubit/favorites_state.dart';
@@ -15,10 +14,10 @@ class FavoritesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Favorites'),
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         actions: [
           IconButton(
             tooltip: 'Refresh favorites',
@@ -29,9 +28,10 @@ class FavoritesScreen extends StatelessWidget {
       ),
       body: BlocBuilder<FavoritesCubit, FavoritesState>(
         builder: (context, state) {
+          final colors = Theme.of(context).colorScheme;
           if (state.status == FavoritesStatus.loading ||
               state.status == FavoritesStatus.initial) {
-            return const Center(child: AppLoadingIndicator());
+            return const EstateListSkeleton();
           }
 
           if (state.status == FavoritesStatus.error) {
@@ -45,7 +45,7 @@ class FavoritesScreen extends StatelessWidget {
                     Text(
                       state.error ?? 'Favorites could not be loaded.',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(color: AppColors.textSecondary),
+                      style: TextStyle(color: colors.onSurfaceVariant),
                     ),
                     const SizedBox(height: 12),
                     if (!cubit.isAuthenticated)
@@ -73,7 +73,7 @@ class FavoritesScreen extends StatelessWidget {
                       ? 'Your saved properties are currently unavailable.'
                       : 'You have not saved any properties yet.',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: AppColors.textSecondary),
+                  style: TextStyle(color: colors.onSurfaceVariant),
                 ),
               ),
             );
@@ -82,11 +82,11 @@ class FavoritesScreen extends StatelessWidget {
           return Column(
             children: [
               if (state.unavailableCount > 0)
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(20, 8, 20, 12),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
                   child: Text(
                     'Some saved properties are no longer available.',
-                    style: TextStyle(color: AppColors.textSecondary),
+                    style: TextStyle(color: colors.onSurfaceVariant),
                   ),
                 ),
               Expanded(

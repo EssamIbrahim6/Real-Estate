@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/helpers/spacing.dart';
 import '../../../../core/router/route_names.dart';
 import '../../../../core/widgets/person_avatar.dart';
-import '../../../../core/widgets/app_loading_indicator.dart';
+import '../../../../core/widgets/app_skeleton.dart';
 import '../../../home/presentation/widgets/estate_card.dart';
 import '../../domain/entities/agent_entity.dart';
 import '../cubit/agent_details_cubit.dart';
@@ -19,28 +18,23 @@ class AgentDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.brandNavy),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
         ),
-        title: const Text(
-          'Agent Details',
-          style: TextStyle(
-            color: AppColors.brandNavy,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
+        title: const Text('Agent Details'),
       ),
       body: BlocBuilder<AgentDetailsCubit, AgentDetailsState>(
         builder: (context, state) {
           if (state.status == AgentDetailsStatus.loading) {
-            return const Center(child: AppLoadingIndicator());
+            return const AgentDetailsSkeleton();
           }
 
           if (state.status == AgentDetailsStatus.error || state.agent == null) {
@@ -50,7 +44,7 @@ class AgentDetailsScreen extends StatelessWidget {
                 child: Text(
                   state.error ?? 'Agent details could not be loaded.',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: AppColors.textSecondary),
+                  style: TextStyle(color: colors.onSurfaceVariant),
                 ),
               ),
             );
@@ -74,32 +68,41 @@ class AgentDetailsScreen extends StatelessWidget {
                   publishedEstatesCount: publishedEstatesCount,
                 ),
                 verticalSpace(24),
-                const Text(
+                Text(
                   "Agent's Properties",
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.brandNavy,
+                    color: colors.onSurface,
                   ),
                 ),
                 verticalSpace(12),
                 if (state.isEstatesLoading)
-                  const Center(child: AppLoadingIndicator())
+                  SizedBox(
+                    height: 260,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 3,
+                      separatorBuilder: (_, _) => horizontalSpace(12),
+                      itemBuilder: (context, index) =>
+                          const EstateCardSkeleton(),
+                    ),
+                  )
                 else if (state.estatesError != null)
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: AppColors.surface,
+                      color: colors.surface,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.inputBorder),
+                      border: Border.all(color: colors.outlineVariant),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Properties could not be loaded.',
-                          style: TextStyle(color: AppColors.textSecondary),
+                          style: TextStyle(color: colors.onSurfaceVariant),
                         ),
                         TextButton(
                           onPressed: () => context
@@ -115,13 +118,13 @@ class AgentDetailsScreen extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: AppColors.surface,
+                      color: colors.surface,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.inputBorder),
+                      border: Border.all(color: colors.outlineVariant),
                     ),
-                    child: const Text(
+                    child: Text(
                       'This agent has no published properties yet.',
-                      style: TextStyle(color: AppColors.textSecondary),
+                      style: TextStyle(color: colors.onSurfaceVariant),
                     ),
                   )
                 else
@@ -164,12 +167,13 @@ class _AgentHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.inputBorder),
+        border: Border.all(color: colors.outlineVariant),
       ),
       child: Row(
         children: [
@@ -188,44 +192,36 @@ class _AgentHeader extends StatelessWidget {
                     Flexible(
                       child: Text(
                         agent.displayName,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w800,
-                          color: AppColors.brandNavy,
+                          color: colors.onSurface,
                         ),
                       ),
                     ),
                     if (agent.isVerified) ...[
                       horizontalSpace(6),
-                      const Icon(
-                        Icons.verified,
-                        color: AppColors.brandGreen,
-                        size: 18,
-                      ),
+                      Icon(Icons.verified, color: colors.tertiary, size: 18),
                     ],
                   ],
                 ),
                 verticalSpace(6),
                 Row(
                   children: [
-                    const Icon(
-                      Icons.star_rounded,
-                      size: 18,
-                      color: Colors.amber,
-                    ),
+                    Icon(Icons.star_rounded, size: 18, color: Colors.amber),
                     horizontalSpace(4),
                     Text(
                       agent.rating.toStringAsFixed(1),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textSecondary,
+                        color: colors.onSurfaceVariant,
                       ),
                     ),
                     const Text(' • '),
                     Text(
                       '${agent.reviewCount} reviews',
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
+                      style: TextStyle(
+                        color: colors.onSurfaceVariant,
                         fontSize: 12,
                       ),
                     ),
@@ -248,6 +244,7 @@ class _InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     final items = <_InfoRowData>[
       if (agent.phone.trim().isNotEmpty)
         _InfoRowData(Icons.phone_outlined, 'Phone', agent.phone),
@@ -269,9 +266,9 @@ class _InfoCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.inputBorder),
+        border: Border.all(color: colors.outlineVariant),
       ),
       child: Column(
         children: items.map((item) {
@@ -280,7 +277,7 @@ class _InfoCard extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(item.icon, size: 18, color: AppColors.brandGreen),
+                Icon(item.icon, size: 18, color: colors.tertiary),
                 horizontalSpace(12),
                 Expanded(
                   child: Column(
@@ -288,9 +285,9 @@ class _InfoCard extends StatelessWidget {
                     children: [
                       Text(
                         item.label,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.textMuted,
+                          color: colors.onSurfaceVariant,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -300,9 +297,9 @@ class _InfoCard extends StatelessWidget {
                         key: item.label == 'Published estates'
                             ? const Key('published-estates-count')
                             : null,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
-                          color: AppColors.brandNavy,
+                          color: colors.onSurface,
                           height: 1.5,
                         ),
                       ),

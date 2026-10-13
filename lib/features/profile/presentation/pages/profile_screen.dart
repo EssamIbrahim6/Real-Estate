@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/route_names.dart';
+import '../../../../core/widgets/app_feedback.dart';
+import '../../../../core/widgets/app_skeleton.dart';
 import '../../../../core/widgets/person_avatar.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
@@ -21,8 +23,7 @@ class ProfileScreen extends StatelessWidget {
         if (state is Unauthenticated) {
           context.go(AppRoutes.welcome);
         } else if (state is AuthFailureState) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(state.message)));
+          AppFeedback.error(context, state.message);
         }
       },
       child: Scaffold(
@@ -43,7 +44,18 @@ class ProfileScreen extends StatelessWidget {
           builder: (context, state) {
             if (state.status == ProfileStatus.initial ||
                 state.status == ProfileStatus.loading) {
-              return const Center(child: CircularProgressIndicator());
+              return const SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(20, 16, 20, 32),
+                child: Column(
+                  children: [
+                    ProfileHeaderSkeleton(),
+                    SizedBox(height: 28),
+                    AppSkeleton(height: 174),
+                    SizedBox(height: 24),
+                    AppSkeleton(height: 118),
+                  ],
+                ),
+              );
             }
             if (state.status == ProfileStatus.signedOut) {
               return _SignedOutView(

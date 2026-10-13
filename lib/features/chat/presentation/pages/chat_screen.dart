@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/router/route_names.dart';
 import '../../../../core/widgets/app_error_view.dart';
-import '../../../../core/widgets/app_loading_indicator.dart';
+import '../../../../core/widgets/app_skeleton.dart';
 import '../cubit/chat_cubit.dart';
 import '../cubit/chat_state.dart';
 
@@ -45,7 +45,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 switch (state.conversationsStatus) {
                   case ChatLoadStatus.initial:
                   case ChatLoadStatus.loading:
-                    return const AppLoadingIndicator();
+                    return const ChatListSkeleton();
                   case ChatLoadStatus.failure:
                     return AppErrorView(
                       message:

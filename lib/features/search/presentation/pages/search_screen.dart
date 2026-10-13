@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/router/route_names.dart';
 import '../../../../core/widgets/app_error_view.dart';
-import '../../../../core/widgets/app_loading_indicator.dart';
+import '../../../../core/widgets/app_skeleton.dart';
+import '../../../estate/domain/entities/estate_entity.dart';
 import '../../../home/presentation/widgets/estate_card.dart';
 import '../cubit/search_cubit.dart';
 import '../cubit/search_state.dart';
@@ -87,7 +87,7 @@ class _SearchScreenState extends State<SearchScreen> {
     final filter = await showModalBottomSheet<SearchFilter>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppColors.surface,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       builder: (_) => SearchFilterSheet(
         initialFilter: SearchFilter(
           query: _queryController.text.trim().isEmpty
@@ -117,8 +117,9 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Search properties'),
         actions: [
@@ -189,7 +190,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           ],
                         ),
                         filled: true,
-                        fillColor: AppColors.inputBackground,
+                        fillColor: colors.surfaceContainerLow,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide.none,
@@ -213,8 +214,17 @@ class _SearchScreenState extends State<SearchScreen> {
                 switch (state.status) {
                   case SearchStatus.initial:
                   case SearchStatus.loading:
-                    return const AppLoadingIndicator(
-                      message: 'Searching properties...',
+                    if (state.estates.isEmpty) {
+                      return const EstateListSkeleton(itemCount: 4);
+                    }
+                    return Stack(
+                      children: [
+                        _SearchResults(estates: state.estates),
+                        const Align(
+                          alignment: Alignment.topCenter,
+                          child: LinearProgressIndicator(),
+                        ),
+                      ],
                     );
                   case SearchStatus.failure:
                     return AppErrorView(
@@ -224,22 +234,22 @@ class _SearchScreenState extends State<SearchScreen> {
                       onRetry: () => context.read<SearchCubit>().retry(),
                     );
                   case SearchStatus.empty:
-                    return const Center(
+                    return Center(
                       child: Padding(
-                        padding: EdgeInsets.all(AppDimensions.p20),
+                        padding: const EdgeInsets.all(AppDimensions.p20),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
                               Icons.search_off_rounded,
                               size: 48,
-                              color: AppColors.textMuted,
+                              color: colors.onSurfaceVariant,
                             ),
                             SizedBox(height: 12),
                             Text(
                               'No estates found',
                               style: TextStyle(
-                                color: AppColors.brandNavy,
+                                color: colors.onSurface,
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -248,29 +258,14 @@ class _SearchScreenState extends State<SearchScreen> {
                             Text(
                               'Try changing your search or filters.',
                               textAlign: TextAlign.center,
-                              style: TextStyle(color: AppColors.textSecondary),
+                              style: TextStyle(color: colors.onSurfaceVariant),
                             ),
                           ],
                         ),
                       ),
                     );
                   case SearchStatus.success:
-                    return ListView.separated(
-                      padding: const EdgeInsets.all(AppDimensions.p20),
-                      itemCount: state.estates.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 16),
-                      itemBuilder: (context, index) {
-                        final estate = state.estates[index];
-                        return EstateCard(
-                          estate: estate,
-                          width: double.infinity,
-                          onTap: () => context.push(
-                            '${AppRoutes.propertyDetails}/${estate.id}',
-                            extra: estate,
-                          ),
-                        );
-                      },
-                    );
+                    return _SearchResults(estates: state.estates);
                 }
               },
             ),
@@ -279,4 +274,28 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
     );
   }
+}
+
+class _SearchResults extends StatelessWidget {
+  final List<EstateEntity> estates;
+
+  const _SearchResults({required this.estates});
+
+  @override
+  Widget build(BuildContext context) => ListView.separated(
+    padding: const EdgeInsets.all(AppDimensions.p20),
+    itemCount: estates.length,
+    separatorBuilder: (_, _) => const SizedBox(height: 16),
+    itemBuilder: (context, index) {
+      final estate = estates[index];
+      return EstateCard(
+        estate: estate,
+        width: double.infinity,
+        onTap: () => context.push(
+          '${AppRoutes.propertyDetails}/${estate.id}',
+          extra: estate,
+        ),
+      );
+    },
+  );
 }

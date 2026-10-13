@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:real_estate_app/core/errors/failures.dart';
+import 'package:real_estate_app/core/theme/theme_cubit.dart';
 import 'package:real_estate_app/core/utils/typedefs.dart';
 import 'package:real_estate_app/features/account_setup/domain/entities/user_profile_entity.dart';
 import 'package:real_estate_app/features/account_setup/domain/repositories/account_setup_repository.dart';
@@ -12,6 +13,7 @@ import 'package:real_estate_app/features/auth/presentation/cubit/auth_state.dart
 import 'package:real_estate_app/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:real_estate_app/features/profile/presentation/pages/profile_screen.dart';
 import 'package:real_estate_app/features/profile/presentation/pages/settings_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   testWidgets('shows real profile details and circular-avatar fallback', (
@@ -100,33 +102,53 @@ void main() {
     expect(find.text('Edit Profile destination'), findsOneWidget);
   });
 
-  testWidgets('shows unsupported preferences as unavailable, not controls', (
+  testWidgets('shows supported and unavailable preferences responsively', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     final authCubit = _FakeAuthCubit();
-    addTearDown(authCubit.close);
+    SharedPreferences.setMockInitialValues({});
+    final themeCubit = ThemeCubit(
+      preferences: await SharedPreferences.getInstance(),
+    );
+    await themeCubit.loadPreference();
+    addTearDown(() async {
+      await authCubit.close();
+      await themeCubit.close();
+    });
 
     await tester.pumpWidget(
-      BlocProvider<AuthCubit>.value(
-        value: authCubit,
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthCubit>.value(value: authCubit),
+          BlocProvider<ThemeCubit>.value(value: themeCubit),
+        ],
         child: const MaterialApp(
           home: SettingsScreen(email: 'user@example.com'),
         ),
       ),
     );
 
-    expect(
-      find.text(
-        'Light theme is currently in use; theme selection is unavailable.',
-      ),
-      findsOneWidget,
-    );
+    expect(find.text('Choose your preferred theme'), findsOneWidget);
     expect(
       find.text('Notification preferences are not available yet.'),
       findsOneWidget,
     );
     expect(find.byType(Switch), findsNothing);
     expect(find.textContaining('user@example.com'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    final themeDropdown = find.byType(DropdownButton<AppThemePreference>);
+    await tester.ensureVisible(themeDropdown);
+    await tester.pumpAndSettle();
+    await tester.tap(themeDropdown);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Dark').last);
+    await tester.pumpAndSettle();
+    expect(themeCubit.state.preference, AppThemePreference.dark);
   });
 }
 

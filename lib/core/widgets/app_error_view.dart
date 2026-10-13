@@ -25,7 +25,8 @@ class AppErrorView extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               message,
-              style: Theme.of(context).textTheme.bodyLarge,
+              style: Theme.of(context).textTheme.bodyLarge
+                  ?.copyWith(color: Theme.of(context).colorScheme.onSurface),
               textAlign: TextAlign.center,
             ),
             if (onRetry != null) ...[

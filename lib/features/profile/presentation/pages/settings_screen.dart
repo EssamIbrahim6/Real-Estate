@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/route_names.dart';
+import '../../../../core/theme/theme_cubit.dart';
+import '../../../../core/widgets/app_feedback.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
 import '../widgets/account_actions.dart';
@@ -20,8 +22,7 @@ class SettingsScreen extends StatelessWidget {
         if (state is Unauthenticated) {
           context.go(AppRoutes.welcome);
         } else if (state is AuthFailureState) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(state.message)));
+          AppFeedback.error(context, state.message);
         }
       },
       child: Scaffold(
@@ -52,13 +53,8 @@ class SettingsScreen extends StatelessWidget {
             const SizedBox(height: 24),
             ProfileSection(
               title: 'PREFERENCES',
-              children: const [
-                ProfileActionTile(
-                  icon: Icons.palette_outlined,
-                  title: 'Appearance',
-                  subtitle: 'Light theme is currently in use; theme selection is unavailable.',
-                  enabled: false,
-                ),
+              children: [
+                const _ThemePreferenceTile(),
                 ProfileActionTile(
                   icon: Icons.notifications_none_rounded,
                   title: 'Notifications',
@@ -103,4 +99,71 @@ class SettingsScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+class _ThemePreferenceTile extends StatelessWidget {
+  const _ThemePreferenceTile();
+
+  @override
+  Widget build(BuildContext context) => BlocBuilder<ThemeCubit, ThemeState>(
+    builder: (context, state) {
+      final preference = state.preference;
+      return ListTile(
+        minVerticalPadding: 12,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+        leading: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary
+                .withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Icon(Icons.palette_outlined, size: 20),
+        ),
+        title: const Text(
+          'Appearance',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
+        subtitle: Text(
+          state.isLoaded
+              ? 'Choose your preferred theme'
+              : 'Loading saved preference…',
+        ),
+        trailing: DropdownButton<AppThemePreference>(
+          value: preference,
+          underline: const SizedBox.shrink(),
+          borderRadius: BorderRadius.circular(12),
+          onChanged: state.isLoaded
+              ? (value) async {
+                  if (value == null || value == preference) return;
+                  final cubit = context.read<ThemeCubit>();
+                  final saved = await cubit.setPreference(value);
+                  if (!saved && context.mounted) {
+                    AppFeedback.error(
+                      context,
+                      cubit.state.error ??
+                          'Appearance preference could not be saved.',
+                    );
+                  }
+                }
+              : null,
+          items: const [
+            DropdownMenuItem(
+              value: AppThemePreference.system,
+              child: Text('System'),
+            ),
+            DropdownMenuItem(
+              value: AppThemePreference.light,
+              child: Text('Light'),
+            ),
+            DropdownMenuItem(
+              value: AppThemePreference.dark,
+              child: Text('Dark'),
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }

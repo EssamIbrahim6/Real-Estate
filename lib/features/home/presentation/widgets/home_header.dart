@@ -1,15 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/helpers/spacing.dart';
 import '../../../../core/widgets/person_avatar.dart';
 
 class HomeHeader extends StatelessWidget {
   final String? locationName;
-  final VoidCallback? onNotificationTap;
 
-  const HomeHeader({super.key, this.locationName, this.onNotificationTap});
+  const HomeHeader({super.key, this.locationName});
 
   @override
   Widget build(BuildContext context) {
@@ -17,73 +15,46 @@ class HomeHeader extends StatelessWidget {
     final displayName =
         user?.displayName?.split(' ').first ??
         (user?.email != null ? user!.email!.split('@').first : 'Guest');
+    final colors = Theme.of(context).colorScheme;
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          children: [
-            PersonAvatar(
-              photoUrl: user?.photoURL,
-              radius: 22,
-              iconSize: 24,
-              backgroundColor: AppColors.inputBackground,
-            ),
-            horizontalSpace(12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Hello, $displayName 👋',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.brandNavy,
-                  ),
-                ),
-                verticalSpace(2),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.location_on,
-                      size: 14,
-                      color: AppColors.brandGreen,
-                    ),
-                    const SizedBox(width: 3),
-                    Text(
-                      locationName ?? 'Egypt',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
+        PersonAvatar(
+          photoUrl: user?.photoURL,
+          radius: 22,
+          iconSize: 24,
+          backgroundColor: colors.surfaceContainer,
+          iconColor: colors.primary,
         ),
-        IconButton(
-          onPressed:
-              onNotificationTap ??
-              () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('No new notifications')),
-                );
-              },
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: AppColors.inputBackground,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.inputBorder),
-            ),
-            child: const Icon(
-              Icons.notifications_none_rounded,
-              size: 20,
-              color: AppColors.brandNavy,
-            ),
+        horizontalSpace(12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Hello, $displayName 👋',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.w800),
+              ),
+              verticalSpace(2),
+              Row(
+                children: [
+                  Icon(Icons.location_on, size: 14, color: colors.tertiary),
+                  const SizedBox(width: 3),
+                  Expanded(
+                    child: Text(
+                      locationName ?? 'Egypt',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodySmall
+                          ?.copyWith(fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ],

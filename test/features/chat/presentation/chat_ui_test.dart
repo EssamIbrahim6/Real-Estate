@@ -11,6 +11,7 @@ import 'package:real_estate_app/features/chat/presentation/cubit/chat_cubit.dart
 import 'package:real_estate_app/features/chat/presentation/pages/chat_screen.dart';
 import 'package:real_estate_app/features/chat/presentation/pages/conversation_screen.dart';
 import 'package:real_estate_app/core/utils/typedefs.dart';
+import 'package:real_estate_app/core/widgets/app_skeleton.dart';
 
 void main() {
   testWidgets('Chat list shows loading, empty, success, and error states', (
@@ -28,7 +29,7 @@ void main() {
       ),
     );
     await tester.pump();
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.byType(ChatListSkeleton), findsOneWidget);
 
     repository.conversations.add(const []);
     await tester.pump();

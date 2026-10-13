@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
 import '../../domain/entities/location_summary.dart';
 
 class LocationCard extends StatelessWidget {
@@ -11,6 +10,7 @@ class LocationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -18,8 +18,8 @@ class LocationCard extends StatelessWidget {
         height: 110,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.inputBorder),
-          color: AppColors.surface,
+          border: Border.all(color: colors.outlineVariant),
+          color: colors.surface,
         ),
         clipBehavior: Clip.antiAlias,
         child: Stack(
@@ -30,10 +30,10 @@ class LocationCard extends StatelessWidget {
                 location.representativeImageUrl!,
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) =>
-                    Container(color: AppColors.inputBackground),
+                    Container(color: colors.surfaceContainerHighest),
               )
             else
-              Container(color: AppColors.inputBackground),
+              Container(color: colors.surfaceContainerHighest),
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(

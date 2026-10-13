@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:real_estate_app/features/agent/data/datasources/agent_remote_data_source.dart';
 import 'package:real_estate_app/features/agent/data/repositories/agent_repository_impl.dart';
 import 'package:real_estate_app/features/agent/domain/repositories/agent_repository.dart';
@@ -16,6 +17,7 @@ import 'package:real_estate_app/features/estate_details/presentation/cubit/estat
 import 'package:real_estate_app/features/favorites/presentation/cubit/favorites_cubit.dart';
 import 'package:real_estate_app/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:real_estate_app/features/profile/presentation/cubit/profile_edit_cubit.dart';
+import 'package:real_estate_app/core/theme/theme_cubit.dart';
 import 'package:real_estate_app/features/category/data/datasources/category_remote_data_source.dart';
 import 'package:real_estate_app/features/category/data/repositories/category_repository_impl.dart';
 import 'package:real_estate_app/features/category/domain/repositories/category_repository.dart';
@@ -81,6 +83,8 @@ Future<void> initDependencies() async {
 
   // Google Sign In
   sl.registerLazySingleton<GoogleSignIn>(() => GoogleSignIn.instance);
+  final sharedPreferences = await SharedPreferences.getInstance();
+  sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
 
   // Connectivity
   sl.registerLazySingleton<ConnectivityService>(
@@ -282,4 +286,5 @@ Future<void> initDependencies() async {
   sl.registerFactory(
     () => ProfileEditCubit(firebaseAuth: sl(), accountSetupRepository: sl()),
   );
+  sl.registerFactory(() => ThemeCubit(preferences: sl()));
 }

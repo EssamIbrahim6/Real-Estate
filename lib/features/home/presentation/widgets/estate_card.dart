@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/helpers/spacing.dart';
 import '../../../estate/domain/entities/estate_entity.dart';
@@ -21,14 +20,15 @@ class EstateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: width,
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: colors.surface,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppColors.inputBorder),
+          border: Border.all(color: colors.outlineVariant),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.04),
@@ -53,19 +53,19 @@ class EstateCard extends StatelessWidget {
                           estate.coverImage,
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => Container(
-                            color: AppColors.inputBackground,
-                            child: const Icon(
+                            color: colors.surfaceContainerHighest,
+                            child: Icon(
                               Icons.home_outlined,
-                              color: AppColors.textMuted,
+                              color: colors.onSurfaceVariant,
                               size: 36,
                             ),
                           ),
                         )
                       : Container(
-                          color: AppColors.inputBackground,
-                          child: const Icon(
+                          color: colors.surfaceContainerHighest,
+                          child: Icon(
                             Icons.home_outlined,
-                            color: AppColors.textMuted,
+                            color: colors.onSurfaceVariant,
                             size: 36,
                           ),
                         ),
@@ -80,7 +80,7 @@ class EstateCard extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.brandGreen,
+                        color: colors.tertiary,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Text(
@@ -139,10 +139,10 @@ class EstateCard extends StatelessWidget {
                 children: [
                   Text(
                     estate.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.brandNavy,
+                      color: colors.onSurface,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -150,10 +150,10 @@ class EstateCard extends StatelessWidget {
                   verticalSpace(4),
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.location_on_outlined,
                         size: 14,
-                        color: AppColors.textSecondary,
+                        color: colors.onSurfaceVariant,
                       ),
                       const SizedBox(width: 4),
                       Expanded(
@@ -163,9 +163,9 @@ class EstateCard extends StatelessWidget {
                               : estate.location.city.isNotEmpty
                               ? estate.location.city
                               : estate.location.address,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.textSecondary,
+                            color: colors.onSurfaceVariant,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -177,49 +177,49 @@ class EstateCard extends StatelessWidget {
                   Row(
                     children: [
                       if (estate.bedrooms > 0) ...[
-                        const Icon(
+                        Icon(
                           Icons.bed_outlined,
                           size: 14,
-                          color: AppColors.textMuted,
+                          color: colors.onSurfaceVariant,
                         ),
                         const SizedBox(width: 3),
                         Text(
                           '${estate.bedrooms}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.textMuted,
+                            color: colors.onSurfaceVariant,
                           ),
                         ),
                         horizontalSpace(8),
                       ],
                       if (estate.bathrooms > 0) ...[
-                        const Icon(
+                        Icon(
                           Icons.bathtub_outlined,
                           size: 14,
-                          color: AppColors.textMuted,
+                          color: colors.onSurfaceVariant,
                         ),
                         const SizedBox(width: 3),
                         Text(
                           '${estate.bathrooms}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.textMuted,
+                            color: colors.onSurfaceVariant,
                           ),
                         ),
                         horizontalSpace(8),
                       ],
                       if (estate.area > 0) ...[
-                        const Icon(
+                        Icon(
                           Icons.square_foot_outlined,
                           size: 14,
-                          color: AppColors.textMuted,
+                          color: colors.onSurfaceVariant,
                         ),
                         const SizedBox(width: 3),
                         Text(
                           '${estate.area.toInt()} m²',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.textMuted,
+                            color: colors.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -228,10 +228,10 @@ class EstateCard extends StatelessWidget {
                   verticalSpace(8),
                   Text(
                     'EGP ${estate.price.toInt()} ${estate.pricePeriod != null ? '/ ${estate.pricePeriod}' : ''}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.brandGreen,
+                      color: colors.tertiary,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

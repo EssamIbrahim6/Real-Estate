@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../constants/app_colors.dart';
-
 class PersonAvatar extends StatelessWidget {
   final String? photoUrl;
   final double radius;
   final double iconSize;
   final Color? backgroundColor;
-  final Color iconColor;
+  final Color? iconColor;
 
   const PersonAvatar({
     super.key,
@@ -15,7 +13,7 @@ class PersonAvatar extends StatelessWidget {
     required this.radius,
     required this.iconSize,
     this.backgroundColor,
-    this.iconColor = AppColors.brandNavy,
+    this.iconColor,
   });
 
   @override
@@ -24,25 +22,31 @@ class PersonAvatar extends StatelessWidget {
     return CircleAvatar(
       radius: radius,
       backgroundColor:
-          backgroundColor ?? AppColors.brandNavy.withValues(alpha: 0.08),
+          backgroundColor ??
+          Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
       child: SizedBox(
         width: radius * 2,
         height: radius * 2,
         child: ClipOval(
           child: url.isEmpty
-              ? _placeholder()
+              ? _placeholder(context)
               : Image.network(
                   key: const Key('person-profile-image'),
                   url,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => _placeholder(),
+                  errorBuilder: (context, error, stackTrace) =>
+                      _placeholder(context),
                 ),
         ),
       ),
     );
   }
 
-  Widget _placeholder() => Center(
-    child: Icon(Icons.person, color: iconColor, size: iconSize),
+  Widget _placeholder(BuildContext context) => Center(
+    child: Icon(
+      Icons.person,
+      color: iconColor ?? Theme.of(context).colorScheme.onSurfaceVariant,
+      size: iconSize,
+    ),
   );
 }

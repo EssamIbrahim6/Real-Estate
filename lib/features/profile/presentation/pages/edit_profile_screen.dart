@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/widgets/person_avatar.dart';
+import '../../../../core/widgets/app_feedback.dart';
 import '../cubit/profile_edit_cubit.dart';
 import '../cubit/profile_edit_state.dart';
 
@@ -44,14 +45,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           _phoneController.text = state.phone;
         } else if (state.status == ProfileEditStatus.saved) {
           if (state.warning != null) {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(state.warning!)));
+            AppFeedback.info(context, state.warning!);
           }
           context.pop(true);
         } else if (state.status == ProfileEditStatus.error &&
             state.message != null) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(state.message!)));
+          AppFeedback.error(context, state.message!);
         }
       },
       builder: (context, state) {
