@@ -23,16 +23,16 @@ class ConnectivityServiceImpl implements ConnectivityService {
   bool _isConnected = true; // optimistic default
 
   ConnectivityServiceImpl({InternetConnection? checker})
-      : _checker = checker ?? InternetConnection();
+    : _checker = checker ?? InternetConnection();
 
   @override
   bool get isConnected => _isConnected;
 
   @override
   Stream<bool> get onStatusChange => _checker.onStatusChange.map((status) {
-        _isConnected = status == InternetStatus.connected;
-        return _isConnected;
-      });
+    _isConnected = status == InternetStatus.connected;
+    return _isConnected;
+  });
 
   @override
   Future<bool> checkConnectivity() async {
@@ -40,4 +40,3 @@ class ConnectivityServiceImpl implements ConnectivityService {
     return _isConnected;
   }
 }
-

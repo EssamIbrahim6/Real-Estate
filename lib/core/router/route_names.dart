@@ -16,7 +16,12 @@ abstract class AppRoutes {
   static const String chatConversation = '/chat/conversation/:conversationId';
   static const String chatConversationName = 'chat-conversation';
   static const String profile = '/profile';
+  static const String settings = '/settings';
+  static const String editProfile = '/profile/edit';
+  static const String agentDetails = '/agent-details/:agentId';
+  static const String agentDetailsName = 'agent-details';
   static const String propertyDetails = '/property-details';
+  static const String propertyDetailsName = 'property-details';
   static const String categoryListings = '/categories/:categoryId';
   static const String listings = '/listings/:type';
   static const String fullscreenGallery = '/fullscreen-gallery';

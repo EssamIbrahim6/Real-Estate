@@ -4,16 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/router/route_names.dart';
 import '../../../../core/widgets/app_error_view.dart';
-import '../../../../core/widgets/app_loading_indicator.dart';
+import '../../../../core/widgets/app_skeleton.dart';
+import '../../../estate/domain/entities/estate_entity.dart';
 import '../../../home/presentation/widgets/estate_card.dart';
 import '../cubit/search_cubit.dart';
 import '../cubit/search_state.dart';
 import '../../domain/entities/search_filter.dart';
 import '../widgets/search_filter_sheet.dart';
+import '../../../map/domain/models/map_screen_args.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -30,6 +31,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   /// How long to wait after the last keystroke before issuing a search.
   static const _debounceDuration = Duration(milliseconds: 350);
+  bool _suppressQuerySearch = false;
 
   @override
   void initState() {
@@ -54,11 +56,13 @@ class _SearchScreenState extends State<SearchScreen> {
   void _onQueryChanged() {
     // Rebuild to show/hide the clear button immediately.
     setState(() {});
+    if (_suppressQuerySearch) return;
     _debounceTimer?.cancel();
     _debounceTimer = Timer(_debounceDuration, _runSearch);
   }
 
   Future<void> _runSearch() async {
+    _debounceTimer?.cancel();
     if (!mounted) return;
     final current = context.read<SearchCubit>().state.filter;
     final rawQuery = _queryController.text.trim();
@@ -83,7 +87,7 @@ class _SearchScreenState extends State<SearchScreen> {
     final filter = await showModalBottomSheet<SearchFilter>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppColors.surface,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       builder: (_) => SearchFilterSheet(
         initialFilter: SearchFilter(
           query: _queryController.text.trim().isEmpty
@@ -105,15 +109,37 @@ class _SearchScreenState extends State<SearchScreen> {
     if (!mounted || filter == null) return;
     // Cancel any pending debounce — the filter sheet already sets a full filter.
     _debounceTimer?.cancel();
+    _suppressQuerySearch = true;
     _queryController.text = filter.query ?? '';
+    _suppressQuerySearch = false;
     await context.read<SearchCubit>().search(filter);
   }
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Search properties')),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: const Text('Search properties'),
+        actions: [
+          BlocBuilder<SearchCubit, SearchState>(
+            builder: (context, state) => IconButton(
+              tooltip: 'View on map',
+              icon: const Icon(Icons.map_outlined),
+              onPressed: () {
+                context.push(
+                  AppRoutes.map,
+                  extra: MapScreenArgs(
+                    estates: state.estates,
+                    title: 'Search Map',
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Padding(
@@ -164,7 +190,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           ],
                         ),
                         filled: true,
-                        fillColor: AppColors.inputBackground,
+                        fillColor: colors.surfaceContainerLow,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide.none,
@@ -188,8 +214,17 @@ class _SearchScreenState extends State<SearchScreen> {
                 switch (state.status) {
                   case SearchStatus.initial:
                   case SearchStatus.loading:
-                    return const AppLoadingIndicator(
-                      message: 'Searching properties...',
+                    if (state.estates.isEmpty) {
+                      return const EstateListSkeleton(itemCount: 4);
+                    }
+                    return Stack(
+                      children: [
+                        _SearchResults(estates: state.estates),
+                        const Align(
+                          alignment: Alignment.topCenter,
+                          child: LinearProgressIndicator(),
+                        ),
+                      ],
                     );
                   case SearchStatus.failure:
                     return AppErrorView(
@@ -199,22 +234,22 @@ class _SearchScreenState extends State<SearchScreen> {
                       onRetry: () => context.read<SearchCubit>().retry(),
                     );
                   case SearchStatus.empty:
-                    return const Center(
+                    return Center(
                       child: Padding(
-                        padding: EdgeInsets.all(AppDimensions.p20),
+                        padding: const EdgeInsets.all(AppDimensions.p20),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
                               Icons.search_off_rounded,
                               size: 48,
-                              color: AppColors.textMuted,
+                              color: colors.onSurfaceVariant,
                             ),
                             SizedBox(height: 12),
                             Text(
                               'No estates found',
                               style: TextStyle(
-                                color: AppColors.brandNavy,
+                                color: colors.onSurface,
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -223,29 +258,14 @@ class _SearchScreenState extends State<SearchScreen> {
                             Text(
                               'Try changing your search or filters.',
                               textAlign: TextAlign.center,
-                              style: TextStyle(color: AppColors.textSecondary),
+                              style: TextStyle(color: colors.onSurfaceVariant),
                             ),
                           ],
                         ),
                       ),
                     );
                   case SearchStatus.success:
-                    return ListView.separated(
-                      padding: const EdgeInsets.all(AppDimensions.p20),
-                      itemCount: state.estates.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 16),
-                      itemBuilder: (context, index) {
-                        final estate = state.estates[index];
-                        return EstateCard(
-                          estate: estate,
-                          width: double.infinity,
-                          onTap: () => context.push(
-                            '${AppRoutes.propertyDetails}/${estate.id}',
-                            extra: estate,
-                          ),
-                        );
-                      },
-                    );
+                    return _SearchResults(estates: state.estates);
                 }
               },
             ),
@@ -254,4 +274,28 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
     );
   }
+}
+
+class _SearchResults extends StatelessWidget {
+  final List<EstateEntity> estates;
+
+  const _SearchResults({required this.estates});
+
+  @override
+  Widget build(BuildContext context) => ListView.separated(
+    padding: const EdgeInsets.all(AppDimensions.p20),
+    itemCount: estates.length,
+    separatorBuilder: (_, _) => const SizedBox(height: 16),
+    itemBuilder: (context, index) {
+      final estate = estates[index];
+      return EstateCard(
+        estate: estate,
+        width: double.infinity,
+        onTap: () => context.push(
+          '${AppRoutes.propertyDetails}/${estate.id}',
+          extra: estate,
+        ),
+      );
+    },
+  );
 }

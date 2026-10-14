@@ -7,7 +7,7 @@ import 'package:real_estate_app/core/helpers/auth_navigation_helper.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/helpers/spacing.dart';
-import '../../../../core/router/route_names.dart';
+import '../../../../core/widgets/app_feedback.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 
@@ -25,12 +25,7 @@ class WelcomeScreen extends StatelessWidget {
         if (state is Authenticated) {
           handleAuthSuccessNavigation(context, state);
         } else if (state is AuthFailureState) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: AppColors.error,
-            ),
-          );
+          AppFeedback.error(context, state.message);
         }
       },
       builder: (context, state) {

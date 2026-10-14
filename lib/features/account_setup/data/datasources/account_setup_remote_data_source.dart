@@ -32,16 +32,9 @@ class AccountSetupRemoteDataSourceImpl implements AccountSetupRemoteDataSource {
     try {
       String? imageUrl = model.profileImageUrl;
 
-      // Upload profile image to Cloudinary if a local file was picked
       if (localImagePath != null && localImagePath.isNotEmpty) {
-        try {
-          imageUrl = await _cloudinaryService.uploadImage(File(localImagePath));
-        } catch (_) {
-          // If Cloudinary is not configured yet, continue saving the rest of the profile
-          imageUrl = null;
-        }
+        imageUrl = await _cloudinaryService.uploadImage(File(localImagePath));
       }
-      // Upload profile image to Cloudinary if a local file was picked
 
       final updatedModel = UserProfileModel(
         userId: model.userId,

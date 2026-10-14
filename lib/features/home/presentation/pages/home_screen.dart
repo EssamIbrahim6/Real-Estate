@@ -4,10 +4,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/route_names.dart';
 
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/helpers/spacing.dart';
-import '../../../../core/widgets/app_loading_indicator.dart';
+import '../../../../core/widgets/app_feedback.dart';
+import '../../../../core/widgets/app_skeleton.dart';
 import '../../../listing/presentation/cubit/listing_cubit.dart';
 import '../cubit/home_cubit.dart';
 import '../cubit/home_state.dart';
@@ -25,19 +25,21 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: BlocBuilder<HomeCubit, HomeState>(
           builder: (context, state) {
+            final colors = Theme.of(context).colorScheme;
             if (state.status == HomeStatus.loading &&
                 state.featuredEstates.isEmpty) {
-              return const AppLoadingIndicator(
-                message: 'Loading properties...',
+              return RefreshIndicator(
+                onRefresh: () => context.read<HomeCubit>().loadHome(),
+                child: const HomeSkeleton(),
               );
             }
 
             return RefreshIndicator(
-              color: AppColors.brandGreen,
+              color: Theme.of(context).colorScheme.primary,
               onRefresh: () => context.read<HomeCubit>().loadHome(),
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -64,16 +66,16 @@ class HomeScreen extends StatelessWidget {
                     if (state.categoriesError != null)
                       Text(
                         state.categoriesError!,
-                        style: const TextStyle(
-                          color: AppColors.error,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
                           fontSize: 13,
                         ),
                       )
                     else if (state.categories.isEmpty)
-                      const Text(
+                      Text(
                         'No categories available right now.',
                         style: TextStyle(
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 13,
                         ),
                       )
@@ -112,16 +114,16 @@ class HomeScreen extends StatelessWidget {
                     if (state.featuredError != null)
                       Text(
                         state.featuredError!,
-                        style: const TextStyle(
-                          color: AppColors.error,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
                           fontSize: 13,
                         ),
                       )
                     else if (state.featuredEstates.isEmpty)
-                      const Text(
+                      Text(
                         'No featured estates available right now.',
                         style: TextStyle(
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 13,
                         ),
                       )
@@ -153,10 +155,10 @@ class HomeScreen extends StatelessWidget {
                     const SectionHeader(title: 'Top Locations'),
                     verticalSpace(12),
                     if (state.topLocations.isEmpty)
-                      const Text(
+                      Text(
                         'No location data available right now.',
                         style: TextStyle(
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 13,
                         ),
                       )
@@ -166,7 +168,7 @@ class HomeScreen extends StatelessWidget {
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           itemCount: state.topLocations.length,
-                          separatorBuilder: (_, __) => horizontalSpace(12),
+                          separatorBuilder: (_, _) => horizontalSpace(12),
                           itemBuilder: (context, index) {
                             final location = state.topLocations[index];
                             return LocationCard(
@@ -191,16 +193,13 @@ class HomeScreen extends StatelessWidget {
                     if (state.agentsError != null)
                       Text(
                         state.agentsError!,
-                        style: const TextStyle(
-                          color: AppColors.error,
-                          fontSize: 13,
-                        ),
+                        style: TextStyle(color: colors.error, fontSize: 13),
                       )
                     else if (state.topAgents.isEmpty)
-                      const Text(
+                      Text(
                         'No agents available right now.',
                         style: TextStyle(
-                          color: AppColors.textSecondary,
+                          color: colors.onSurfaceVariant,
                           fontSize: 13,
                         ),
                       )
@@ -216,13 +215,10 @@ class HomeScreen extends StatelessWidget {
                             final agent = state.topAgents[index];
                             return AgentCard(
                               agent: agent,
-                              onTap: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Agent: ${agent.agencyName}'),
-                                  ),
-                                );
-                              },
+                              onTap: () => context.pushNamed(
+                                AppRoutes.agentDetailsName,
+                                pathParameters: {'agentId': agent.id},
+                              ),
                             );
                           },
                         ),
@@ -238,12 +234,9 @@ class HomeScreen extends StatelessWidget {
                         if (!context.mounted) return;
                         final homeState = homeCubit.state;
                         if (!homeState.isLocationPermissionGranted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Enable location access to see nearby properties.',
-                              ),
-                            ),
+                          AppFeedback.info(
+                            context,
+                            'Enable location access to see nearby properties.',
                           );
                           return;
                         }
@@ -264,24 +257,24 @@ class HomeScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppColors.inputBackground,
+                          color: colors.surfaceContainerLow,
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: AppColors.inputBorder),
+                          border: Border.all(color: colors.outlineVariant),
                         ),
                         child: Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.location_disabled_rounded,
-                              color: AppColors.textSecondary,
+                              color: colors.onSurfaceVariant,
                               size: 28,
                             ),
                             horizontalSpace(14),
-                            const Expanded(
+                            Expanded(
                               child: Text(
                                 'Enable location to explore estates near you.',
                                 style: TextStyle(
                                   fontSize: 13,
-                                  color: AppColors.brandNavy,
+                                  color: colors.onSurface,
                                 ),
                               ),
                             ),
@@ -289,11 +282,11 @@ class HomeScreen extends StatelessWidget {
                               onPressed: () => context
                                   .read<HomeCubit>()
                                   .requestLocationPermission(),
-                              child: const Text(
+                              child: Text(
                                 'Enable',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w700,
-                                  color: AppColors.brandGreen,
+                                  color: colors.tertiary,
                                 ),
                               ),
                             ),
@@ -301,10 +294,10 @@ class HomeScreen extends StatelessWidget {
                         ),
                       )
                     else if (state.nearbyEstates.isEmpty)
-                      const Text(
+                      Text(
                         'No estates found near your location.',
                         style: TextStyle(
-                          color: AppColors.textSecondary,
+                          color: colors.onSurfaceVariant,
                           fontSize: 13,
                         ),
                       )

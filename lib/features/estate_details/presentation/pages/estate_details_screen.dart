@@ -1,21 +1,27 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/helpers/spacing.dart';
 import '../../../../core/router/route_names.dart';
+import '../../../agent/domain/entities/agent_entity.dart';
+import '../../../estate/domain/entities/estate_entity.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_error_view.dart';
-import '../../../../core/widgets/app_loading_indicator.dart';
+import '../../../../core/widgets/app_feedback.dart';
+import '../../../../core/widgets/app_skeleton.dart';
+import '../../../../core/widgets/person_avatar.dart';
 import '../cubit/estate_details_cubit.dart';
 import '../cubit/estate_details_state.dart';
 import 'fullscreen_gallery_screen.dart';
 import '../widgets/estate_map_section.dart';
+import '../widgets/estate_favorite_button.dart';
 import '../widgets/image_gallery.dart';
 import '../widgets/property_info_section.dart';
 import '../widgets/submit_review_bottom_sheet.dart';
+import '../../../map/domain/models/map_screen_args.dart';
 
 class EstateDetailsScreen extends StatefulWidget {
   final String estateId;
@@ -30,6 +36,8 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
   bool _isDescriptionExpanded = false;
   ReviewSubmitStatus _lastReviewStatus = ReviewSubmitStatus.initial;
   ContactAgentStatus _lastContactAgentStatus = ContactAgentStatus.initial;
+  FavoriteActionStatus _lastFavoriteActionStatus = FavoriteActionStatus.initial;
+  String? _lastFavoriteError;
 
   void _openGallery(List<String> images, int initialIndex) {
     context.pushNamed(
@@ -54,65 +62,93 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
       );
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'The conversation was created, but could not be opened.',
-          ),
-          backgroundColor: AppColors.error,
-        ),
+      AppFeedback.error(
+        context,
+        'The conversation was created, but could not be opened.',
       );
     }
+  }
+
+  bool _isOwner(EstateEntity estate, AgentEntity? agent) {
+    String? currentUserUid;
+    try {
+      currentUserUid = FirebaseAuth.instance.currentUser?.uid.trim();
+    } catch (_) {
+      return false;
+    }
+
+    if (currentUserUid == null || currentUserUid.isEmpty) return false;
+
+    final ownerIds =
+        [
+              estate.ownerId,
+              estate.userId,
+              estate.createdBy,
+              estate.publisherId,
+              estate.agentUserId,
+            ]
+            .whereType<String>()
+            .map((value) => value.trim())
+            .where((value) => value.isNotEmpty);
+
+    if (ownerIds.contains(currentUserUid)) return true;
+    final agentUid = agent?.userId.trim();
+    return agentUid != null &&
+        agentUid.isNotEmpty &&
+        agentUid == currentUserUid &&
+        estate.agentId.trim().isNotEmpty &&
+        (agent?.id.trim() == estate.agentId.trim() ||
+            estate.primaryOwnerUid == currentUserUid);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: BlocConsumer<EstateDetailsCubit, EstateDetailsState>(
         listenWhen: (previous, current) =>
             previous.submitStatus != current.submitStatus ||
             previous.submitError != current.submitError ||
             previous.contactAgentStatus != current.contactAgentStatus ||
-            previous.contactAgentError != current.contactAgentError,
+            previous.contactAgentError != current.contactAgentError ||
+            previous.favoriteActionStatus != current.favoriteActionStatus ||
+            previous.favoriteError != current.favoriteError,
         listener: (context, state) {
           final reviewStatusChanged = _lastReviewStatus != state.submitStatus;
           final contactStatusChanged =
               _lastContactAgentStatus != state.contactAgentStatus;
+          final favoriteStatusChanged =
+              _lastFavoriteActionStatus != state.favoriteActionStatus;
+          final favoriteErrorChanged =
+              _lastFavoriteError != state.favoriteError;
           _lastReviewStatus = state.submitStatus;
           _lastContactAgentStatus = state.contactAgentStatus;
+          _lastFavoriteActionStatus = state.favoriteActionStatus;
+          _lastFavoriteError = state.favoriteError;
 
           if (reviewStatusChanged &&
               state.submitStatus == ReviewSubmitStatus.error &&
               state.submitError != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.submitError!),
-                backgroundColor: AppColors.error,
-              ),
-            );
+            AppFeedback.error(context, state.submitError!);
           } else if (reviewStatusChanged &&
               state.submitStatus == ReviewSubmitStatus.success) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Your review was successfully submitted!'),
-                backgroundColor: AppColors.brandGreen,
-              ),
+            AppFeedback.success(
+              context,
+              'Your review was successfully submitted!',
             );
           } else if (contactStatusChanged &&
               state.contactAgentStatus == ContactAgentStatus.error &&
               state.contactAgentError != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.contactAgentError!),
-                backgroundColor: AppColors.error,
-              ),
-            );
+            AppFeedback.error(context, state.contactAgentError!);
+          } else if ((favoriteStatusChanged || favoriteErrorChanged) &&
+              state.favoriteError != null) {
+            AppFeedback.error(context, state.favoriteError!);
           }
         },
         builder: (context, state) {
+          final colors = Theme.of(context).colorScheme;
           if (state.estateStatus == EstateLoadingStatus.loading) {
-            return const Scaffold(body: Center(child: AppLoadingIndicator()));
+            return const Scaffold(body: EstateDetailsSkeleton());
           }
 
           if (state.estateStatus == EstateLoadingStatus.error ||
@@ -128,6 +164,7 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
           }
 
           final estate = state.estate!;
+          final isOwnedByCurrentUser = _isOwner(estate, state.agent);
           final estateImages = ImageGallery.collectImages(
             estate.coverImage,
             estate.images,
@@ -162,10 +199,10 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                               Expanded(
                                 child: Text(
                                   estate.title,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 22,
                                     fontWeight: FontWeight.w800,
-                                    color: AppColors.brandNavy,
+                                    color: colors.onSurface,
                                     height: 1.25,
                                   ),
                                 ),
@@ -176,18 +213,18 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                                 children: [
                                   Text(
                                     'EGP ${estate.price.toInt()}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w800,
-                                      color: AppColors.brandGreen,
+                                      color: colors.tertiary,
                                     ),
                                   ),
                                   if (estate.pricePeriod != null)
                                     Text(
                                       '/ ${estate.pricePeriod}',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 12,
-                                        color: AppColors.textMuted,
+                                        color: colors.onSurfaceVariant,
                                       ),
                                     ),
                                 ],
@@ -199,18 +236,18 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                           // Location & Rating Summary Row
                           Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.location_on_outlined,
                                 size: 16,
-                                color: AppColors.textSecondary,
+                                color: colors.onSurfaceVariant,
                               ),
                               horizontalSpace(4),
                               Expanded(
                                 child: Text(
                                   '${estate.location.address}, ${estate.location.city}',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 13,
-                                    color: AppColors.textSecondary,
+                                    color: colors.onSurfaceVariant,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -232,9 +269,9 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                               ),
                               Text(
                                 ' (${state.calculatedReviewCount})',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
-                                  color: AppColors.textMuted,
+                                  color: colors.onSurfaceVariant,
                                 ),
                               ),
                             ],
@@ -246,20 +283,20 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                           verticalSpace(24),
 
                           // 4. Description
-                          const Text(
+                          Text(
                             'Description',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.brandNavy,
+                              color: colors.onSurface,
                             ),
                           ),
                           verticalSpace(8),
                           Text(
                             estate.description,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
-                              color: AppColors.textSecondary,
+                              color: colors.onSurfaceVariant,
                               height: 1.5,
                             ),
                             maxLines: _isDescriptionExpanded ? null : 3,
@@ -279,9 +316,9 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                                   _isDescriptionExpanded
                                       ? 'Show less'
                                       : 'Read more',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontWeight: FontWeight.w700,
-                                    color: AppColors.brandGreen,
+                                    color: colors.tertiary,
                                   ),
                                 ),
                               ),
@@ -289,19 +326,19 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                           verticalSpace(24),
 
                           // 5. Amenities
-                          const Text(
+                          Text(
                             'Amenities',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.brandNavy,
+                              color: colors.onSurface,
                             ),
                           ),
                           verticalSpace(10),
                           if (estate.amenities.isEmpty)
-                            const Text(
+                            Text(
                               'No specific amenities listed.',
-                              style: TextStyle(color: AppColors.textMuted),
+                              style: TextStyle(color: colors.onSurfaceVariant),
                             )
                           else
                             Wrap(
@@ -314,19 +351,19 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                                     vertical: 8,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: AppColors.inputBackground,
+                                    color: colors.surfaceContainerLow,
                                     borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
-                                      color: AppColors.inputBorder,
+                                      color: colors.outlineVariant,
                                     ),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Icon(
+                                      Icon(
                                         Icons.check_circle_outline,
                                         size: 15,
-                                        color: AppColors.brandGreen,
+                                        color: colors.tertiary,
                                       ),
                                       horizontalSpace(6),
                                       Text(
@@ -344,88 +381,133 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                           verticalSpace(24),
 
                           // 6. Location Map
-                          const Text(
+                          Text(
                             'Location',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.brandNavy,
+                              color: colors.onSurface,
                             ),
                           ),
                           verticalSpace(10),
-                          EstateMapSection(location: estate.location),
+                          EstateMapSection(
+                            location: estate.location,
+                            onTap: () {
+                              context.push(
+                                AppRoutes.map,
+                                extra: MapScreenArgs(
+                                  targetEstate: estate,
+                                  title: estate.title,
+                                ),
+                              );
+                            },
+                          ),
                           verticalSpace(24),
 
                           // 7. Assigned Agent
                           if (state.agent != null) ...[
-                            const Text(
+                            if (isOwnedByCurrentUser) ...[
+                              Container(
+                                margin: const EdgeInsets.only(bottom: 10),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: colors.tertiary.withValues(
+                                    alpha: 0.12,
+                                  ),
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: Text(
+                                  'My Property',
+                                  style: TextStyle(
+                                    color: colors.tertiary,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ],
+                            Text(
                               'Listing Agent',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.brandNavy,
+                                color: colors.onSurface,
                               ),
                             ),
                             verticalSpace(10),
-                            Container(
-                              padding: const EdgeInsets.all(14),
-                              decoration: BoxDecoration(
-                                color: AppColors.surface,
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: AppColors.inputBorder,
-                                ),
+                            InkWell(
+                              borderRadius: BorderRadius.circular(16),
+                              onTap: () => context.pushNamed(
+                                AppRoutes.agentDetailsName,
+                                pathParameters: {'agentId': state.agent!.id},
                               ),
-                              child: Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 26,
-                                    backgroundColor: AppColors.brandNavy
-                                        .withValues(alpha: 0.08),
-                                    child: const Icon(
-                                      Icons.person,
-                                      color: AppColors.brandNavy,
-                                      size: 28,
-                                    ),
+                              child: Container(
+                                padding: const EdgeInsets.all(14),
+                                decoration: BoxDecoration(
+                                  color: colors.surface,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: colors.outlineVariant,
                                   ),
-                                  horizontalSpace(12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Text(
-                                              state.agent!.agencyName,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w700,
-                                                color: AppColors.brandNavy,
+                                ),
+                                child: Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () => context.pushNamed(
+                                        AppRoutes.agentDetailsName,
+                                        pathParameters: {
+                                          'agentId': state.agent!.id,
+                                        },
+                                      ),
+                                      child: PersonAvatar(
+                                        photoUrl: state.agent!.primaryPhotoUrl,
+                                        radius: 26,
+                                        iconSize: 28,
+                                      ),
+                                    ),
+                                    horizontalSpace(12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  state.agent!.displayName,
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: colors.onSurface,
+                                                  ),
+                                                ),
                                               ),
-                                            ),
-                                            if (state.agent!.isVerified) ...[
-                                              horizontalSpace(4),
-                                              const Icon(
-                                                Icons.verified,
-                                                size: 15,
-                                                color: AppColors.brandGreen,
-                                              ),
+                                              if (state.agent!.isVerified) ...[
+                                                horizontalSpace(4),
+                                                Icon(
+                                                  Icons.verified,
+                                                  size: 15,
+                                                  color: colors.tertiary,
+                                                ),
+                                              ],
                                             ],
-                                          ],
-                                        ),
-                                        verticalSpace(2),
-                                        Text(
-                                          '${state.agent!.yearsOfExperience} years exp • ★ ${state.agent!.rating.toStringAsFixed(1)}',
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: AppColors.textMuted,
                                           ),
-                                        ),
-                                      ],
+                                          verticalSpace(2),
+                                          Text(
+                                            '${state.agent!.yearsOfExperience} years exp • ★ ${state.agent!.rating.toStringAsFixed(1)}',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: colors.onSurfaceVariant,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                             verticalSpace(24),
@@ -437,10 +519,10 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                             children: [
                               Text(
                                 'Reviews (${state.calculatedReviewCount})',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
-                                  color: AppColors.brandNavy,
+                                  color: colors.onSurface,
                                 ),
                               ),
                               TextButton(
@@ -473,9 +555,9 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                                   state.currentUserReview != null
                                       ? 'Edit Review'
                                       : 'Add Review',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontWeight: FontWeight.w700,
-                                    color: AppColors.brandGreen,
+                                    color: colors.tertiary,
                                   ),
                                 ),
                               ),
@@ -487,15 +569,15 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                             Container(
                               padding: const EdgeInsets.all(18),
                               decoration: BoxDecoration(
-                                color: AppColors.inputBackground,
+                                color: colors.surfaceContainerLow,
                                 borderRadius: BorderRadius.circular(14),
                               ),
-                              child: const Center(
+                              child: Center(
                                 child: Text(
                                   'No reviews yet. Be the first to share your experience!',
                                   style: TextStyle(
                                     fontSize: 13,
-                                    color: AppColors.textMuted,
+                                    color: colors.onSurfaceVariant,
                                   ),
                                 ),
                               ),
@@ -506,10 +588,10 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                                 margin: const EdgeInsets.only(bottom: 12),
                                 padding: const EdgeInsets.all(14),
                                 decoration: BoxDecoration(
-                                  color: AppColors.surface,
+                                  color: colors.surface,
                                   borderRadius: BorderRadius.circular(14),
                                   border: Border.all(
-                                    color: AppColors.inputBorder,
+                                    color: colors.outlineVariant,
                                   ),
                                 ),
                                 child: Column(
@@ -544,9 +626,9 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                                       verticalSpace(6),
                                       Text(
                                         r.comment,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 13,
-                                          color: AppColors.textSecondary,
+                                          color: colors.onSurfaceVariant,
                                         ),
                                       ),
                                     ],
@@ -570,28 +652,31 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     CircleAvatar(
-                      backgroundColor: Colors.white,
+                      backgroundColor: colors.surface,
                       radius: 20,
                       child: IconButton(
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.arrow_back,
-                          color: AppColors.brandNavy,
+                          color: colors.onSurface,
                           size: 20,
                         ),
                         onPressed: () => context.pop(),
                       ),
                     ),
-                    CircleAvatar(
-                      backgroundColor: Colors.white,
-                      radius: 20,
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.favorite_border,
-                          color: AppColors.brandNavy,
-                          size: 20,
-                        ),
-                        onPressed: () {},
-                      ),
+                    EstateFavoriteButton(
+                      isFavorite: state.isFavorite,
+                      isLoading:
+                          state.isFavoriteLoading ||
+                          state.favoriteActionStatus ==
+                              FavoriteActionStatus.loading,
+                      onPressed: () {
+                        final cubit = context.read<EstateDetailsCubit>();
+                        if (!cubit.isAuthenticated) {
+                          context.push(AppRoutes.login);
+                          return;
+                        }
+                        cubit.toggleFavorite(estate.id);
+                      },
                     ),
                   ],
                 ),
@@ -608,9 +693,9 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                     vertical: 14,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    border: const Border(
-                      top: BorderSide(color: AppColors.inputBorder),
+                    color: colors.surface,
+                    border: Border(
+                      top: BorderSide(color: colors.outlineVariant),
                     ),
                     boxShadow: [
                       BoxShadow(
@@ -622,35 +707,24 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                   ),
                   child: Row(
                     children: [
-                      if (estate.virtualTourUrl != null &&
-                          estate.virtualTourUrl!.isNotEmpty) ...[
+                      if (!isOwnedByCurrentUser)
                         Expanded(
                           child: AppButton(
-                            text: 'Virtual Tour',
+                            text: 'Contact Agent',
+                            isLoading:
+                                state.contactAgentStatus ==
+                                ContactAgentStatus.loading,
+                            onPressed: _contactAgent,
+                          ),
+                        )
+                      else
+                        Expanded(
+                          child: AppButton(
+                            text: 'Your Property',
                             type: AppButtonType.outlined,
-                            icon: const Icon(Icons.view_in_ar, size: 18),
-                            onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Opening 3D Tour: ${estate.virtualTourUrl}',
-                                  ),
-                                ),
-                              );
-                            },
+                            onPressed: null,
                           ),
                         ),
-                        horizontalSpace(12),
-                      ],
-                      Expanded(
-                        child: AppButton(
-                          text: 'Contact Agent',
-                          isLoading:
-                              state.contactAgentStatus ==
-                              ContactAgentStatus.loading,
-                          onPressed: _contactAgent,
-                        ),
-                      ),
                     ],
                   ),
                 ),

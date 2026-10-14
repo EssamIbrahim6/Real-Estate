@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/router/route_names.dart';
 import '../../../../core/widgets/app_error_view.dart';
-import '../../../../core/widgets/app_loading_indicator.dart';
+import '../../../../core/widgets/app_skeleton.dart';
 import '../cubit/chat_cubit.dart';
 import '../cubit/chat_state.dart';
 
@@ -25,8 +25,10 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    _currentUserUid =
-        widget.currentUserUid ?? FirebaseAuth.instance.currentUser?.uid;
+    final uid =
+        (widget.currentUserUid ?? FirebaseAuth.instance.currentUser?.uid)
+            ?.trim();
+    _currentUserUid = uid != null && uid.isNotEmpty ? uid : null;
     if (_currentUserUid != null) {
       context.read<ChatCubit>().watchConversations(_currentUserUid);
     }
@@ -43,16 +45,14 @@ class _ChatScreenState extends State<ChatScreen> {
                 switch (state.conversationsStatus) {
                   case ChatLoadStatus.initial:
                   case ChatLoadStatus.loading:
-                    return const AppLoadingIndicator();
+                    return const ChatListSkeleton();
                   case ChatLoadStatus.failure:
                     return AppErrorView(
                       message:
                           'Could not load conversations. Please try again.',
-                      onRetry: _currentUserUid == null
-                          ? null
-                          : () => context
-                              .read<ChatCubit>()
-                              .watchConversations(_currentUserUid!),
+                      onRetry: () => context
+                          .read<ChatCubit>()
+                          .watchConversations(_currentUserUid),
                     );
                   case ChatLoadStatus.empty:
                     return const _EmptyConversations();

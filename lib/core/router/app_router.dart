@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:real_estate_app/features/agent/presentation/cubit/agent_details_cubit.dart';
+import 'package:real_estate_app/features/agent/presentation/pages/agent_details_screen.dart';
 import 'package:real_estate_app/features/estate_details/presentation/cubit/estate_details_cubit.dart';
 import 'package:real_estate_app/features/estate_details/presentation/pages/estate_details_screen.dart';
 import 'package:real_estate_app/features/home/presentation/cubit/home_cubit.dart';
@@ -16,6 +18,15 @@ import 'package:real_estate_app/features/chat/presentation/pages/chat_screen.dar
 import 'package:real_estate_app/features/chat/presentation/pages/conversation_screen.dart';
 import 'package:real_estate_app/features/chat/presentation/cubit/chat_cubit.dart';
 import 'package:real_estate_app/features/profile/presentation/pages/profile_screen.dart';
+import 'package:real_estate_app/features/profile/presentation/pages/settings_screen.dart';
+import 'package:real_estate_app/features/profile/presentation/pages/edit_profile_screen.dart';
+import 'package:real_estate_app/features/profile/presentation/cubit/profile_cubit.dart';
+import 'package:real_estate_app/features/profile/presentation/cubit/profile_edit_cubit.dart';
+import 'package:real_estate_app/features/favorites/presentation/cubit/favorites_cubit.dart';
+import 'package:real_estate_app/features/favorites/presentation/pages/favorites_screen.dart';
+import 'package:real_estate_app/features/map/domain/models/map_screen_args.dart';
+import 'package:real_estate_app/features/map/presentation/cubit/map_cubit.dart';
+import 'package:real_estate_app/features/map/presentation/pages/estate_map_screen.dart';
 
 import '../di/injection_container.dart';
 import '../navigation/main_navigation_shell.dart';
@@ -105,7 +116,9 @@ class AppRouter {
         name: 'forgot-password',
         builder: (context, state) => BlocProvider(
           create: (_) => sl<AuthCubit>(),
-          child: const ForgotPasswordScreen(),
+          child: ForgotPasswordScreen(
+            initialEmail: state.extra as String? ?? '',
+          ),
         ),
       ),
       GoRoute(
@@ -168,7 +181,31 @@ class AppRouter {
               GoRoute(
                 path: AppRoutes.profile,
                 name: 'profile',
-                builder: (context, state) => const ProfileScreen(),
+                builder: (context, state) => MultiBlocProvider(
+                  providers: [
+                    BlocProvider(create: (_) => sl<AuthCubit>()),
+                    BlocProvider(
+                      create: (_) => sl<ProfileCubit>()..loadProfile(),
+                    ),
+                  ],
+                  child: const ProfileScreen(),
+                ),
+              ),
+              GoRoute(
+                path: AppRoutes.settings,
+                name: 'settings',
+                builder: (context, state) => BlocProvider(
+                  create: (_) => sl<AuthCubit>(),
+                  child: SettingsScreen(email: state.extra as String? ?? ''),
+                ),
+              ),
+              GoRoute(
+                path: AppRoutes.editProfile,
+                name: 'edit-profile',
+                builder: (context, state) => BlocProvider(
+                  create: (_) => sl<ProfileEditCubit>()..loadProfile(),
+                  child: const EditProfileScreen(),
+                ),
               ),
             ],
           ),
@@ -185,6 +222,14 @@ class AppRouter {
             title: state.uri.queryParameters['title'] ?? 'Agent',
             currentUserUid: FirebaseAuth.instance.currentUser?.uid,
           ),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.favorites,
+        name: 'favorites',
+        builder: (context, state) => BlocProvider(
+          create: (_) => sl<FavoritesCubit>()..loadFavorites(),
+          child: const FavoritesScreen(),
         ),
       ),
       // Support
@@ -231,6 +276,17 @@ class AppRouter {
         path: AppRoutes.accountSetupSuccess,
         name: 'account-setup-success',
         builder: (context, state) => const AccountSuccessScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.agentDetails,
+        name: AppRoutes.agentDetailsName,
+        builder: (context, state) {
+          final agentId = state.pathParameters['agentId'] ?? '';
+          return BlocProvider(
+            create: (_) => sl<AgentDetailsCubit>()..loadAgentDetails(agentId),
+            child: AgentDetailsScreen(agentId: agentId),
+          );
+        },
       ),
       GoRoute(
         path: '${AppRoutes.propertyDetails}/:estateId',
@@ -327,6 +383,19 @@ class AppRouter {
           return FullscreenGalleryScreen(
             images: request.images,
             initialIndex: request.initialIndex,
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.map,
+        name: 'map',
+        builder: (context, state) {
+          final args = state.extra is MapScreenArgs
+              ? state.extra as MapScreenArgs
+              : null;
+          return BlocProvider(
+            create: (_) => sl<MapCubit>(),
+            child: EstateMapScreen(args: args),
           );
         },
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/widgets/app_feedback.dart';
 import '../../../category/domain/entities/category_entity.dart';
 import '../../domain/entities/search_filter.dart';
 
@@ -68,10 +69,9 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
     final minPrice = double.tryParse(_minPriceController.text.trim());
     final maxPrice = double.tryParse(_maxPriceController.text.trim());
     if (minPrice != null && maxPrice != null && minPrice > maxPrice) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Minimum price must not exceed maximum price.'),
-        ),
+      AppFeedback.error(
+        context,
+        'Minimum price must not exceed maximum price.',
       );
       return;
     }

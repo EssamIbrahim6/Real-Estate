@@ -4,6 +4,10 @@ import '../../../../core/errors/exceptions.dart';
 import '../models/review_model.dart';
 
 abstract class EstateDetailsRemoteDataSource {
+  Stream<List<String>> watchFavoriteEstateIds(String userId);
+  Future<void> addFavorite(String userId, String estateId);
+  Future<void> removeFavorite(String userId, String estateId);
+
   Future<List<ReviewModel>> getReviews(String estateId, {int limit = 20});
   Future<ReviewModel?> getUserReview(String estateId, String userId);
   Future<void> submitReview({
@@ -22,6 +26,64 @@ class EstateDetailsRemoteDataSourceImpl
   final FirebaseFirestore _firestore;
 
   const EstateDetailsRemoteDataSourceImpl(this._firestore);
+
+  CollectionReference<Map<String, dynamic>> _favoritesCollection(
+    String userId,
+  ) => _firestore.collection('users').doc(userId).collection('favorites');
+
+  @override
+  Stream<List<String>> watchFavoriteEstateIds(String userId) {
+    final normalizedUserId = userId.trim();
+    if (normalizedUserId.isEmpty) {
+      throw ArgumentError.value(userId, 'userId', 'Must not be empty.');
+    }
+
+    return _favoritesCollection(normalizedUserId).snapshots().map(
+      (snapshot) => snapshot.docs
+          .map((doc) => doc.data()['estateId'] as String? ?? doc.id)
+          .where((estateId) => estateId.trim().isNotEmpty)
+          .toList(growable: false),
+    );
+  }
+
+  @override
+  Future<void> addFavorite(String userId, String estateId) async {
+    final normalizedUserId = userId.trim();
+    final normalizedEstateId = estateId.trim();
+    if (normalizedUserId.isEmpty || normalizedEstateId.isEmpty) {
+      throw ArgumentError('User ID and estate ID must not be empty.');
+    }
+
+    try {
+      await _favoritesCollection(normalizedUserId).doc(normalizedEstateId).set({
+        'estateId': normalizedEstateId,
+        'addedAt': FieldValue.serverTimestamp(),
+      });
+    } on FirebaseException catch (e) {
+      throw ServerException(message: e.message ?? 'Failed to save favorite');
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<void> removeFavorite(String userId, String estateId) async {
+    final normalizedUserId = userId.trim();
+    final normalizedEstateId = estateId.trim();
+    if (normalizedUserId.isEmpty || normalizedEstateId.isEmpty) {
+      throw ArgumentError('User ID and estate ID must not be empty.');
+    }
+
+    try {
+      await _favoritesCollection(normalizedUserId)
+          .doc(normalizedEstateId)
+          .delete();
+    } on FirebaseException catch (e) {
+      throw ServerException(message: e.message ?? 'Failed to remove favorite');
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
 
   @override
   Future<List<ReviewModel>> getReviews(

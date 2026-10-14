@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/helpers/spacing.dart';
+import '../../../../core/widgets/person_avatar.dart';
 import '../../../agent/domain/entities/agent_entity.dart';
 
 class AgentCard extends StatelessWidget {
@@ -12,6 +12,7 @@ class AgentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -19,22 +20,18 @@ class AgentCard extends StatelessWidget {
         //padding: const EdgeInsets.all(12),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: colors.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.inputBorder),
+          border: Border.all(color: colors.outlineVariant),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: .min,
           children: [
-            CircleAvatar(
+            PersonAvatar(
+              photoUrl: agent.primaryPhotoUrl,
               radius: 26,
-              backgroundColor: AppColors.brandNavy.withValues(alpha: 0.08),
-              child: const Icon(
-                Icons.person,
-                color: AppColors.brandNavy,
-                size: 28,
-              ),
+              iconSize: 28,
             ),
             verticalSpace(8),
             Row(
@@ -42,11 +39,11 @@ class AgentCard extends StatelessWidget {
               children: [
                 Flexible(
                   child: Text(
-                    agent.agencyName,
-                    style: const TextStyle(
+                    agent.displayName,
+                    style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.brandNavy,
+                      color: colors.onSurface,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -54,11 +51,7 @@ class AgentCard extends StatelessWidget {
                 ),
                 if (agent.isVerified) ...[
                   const SizedBox(width: 4),
-                  const Icon(
-                    Icons.verified,
-                    size: 14,
-                    color: AppColors.brandGreen,
-                  ),
+                  Icon(Icons.verified, size: 14, color: colors.tertiary),
                 ],
               ],
             ),
@@ -70,9 +63,9 @@ class AgentCard extends StatelessWidget {
                 const SizedBox(width: 3),
                 Text(
                   '${agent.rating.toStringAsFixed(1)} (${agent.reviewCount})',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
-                    color: AppColors.textSecondary,
+                    color: colors.onSurfaceVariant,
                   ),
                 ),
               ],

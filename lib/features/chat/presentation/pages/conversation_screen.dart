@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/widgets/app_error_view.dart';
+import '../../../../core/widgets/app_feedback.dart';
 import '../../../../core/widgets/app_loading_indicator.dart';
 import '../cubit/chat_cubit.dart';
 import '../cubit/chat_state.dart';
@@ -75,9 +76,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     _lastSendingFailure = state.sendingFailure;
     _lastActionFailure = state.actionFailure;
     if (failure != null) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Text(_safeError(failure.message))));
+      AppFeedback.error(context, _safeError(failure.message));
     }
   }
 

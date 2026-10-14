@@ -2,9 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:real_estate_app/features/agent/data/datasources/agent_remote_data_source.dart';
 import 'package:real_estate_app/features/agent/data/repositories/agent_repository_impl.dart';
 import 'package:real_estate_app/features/agent/domain/repositories/agent_repository.dart';
+import 'package:real_estate_app/features/agent/presentation/cubit/agent_details_cubit.dart';
 import 'package:real_estate_app/features/estate/data/datasources/estate_remote_data_source.dart';
 import 'package:real_estate_app/features/estate/data/repositories/estate_repository_impl.dart';
 import 'package:real_estate_app/features/estate/domain/repositories/estate_repository.dart';
@@ -12,6 +14,10 @@ import 'package:real_estate_app/features/estate_details/data/datasources/estate_
 import 'package:real_estate_app/features/estate_details/data/repositories/estate_details_repository_impl.dart';
 import 'package:real_estate_app/features/estate_details/domain/repositories/estate_details_repository.dart';
 import 'package:real_estate_app/features/estate_details/presentation/cubit/estate_details_cubit.dart';
+import 'package:real_estate_app/features/favorites/presentation/cubit/favorites_cubit.dart';
+import 'package:real_estate_app/features/profile/presentation/cubit/profile_cubit.dart';
+import 'package:real_estate_app/features/profile/presentation/cubit/profile_edit_cubit.dart';
+import 'package:real_estate_app/core/theme/theme_cubit.dart';
 import 'package:real_estate_app/features/category/data/datasources/category_remote_data_source.dart';
 import 'package:real_estate_app/features/category/data/repositories/category_repository_impl.dart';
 import 'package:real_estate_app/features/category/domain/repositories/category_repository.dart';
@@ -24,6 +30,7 @@ import 'package:real_estate_app/features/chat/data/datasources/chat_remote_data_
 import 'package:real_estate_app/features/chat/data/repositories/chat_repository_impl.dart';
 import 'package:real_estate_app/features/chat/domain/repositories/chat_repository.dart';
 import 'package:real_estate_app/features/chat/presentation/cubit/chat_cubit.dart';
+import 'package:real_estate_app/features/map/presentation/cubit/map_cubit.dart';
 
 // Connectivity
 import '../../core/cubits/connectivity/connectivity_cubit.dart';
@@ -76,6 +83,13 @@ Future<void> initDependencies() async {
 
   // Google Sign In
   sl.registerLazySingleton<GoogleSignIn>(() => GoogleSignIn.instance);
+  final sharedPreferences = await SharedPreferences.getInstance();
+  sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
+
+  // Connectivity
+  sl.registerLazySingleton<ConnectivityService>(
+    () => ConnectivityServiceImpl(),
+  );
 
   // ============================================================
   // CLOUDINARY
@@ -183,6 +197,9 @@ Future<void> initDependencies() async {
 
   // Support Cubit
   sl.registerFactory(() => SupportCubit());
+  sl.registerFactory(
+    () => ConnectivityCubit(service: sl<ConnectivityService>()),
+  );
   // ============================================================
   // ESTATE DATA SOURCE & REPOSITORY
   // ============================================================
@@ -229,6 +246,7 @@ Future<void> initDependencies() async {
     () => SearchCubit(searchRepository: sl(), categoryRepository: sl()),
   );
   sl.registerFactory(() => ChatCubit(chatRepository: sl()));
+  sl.registerFactory(() => MapCubit(estateRepository: sl()));
   // ============================================================
   // ESTATE DETAILS & REVIEWS
   // ============================================================
@@ -249,4 +267,24 @@ Future<void> initDependencies() async {
       chatRepository: sl(),
     ),
   );
+
+  sl.registerFactory(
+    () => AgentDetailsCubit(agentRepository: sl(), estateRepository: sl()),
+  );
+
+  sl.registerFactory(
+    () => FavoritesCubit(
+      firebaseAuth: sl(),
+      estateDetailsRepository: sl(),
+      estateRepository: sl(),
+    ),
+  );
+
+  sl.registerFactory(
+    () => ProfileCubit(firebaseAuth: sl(), accountSetupRepository: sl()),
+  );
+  sl.registerFactory(
+    () => ProfileEditCubit(firebaseAuth: sl(), accountSetupRepository: sl()),
+  );
+  sl.registerFactory(() => ThemeCubit(preferences: sl()));
 }

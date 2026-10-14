@@ -235,12 +235,9 @@ class ChatCubit extends Cubit<ChatState> {
 
   Failure _asFailure(Object error) {
     if (error is Failure) return error;
-    // Surface Firestore permission errors as an auth failure so the UI can
-    // show a meaningful message rather than a generic server error.
     if (error is FirebaseException && error.code == 'permission-denied') {
-      return const AuthFailure(
-        message:
-            'You do not have permission to view these conversations. Please sign in again.',
+      return const ServerFailure(
+        message: 'You do not have permission to access this chat.',
       );
     }
     return ServerFailure(message: error.toString());

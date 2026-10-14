@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,6 +27,126 @@ import 'package:real_estate_app/features/estate_details/presentation/cubit/estat
 import 'package:real_estate_app/features/estate_details/presentation/pages/estate_details_screen.dart';
 
 void main() {
+  group('EstateDetailsCubit favorites', () {
+    test('adds and removes a favorite using the authenticated UID', () async {
+      final repository = _FakeEstateDetailsRepository();
+      final cubit = _createCubit(
+        auth: _FakeFirebaseAuth(_FakeUser('customer-auth-uid')),
+        agentRepository: _FakeAgentRepository(),
+        chatRepository: _FakeChatRepository(),
+        estateDetailsRepository: repository,
+      );
+
+      await cubit.toggleFavorite('estate-document-id');
+      expect(repository.addedFavorite, (
+        'customer-auth-uid',
+        'estate-document-id',
+      ));
+      expect(cubit.state.isFavorite, isTrue);
+      expect(cubit.state.favoriteActionStatus, FavoriteActionStatus.success);
+
+      await cubit.toggleFavorite('estate-document-id');
+      expect(repository.removedFavorite, (
+        'customer-auth-uid',
+        'estate-document-id',
+      ));
+      expect(cubit.state.isFavorite, isFalse);
+      await cubit.close();
+    });
+
+    test('loads and tracks favorite state from Firestore updates', () async {
+      final favoriteUpdates = StreamController<List<String>>();
+      final repository = _FakeEstateDetailsRepository(
+        favoriteStream: favoriteUpdates.stream,
+      );
+      final cubit = _createCubit(
+        auth: _FakeFirebaseAuth(_FakeUser('customer-auth-uid')),
+        agentRepository: _FakeAgentRepository(),
+        chatRepository: _FakeChatRepository(),
+        estateDetailsRepository: repository,
+      );
+
+      await _loadEstate(cubit, estate: _estate());
+      expect(repository.watchedUserId, 'customer-auth-uid');
+      favoriteUpdates.add(['estate-document-id']);
+      await Future<void>.delayed(Duration.zero);
+      expect(cubit.state.isFavorite, isTrue);
+
+      favoriteUpdates.add(const []);
+      await Future<void>.delayed(Duration.zero);
+      expect(cubit.state.isFavorite, isFalse);
+
+      await cubit.close();
+      await favoriteUpdates.close();
+    });
+
+    test('does not write a favorite when the user is signed out', () async {
+      final repository = _FakeEstateDetailsRepository();
+      final cubit = _createCubit(
+        auth: _FakeFirebaseAuth(null),
+        agentRepository: _FakeAgentRepository(),
+        chatRepository: _FakeChatRepository(),
+        estateDetailsRepository: repository,
+      );
+
+      await cubit.toggleFavorite('estate-document-id');
+
+      expect(repository.addedFavorite, isNull);
+      expect(repository.removedFavorite, isNull);
+      expect(cubit.state.favoriteActionStatus, FavoriteActionStatus.error);
+      expect(cubit.state.favoriteError, contains('Sign in'));
+      await cubit.close();
+    });
+
+    test(
+      'ignores repeated taps while a favorite write is in progress',
+      () async {
+        final writeGate = Completer<void>();
+        final repository = _FakeEstateDetailsRepository(writeGate: writeGate);
+        final cubit = _createCubit(
+          auth: _FakeFirebaseAuth(_FakeUser('customer-auth-uid')),
+          agentRepository: _FakeAgentRepository(),
+          chatRepository: _FakeChatRepository(),
+          estateDetailsRepository: repository,
+        );
+
+        final firstToggle = cubit.toggleFavorite('estate-document-id');
+        await cubit.toggleFavorite('estate-document-id');
+
+        expect(cubit.state.favoriteActionStatus, FavoriteActionStatus.loading);
+        expect(repository.addFavoriteCallCount, 1);
+
+        writeGate.complete();
+        await firstToggle;
+        expect(repository.addFavoriteCallCount, 1);
+        expect(cubit.state.isFavorite, isTrue);
+        await cubit.close();
+      },
+    );
+
+    test(
+      'reports favorite write errors without changing the icon state',
+      () async {
+        final repository = _FakeEstateDetailsRepository(
+          favoriteFailure: const ServerFailure(message: 'permission-denied'),
+        );
+        final cubit = _createCubit(
+          auth: _FakeFirebaseAuth(_FakeUser('customer-auth-uid')),
+          agentRepository: _FakeAgentRepository(),
+          chatRepository: _FakeChatRepository(),
+          estateDetailsRepository: repository,
+        );
+
+        await cubit.toggleFavorite('estate-document-id');
+
+        expect(cubit.state.isFavorite, isFalse);
+        expect(cubit.state.favoriteActionStatus, FavoriteActionStatus.error);
+        expect(cubit.state.favoriteError, 'permission-denied');
+        await cubit.close();
+      },
+    );
+  });
+
   group('EstateDetailsCubit.startConversationWithAgent', () {
     test('resolves estate agent document to its Auth UID', () async {
       final agentRepository = _FakeAgentRepository(agent: _agent());
@@ -351,10 +473,12 @@ EstateDetailsCubit _createCubit({
   required FirebaseAuth auth,
   required _FakeAgentRepository agentRepository,
   required _FakeChatRepository chatRepository,
+  _FakeEstateDetailsRepository? estateDetailsRepository,
 }) => EstateDetailsCubit(
   estateRepository: _FakeEstateRepository(),
   agentRepository: agentRepository,
-  estateDetailsRepository: _FakeEstateDetailsRepository(),
+  estateDetailsRepository:
+      estateDetailsRepository ?? _FakeEstateDetailsRepository(),
   firebaseAuth: auth,
   chatRepository: chatRepository,
 );
@@ -533,9 +657,48 @@ class _FakeEstateRepository implements EstateRepository {
   @override
   ResultFuture<List<EstateEntity>> getFeaturedEstates() async =>
       (failure: null, data: const <EstateEntity>[]);
+
+  @override
+  ResultFuture<List<EstateEntity>> getEstatesByAgentId(String agentId) async =>
+      (failure: null, data: const <EstateEntity>[]);
 }
 
 class _FakeEstateDetailsRepository implements EstateDetailsRepository {
+  _FakeEstateDetailsRepository({
+    this.favoriteStream,
+    this.favoriteFailure,
+    this.writeGate,
+  });
+
+  final Stream<List<String>>? favoriteStream;
+  final Failure? favoriteFailure;
+  final Completer<void>? writeGate;
+  String? watchedUserId;
+  (String, String)? addedFavorite;
+  (String, String)? removedFavorite;
+  int addFavoriteCallCount = 0;
+
+  @override
+  Stream<List<String>> watchFavoriteEstateIds(String userId) {
+    watchedUserId = userId;
+    return favoriteStream ?? Stream.value(const <String>[]);
+  }
+
+  @override
+  ResultVoid addFavorite(String userId, String estateId) async {
+    addFavoriteCallCount++;
+    addedFavorite = (userId, estateId);
+    await writeGate?.future;
+    return (failure: favoriteFailure, isSuccess: favoriteFailure == null);
+  }
+
+  @override
+  ResultVoid removeFavorite(String userId, String estateId) async {
+    removedFavorite = (userId, estateId);
+    await writeGate?.future;
+    return (failure: favoriteFailure, isSuccess: favoriteFailure == null);
+  }
+
   @override
   ResultFuture<List<ReviewEntity>> getReviews(
     String estateId, {

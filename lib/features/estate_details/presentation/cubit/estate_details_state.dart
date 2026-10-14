@@ -12,6 +12,8 @@ enum ReviewSubmitStatus { initial, loading, success, error }
 
 enum ContactAgentStatus { initial, loading, success, error }
 
+enum FavoriteActionStatus { initial, loading, success, error }
+
 class EstateDetailsState extends Equatable {
   final EstateLoadingStatus estateStatus;
   final EstateEntity? estate;
@@ -32,6 +34,11 @@ class EstateDetailsState extends Equatable {
   final String? contactAgentError;
   final String? conversationId;
 
+  final bool isFavoriteLoading;
+  final bool isFavorite;
+  final FavoriteActionStatus favoriteActionStatus;
+  final String? favoriteError;
+
   final double calculatedRating;
   final int calculatedReviewCount;
   final Map<int, int> ratingDistribution; // 5 -> count, 4 -> count, etc.
@@ -51,6 +58,10 @@ class EstateDetailsState extends Equatable {
     this.contactAgentStatus = ContactAgentStatus.initial,
     this.contactAgentError,
     this.conversationId,
+    this.isFavoriteLoading = false,
+    this.isFavorite = false,
+    this.favoriteActionStatus = FavoriteActionStatus.initial,
+    this.favoriteError,
     this.calculatedRating = 0.0,
     this.calculatedReviewCount = 0,
     this.ratingDistribution = const {5: 0, 4: 0, 3: 0, 2: 0, 1: 0},
@@ -72,6 +83,10 @@ class EstateDetailsState extends Equatable {
     String? contactAgentError,
     String? conversationId,
     bool clearConversationId = false,
+    bool? isFavoriteLoading,
+    bool? isFavorite,
+    FavoriteActionStatus? favoriteActionStatus,
+    String? favoriteError,
     double? calculatedRating,
     int? calculatedReviewCount,
     Map<int, int>? ratingDistribution,
@@ -93,6 +108,10 @@ class EstateDetailsState extends Equatable {
       conversationId: clearConversationId
           ? null
           : conversationId ?? this.conversationId,
+      isFavoriteLoading: isFavoriteLoading ?? this.isFavoriteLoading,
+      isFavorite: isFavorite ?? this.isFavorite,
+      favoriteActionStatus: favoriteActionStatus ?? this.favoriteActionStatus,
+      favoriteError: favoriteError,
       calculatedRating: calculatedRating ?? this.calculatedRating,
       calculatedReviewCount:
           calculatedReviewCount ?? this.calculatedReviewCount,
@@ -116,6 +135,10 @@ class EstateDetailsState extends Equatable {
     contactAgentStatus,
     contactAgentError,
     conversationId,
+    isFavoriteLoading,
+    isFavorite,
+    favoriteActionStatus,
+    favoriteError,
     calculatedRating,
     calculatedReviewCount,
     ratingDistribution,

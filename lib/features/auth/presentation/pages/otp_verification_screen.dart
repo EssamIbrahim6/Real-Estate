@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/helpers/spacing.dart';
 import '../../../../core/router/route_names.dart';
+import '../../../../core/widgets/app_feedback.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 import '../widgets/app_back_button.dart';
@@ -80,11 +81,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
         } else if (state is AuthFailureState) {
           setState(() => _errorMessage = state.message);
         } else if (state is OtpResentSuccessState) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('A new verification code has been dispatched.'),
-              backgroundColor: AppColors.success,
-            ),
+          AppFeedback.success(
+            context,
+            'A new verification code has been dispatched.',
           );
         }
       },

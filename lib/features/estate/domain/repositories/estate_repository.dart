@@ -17,6 +17,8 @@ abstract class EstateRepository {
     bool? isAvailable,
   });
 
+  ResultFuture<List<EstateEntity>> getEstatesByAgentId(String agentId);
+
   /// Fetches a single estate by its unique document ID.
   ResultFuture<EstateEntity> getEstateById(String id);
 }

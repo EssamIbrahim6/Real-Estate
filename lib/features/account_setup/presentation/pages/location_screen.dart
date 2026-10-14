@@ -8,6 +8,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/helpers/spacing.dart';
 import '../../../../core/router/route_names.dart';
+import '../../../../core/widgets/app_feedback.dart';
 import '../cubit/account_setup_cubit.dart';
 import '../cubit/account_setup_state.dart';
 import '../widgets/setup_progress_bar.dart';
@@ -44,12 +45,7 @@ class _LocationScreenState extends State<LocationScreen> {
     return BlocConsumer<AccountSetupCubit, AccountSetupState>(
       listener: (context, state) {
         if (state is AccountSetupFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: AppColors.error,
-            ),
-          );
+          AppFeedback.error(context, state.message);
         }
         if (state.data.location != null) {
           final loc = state.data.location!;

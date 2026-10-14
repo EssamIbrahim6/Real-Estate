@@ -7,7 +7,6 @@ import 'package:real_estate_app/core/helpers/auth_navigation_helper.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/helpers/spacing.dart';
-import '../../../../core/router/route_names.dart';
 import '../../../../core/utils/validators.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
