@@ -14,9 +14,8 @@ class CloudinaryServiceImpl implements CloudinaryService {
   final String uploadPreset;
   // xo5cninj
   const CloudinaryServiceImpl({
-    this.cloudName = 'xo5cninj', // Replace with your Cloudinary Cloud Name
-    this.uploadPreset =
-        'real_estate_preset', // Replace with your unsigned preset
+    this.cloudName = 'xo5cninj',
+    this.uploadPreset = 'RealEstate',
   });
 
   @override
