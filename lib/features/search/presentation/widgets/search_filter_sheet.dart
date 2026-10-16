@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/widgets/app_feedback.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../category/domain/entities/category_entity.dart';
 import '../../domain/entities/search_filter.dart';
 
@@ -96,6 +97,7 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.only(
@@ -124,10 +126,10 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                 const SizedBox(height: 18),
                 Row(
                   children: [
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        'Search filters',
-                        style: TextStyle(
+                        l10n?.searchFilters ?? 'Search filters',
+                        style: const TextStyle(
                           color: AppColors.brandNavy,
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
@@ -138,21 +140,21 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                       onPressed: () =>
                           Navigator.of(context)
                               .pop(widget.initialFilter.clearFilters()),
-                      child: const Text('Clear Filters'),
+                      child: Text(l10n?.searchClearFilters ?? 'Clear Filters'),
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   initialValue: _categoryId ?? '',
-                  decoration: const InputDecoration(
-                    labelText: 'Category',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n?.addPropertyCategory ?? 'Category',
+                    border: const OutlineInputBorder(),
                   ),
                   items: [
-                    const DropdownMenuItem<String>(
+                    DropdownMenuItem<String>(
                       value: '',
-                      child: Text('All categories'),
+                      child: Text(l10n?.searchAny ?? 'All categories'),
                     ),
                     if (_categoryId != null &&
                         !widget.categories.any(
@@ -160,7 +162,7 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                         ))
                       DropdownMenuItem<String>(
                         value: _categoryId,
-                        child: const Text('Selected category'),
+                        child: Text(l10n?.searchAny ?? 'Selected category'),
                       ),
                     ...widget.categories.map(
                       (category) => DropdownMenuItem<String>(
@@ -176,19 +178,19 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                   ),
                 ),
                 if (widget.categories.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 6),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
                     child: Text(
-                      'Categories are currently unavailable.',
-                      style: TextStyle(color: AppColors.textSecondary),
+                      l10n?.homeNoFeatured ?? 'Categories are currently unavailable.',
+                      style: const TextStyle(color: AppColors.textSecondary),
                     ),
                   ),
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _cityController,
-                  decoration: const InputDecoration(
-                    labelText: 'City',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n?.addPropertyCityEn ?? 'City',
+                    border: const OutlineInputBorder(),
                   ),
                   textCapitalization: TextCapitalization.words,
                 ),
@@ -198,7 +200,7 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                     Expanded(
                       child: _numberField(
                         controller: _minPriceController,
-                        label: 'Minimum price',
+                        label: l10n?.searchMinPrice ?? 'Minimum price',
                         decimal: true,
                       ),
                     ),
@@ -206,7 +208,7 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                     Expanded(
                       child: _numberField(
                         controller: _maxPriceController,
-                        label: 'Maximum price',
+                        label: l10n?.searchMaxPrice ?? 'Maximum price',
                         decimal: true,
                       ),
                     ),
@@ -218,14 +220,14 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                     Expanded(
                       child: _numberField(
                         controller: _bedroomsController,
-                        label: 'Bedrooms',
+                        label: l10n?.searchBedrooms ?? 'Bedrooms',
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _numberField(
                         controller: _bathroomsController,
-                        label: 'Bathrooms',
+                        label: l10n?.searchBathrooms ?? 'Bathrooms',
                       ),
                     ),
                   ],
@@ -233,17 +235,23 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                 const SizedBox(height: 14),
                 DropdownButtonFormField<String>(
                   initialValue: _listingType ?? '',
-                  decoration: const InputDecoration(
-                    labelText: 'Listing type',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n?.searchListingType ?? 'Listing type',
+                    border: const OutlineInputBorder(),
                   ),
-                  items: const [
+                  items: [
                     DropdownMenuItem<String>(
                       value: '',
-                      child: Text('Sale or rent'),
+                      child: Text(l10n?.searchAny ?? 'Sale or rent'),
                     ),
-                    DropdownMenuItem(value: 'sale', child: Text('For sale')),
-                    DropdownMenuItem(value: 'rent', child: Text('For rent')),
+                    DropdownMenuItem(
+                      value: 'sale',
+                      child: Text(l10n?.searchForSale ?? 'For sale'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'rent',
+                      child: Text(l10n?.searchForRent ?? 'For rent'),
+                    ),
                   ],
                   onChanged: (value) => setState(
                     () => _listingType = value == null || value.isEmpty
@@ -258,19 +266,22 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                       : _isFurnished!
                       ? 'furnished'
                       : 'unfurnished',
-                  decoration: const InputDecoration(
-                    labelText: 'Furnished',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n?.addPropertyFurnished ?? 'Furnished',
+                    border: const OutlineInputBorder(),
                   ),
-                  items: const [
-                    DropdownMenuItem(value: 'any', child: Text('Any')),
+                  items: [
+                    DropdownMenuItem(
+                      value: 'any',
+                      child: Text(l10n?.searchAny ?? 'Any'),
+                    ),
                     DropdownMenuItem(
                       value: 'furnished',
-                      child: Text('Furnished'),
+                      child: Text(l10n?.detailsFurnished ?? 'Furnished'),
                     ),
                     DropdownMenuItem(
                       value: 'unfurnished',
-                      child: Text('Unfurnished'),
+                      child: Text(l10n?.detailsUnfurnished ?? 'Unfurnished'),
                     ),
                   ],
                   onChanged: (value) => setState(
@@ -286,7 +297,7 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                   width: double.infinity,
                   child: FilledButton(
                     onPressed: _apply,
-                    child: const Text('Apply filters'),
+                    child: Text(l10n?.searchApplyFilters ?? 'Apply filters'),
                   ),
                 ),
               ],

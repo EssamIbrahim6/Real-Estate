@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/generated/app_localizations.dart';
+
 class HomeSearchBar extends StatelessWidget {
   final VoidCallback onSearchTap;
 
@@ -8,6 +10,7 @@ class HomeSearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
     return Column(
       children: [
         GestureDetector(
@@ -30,7 +33,8 @@ class HomeSearchBar extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Search properties, location, type...',
+                    l10n?.homeSearchHint ??
+                        'Search properties, location, type...',
                     style: TextStyle(
                       fontSize: 14,
                       color: colors.onSurfaceVariant,

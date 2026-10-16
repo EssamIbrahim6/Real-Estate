@@ -6,6 +6,7 @@ import '../../../../core/router/route_names.dart';
 import '../../../../core/widgets/app_feedback.dart';
 import '../../../../core/widgets/app_skeleton.dart';
 import '../../../../core/widgets/person_avatar.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
 import '../cubit/profile_cubit.dart';
@@ -18,6 +19,7 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is Unauthenticated) {
@@ -28,10 +30,10 @@ class ProfileScreen extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Your profile'),
+          title: Text(l10n?.profileTitle ?? 'Your profile'),
           actions: [
             IconButton(
-              tooltip: 'Settings',
+              tooltip: l10n?.profileSettingsTitle ?? 'Settings',
               onPressed: () => context.pushNamed(
                 'settings',
                 extra: context.read<ProfileCubit>().state.email,
@@ -64,7 +66,9 @@ class ProfileScreen extends StatelessWidget {
             }
             if (state.status == ProfileStatus.error) {
               return _ProfileLoadError(
-                message: state.error ?? 'Your profile could not be loaded.',
+                message: state.error ??
+                    l10n?.profileLoadError ??
+                    'Your profile could not be loaded.',
                 onRetry: context.read<ProfileCubit>().loadProfile,
               );
             }
@@ -95,12 +99,13 @@ class ProfileScreen extends StatelessWidget {
                   ],
                   const SizedBox(height: 28),
                   ProfileSection(
-                    title: 'YOUR ACCOUNT',
+                    title: l10n?.profileSectionAccount ?? 'YOUR ACCOUNT',
                     children: [
                       ProfileActionTile(
                         icon: Icons.person_outline_rounded,
-                        title: 'Edit profile',
-                        subtitle: 'Update your name, phone, and photo',
+                        title: l10n?.profileEditTitle ?? 'Edit profile',
+                        subtitle: l10n?.profileEditSubtitle ??
+                            'Update your name, phone, and photo',
                         onTap: () async {
                           final updated = await context.pushNamed<bool>(
                             'edit-profile',
@@ -112,45 +117,51 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       ProfileActionTile(
                         icon: Icons.favorite_border_rounded,
-                        title: 'Favorites',
-                        subtitle: 'Properties you have saved',
+                        title: l10n?.favoritesTitle ?? 'Favorites',
+                        subtitle: l10n?.profileFavoritesSubtitle ??
+                            'Properties you have saved',
                         onTap: () => context.push(AppRoutes.favorites),
                       ),
                       ProfileActionTile(
                         icon: Icons.chat_bubble_outline_rounded,
-                        title: 'Messages',
-                        subtitle: 'Continue your conversations',
+                        title: l10n?.navChat ?? 'Messages',
+                        subtitle: l10n?.profileMessagesSubtitle ??
+                            'Continue your conversations',
                         onTap: () => context.go(AppRoutes.chat),
                       ),
                     ],
                   ),
                   const SizedBox(height: 24),
                   ProfileSection(
-                    title: 'PREFERENCES & SUPPORT',
+                    title: l10n?.profileSectionPreferences ??
+                        'PREFERENCES & SUPPORT',
                     children: [
                       ProfileActionTile(
                         icon: Icons.settings_outlined,
-                        title: 'Settings',
-                        subtitle: 'Account security and app preferences',
+                        title: l10n?.profileSettingsTitle ?? 'Settings',
+                        subtitle: l10n?.profileSettingsSubtitle ??
+                            'Account security and app preferences',
                         onTap: () =>
                             context.pushNamed('settings', extra: state.email),
                       ),
                       ProfileActionTile(
                         icon: Icons.help_outline_rounded,
-                        title: 'Help & support',
-                        subtitle: 'Browse frequently asked questions',
+                        title: l10n?.profileHelpTitle ?? 'Help & support',
+                        subtitle: l10n?.profileHelpSubtitle ??
+                            'Browse frequently asked questions',
                         onTap: () => context.push(AppRoutes.faqSupport),
                       ),
                     ],
                   ),
                   const SizedBox(height: 24),
                   ProfileSection(
-                    title: 'ACCOUNT',
+                    title: l10n?.profileSectionSignOut ?? 'ACCOUNT',
                     children: [
                       ProfileActionTile(
                         icon: Icons.logout_rounded,
-                        title: 'Sign out',
-                        subtitle: 'Sign out of this account on this device',
+                        title: l10n?.profileSignOutTitle ?? 'Sign out',
+                        subtitle: l10n?.profileSignOutSubtitle ??
+                            'Sign out of this account on this device',
                         destructive: true,
                         onTap: () => confirmSignOut(context),
                       ),
@@ -184,6 +195,7 @@ class _ProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -208,7 +220,9 @@ class _ProfileHeader extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      name.trim().isEmpty ? 'Your profile' : name,
+                      name.trim().isEmpty
+                          ? (l10n?.profileTitle ?? 'Your profile')
+                          : name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -245,7 +259,9 @@ class _ProfileHeader extends StatelessWidget {
               const SizedBox(width: 7),
               Expanded(
                 child: Text(
-                  isEmailVerified ? 'Email verified' : 'Email not verified',
+                  isEmailVerified
+                      ? (l10n?.profileEmailVerified ?? 'Email verified')
+                      : (l10n?.profileEmailNotVerified ?? 'Email not verified'),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: colors.onSurface.withValues(alpha: 0.65),
                     fontWeight: FontWeight.w500,
@@ -255,7 +271,7 @@ class _ProfileHeader extends StatelessWidget {
               OutlinedButton.icon(
                 onPressed: onEdit,
                 icon: const Icon(Icons.edit_outlined, size: 16),
-                label: const Text('Edit profile'),
+                label: Text(l10n?.profileEditTitle ?? 'Edit profile'),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size(0, 40),
                   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -302,26 +318,36 @@ class _SignedOutView extends StatelessWidget {
   const _SignedOutView({required this.onSignIn});
 
   @override
-  Widget build(BuildContext context) => Center(
-    child: Padding(
-      padding: const EdgeInsets.all(28),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.person_outline_rounded, size: 48),
-          const SizedBox(height: 16),
-          Text(
-            'Sign in to view your profile',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 8),
-          const Text('Your saved properties and account details will be here.'),
-          const SizedBox(height: 20),
-          FilledButton(onPressed: onSignIn, child: const Text('Sign in')),
-        ],
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.person_outline_rounded, size: 48),
+            const SizedBox(height: 16),
+            Text(
+              l10n?.profileSignInPrompt ?? 'Sign in to view your profile',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              l10n?.profileSignInSubtitle ??
+                  'Your saved properties and account details will be here.',
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            FilledButton(
+              onPressed: onSignIn,
+              child: Text(l10n?.authSignIn ?? 'Sign in'),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _ProfileLoadError extends StatelessWidget {
@@ -331,21 +357,24 @@ class _ProfileLoadError extends StatelessWidget {
   const _ProfileLoadError({required this.message, required this.onRetry});
 
   @override
-  Widget build(BuildContext context) => Center(
-    child: Padding(
-      padding: const EdgeInsets.all(28),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(message, textAlign: TextAlign.center),
-          const SizedBox(height: 16),
-          OutlinedButton.icon(
-            onPressed: onRetry,
-            icon: const Icon(Icons.refresh_rounded),
-            label: const Text('Try again'),
-          ),
-        ],
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(message, textAlign: TextAlign.center),
+            const SizedBox(height: 16),
+            OutlinedButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh_rounded),
+              label: Text(l10n?.commonRetry ?? 'Try again'),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }

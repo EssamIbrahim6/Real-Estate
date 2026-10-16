@@ -189,4 +189,8 @@ class _FakeEstateRepository implements EstateRepository {
         failure: null,
         data: estates.where((estate) => estate.agentId == agentId).toList(),
       );
+
+  @override
+  ResultFuture<String> createEstate(EstateEntity estate) async =>
+      (failure: null, data: estate.id);
 }

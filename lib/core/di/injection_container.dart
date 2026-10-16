@@ -34,6 +34,7 @@ import 'package:real_estate_app/features/map/presentation/cubit/map_cubit.dart';
 
 // Connectivity
 import '../../core/cubits/connectivity/connectivity_cubit.dart';
+import '../../core/localization/locale_cubit.dart';
 import '../../core/services/connectivity_service.dart';
 
 // ============================================================
@@ -287,4 +288,5 @@ Future<void> initDependencies() async {
     () => ProfileEditCubit(firebaseAuth: sl(), accountSetupRepository: sl()),
   );
   sl.registerFactory(() => ThemeCubit(preferences: sl()));
+  sl.registerFactory(() => LocaleCubit(preferences: sl()));
 }

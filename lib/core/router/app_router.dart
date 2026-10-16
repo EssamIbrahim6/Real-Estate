@@ -11,7 +11,6 @@ import 'package:real_estate_app/features/home/presentation/pages/home_screen.dar
 import 'package:real_estate_app/features/estate_details/presentation/pages/fullscreen_gallery_screen.dart';
 import 'package:real_estate_app/features/listing/presentation/cubit/listing_cubit.dart';
 import 'package:real_estate_app/features/listing/presentation/pages/category_estates_screen.dart';
-import 'package:real_estate_app/features/listing/presentation/pages/listings_screen.dart';
 import 'package:real_estate_app/features/search/presentation/cubit/search_cubit.dart';
 import 'package:real_estate_app/features/search/presentation/pages/search_screen.dart';
 import 'package:real_estate_app/features/chat/presentation/pages/chat_screen.dart';
@@ -32,6 +31,7 @@ import '../di/injection_container.dart';
 import '../navigation/main_navigation_shell.dart';
 import 'route_names.dart';
 import '../../features/estate/domain/entities/estate_entity.dart';
+import '../../features/estate/presentation/pages/add_property_screen.dart';
 
 // Splash & Onboarding
 import '../../features/splash/screens/splash_screen.dart';
@@ -398,6 +398,11 @@ class AppRouter {
             child: EstateMapScreen(args: args),
           );
         },
+      ),
+      GoRoute(
+        path: AppRoutes.addProperty,
+        name: 'add-property',
+        builder: (context, state) => const AddPropertyScreen(),
       ),
       // Home Screen
       // GoRoute(

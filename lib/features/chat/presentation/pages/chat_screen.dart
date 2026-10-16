@@ -7,6 +7,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/router/route_names.dart';
 import '../../../../core/widgets/app_error_view.dart';
 import '../../../../core/widgets/app_skeleton.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../cubit/chat_cubit.dart';
 import '../cubit/chat_state.dart';
 
@@ -36,8 +37,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Chat')),
+      appBar: AppBar(title: Text(l10n?.navChat ?? 'Chat')),
       body: _currentUserUid == null
           ? const _ChatAuthenticationRequired()
           : BlocBuilder<ChatCubit, ChatState>(
@@ -48,7 +50,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     return const ChatListSkeleton();
                   case ChatLoadStatus.failure:
                     return AppErrorView(
-                      message:
+                      message: l10n?.commonError ??
                           'Could not load conversations. Please try again.',
                       onRetry: () => context
                           .read<ChatCubit>()
@@ -112,7 +114,9 @@ class _ChatScreenState extends State<ChatScreen> {
                               ),
                             ),
                             subtitle: Text(
-                              conversation.lastMessage ?? 'Property inquiry',
+                              conversation.lastMessage ??
+                                  l10n?.chatInquiry ??
+                                  'Property inquiry',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -166,6 +170,7 @@ class _EmptyConversations extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -179,12 +184,13 @@ class _EmptyConversations extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'No conversations yet',
+              l10n?.chatEmptyTitle ?? 'No conversations yet',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
             Text(
-              'Start a conversation with an agent from a property.',
+              l10n?.chatEmptyMessage ??
+                  'Start a conversation with an agent from a property.',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -202,7 +208,12 @@ class _ChatAuthenticationRequired extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Sign in to view your conversations.'));
+    final l10n = AppLocalizations.of(context);
+    return Center(
+      child: Text(
+        l10n?.chatAuthRequired ?? 'Sign in to view your conversations.',
+      ),
+    );
   }
 }
 

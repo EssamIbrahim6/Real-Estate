@@ -8,6 +8,7 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/router/route_names.dart';
 import '../../../../core/widgets/app_error_view.dart';
 import '../../../../core/widgets/app_skeleton.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../estate/domain/entities/estate_entity.dart';
 import '../../../home/presentation/widgets/estate_card.dart';
 import '../cubit/search_cubit.dart';
@@ -118,21 +119,22 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Search properties'),
+        title: Text(l10n?.searchTitle ?? 'Search properties'),
         actions: [
           BlocBuilder<SearchCubit, SearchState>(
             builder: (context, state) => IconButton(
-              tooltip: 'View on map',
+              tooltip: l10n?.searchViewOnMap ?? 'View on map',
               icon: const Icon(Icons.map_outlined),
               onPressed: () {
                 context.push(
                   AppRoutes.map,
                   extra: MapScreenArgs(
                     estates: state.estates,
-                    title: 'Search Map',
+                    title: l10n?.mapSearchTitle ?? 'Search Map',
                   ),
                 );
               },
@@ -163,14 +165,14 @@ class _SearchScreenState extends State<SearchScreen> {
                         _runSearch();
                       },
                       decoration: InputDecoration(
-                        hintText: 'Search estates...',
+                        hintText: l10n?.searchHint ?? 'Search estates…',
                         prefixIcon: const Icon(Icons.search_rounded),
                         suffixIcon: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             if (_queryController.text.isNotEmpty)
                               IconButton(
-                                tooltip: 'Clear search',
+                                tooltip: l10n?.commonClear ?? 'Clear search',
                                 onPressed: () {
                                   _debounceTimer?.cancel();
                                   _queryController.clear();
@@ -180,7 +182,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                 icon: const Icon(Icons.close_rounded),
                               ),
                             IconButton(
-                              tooltip: 'Search',
+                              tooltip: l10n?.commonSearch ?? 'Search',
                               onPressed: () {
                                 _debounceTimer?.cancel();
                                 _runSearch();
@@ -200,7 +202,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                   const SizedBox(width: 8),
                   IconButton.filledTonal(
-                    tooltip: 'Filters',
+                    tooltip: l10n?.searchFilters ?? 'Filters',
                     onPressed: () => _openFilters(state),
                     icon: const Icon(Icons.tune_rounded),
                   ),
@@ -230,6 +232,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     return AppErrorView(
                       message:
                           state.failure?.message ??
+                          l10n?.homeLoadError ??
                           'Search could not be completed.',
                       onRetry: () => context.read<SearchCubit>().retry(),
                     );
@@ -245,18 +248,19 @@ class _SearchScreenState extends State<SearchScreen> {
                               size: 48,
                               color: colors.onSurfaceVariant,
                             ),
-                            SizedBox(height: 12),
+                            const SizedBox(height: 12),
                             Text(
-                              'No estates found',
+                              l10n?.searchNoResults ?? 'No estates found',
                               style: TextStyle(
                                 color: colors.onSurface,
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
-                            SizedBox(height: 6),
+                            const SizedBox(height: 6),
                             Text(
-                              'Try changing your search or filters.',
+                              l10n?.searchNoResultsHint ??
+                                  'Try changing your search or filters.',
                               textAlign: TextAlign.center,
                               style: TextStyle(color: colors.onSurfaceVariant),
                             ),

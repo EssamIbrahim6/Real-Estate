@@ -6,6 +6,10 @@ class EstateLocationModel extends EstateLocationEntity {
   const EstateLocationModel({
     required super.address,
     required super.city,
+    super.addressEn,
+    super.addressAr,
+    super.cityEn,
+    super.cityAr,
     required super.latitude,
     required super.longitude,
     super.geohash,
@@ -20,9 +24,25 @@ class EstateLocationModel extends EstateLocationEntity {
         longitude: 0.0,
       );
     }
+    final addressEn =
+        map['address_en'] as String? ?? map['addressEn'] as String?;
+    final addressAr =
+        map['address_ar'] as String? ?? map['addressAr'] as String?;
+    final cityEn = map['city_en'] as String? ?? map['cityEn'] as String?;
+    final cityAr = map['city_ar'] as String? ?? map['cityAr'] as String?;
+    final rawAddress = map['address'] as String? ?? '';
+    final rawCity = map['city'] as String? ?? '';
+
+    final address = rawAddress.isNotEmpty ? rawAddress : (addressEn ?? '');
+    final city = rawCity.isNotEmpty ? rawCity : (cityEn ?? '');
+
     return EstateLocationModel(
-      address: map['address'] as String? ?? '',
-      city: map['city'] as String? ?? '',
+      address: address,
+      city: city,
+      addressEn: addressEn ?? (rawAddress.isNotEmpty ? rawAddress : null),
+      addressAr: addressAr,
+      cityEn: cityEn ?? (rawCity.isNotEmpty ? rawCity : null),
+      cityAr: cityAr,
       latitude: (map['latitude'] as num?)?.toDouble() ?? 0.0,
       longitude: (map['longitude'] as num?)?.toDouble() ?? 0.0,
       geohash: map['geohash'] as String?,
@@ -32,6 +52,10 @@ class EstateLocationModel extends EstateLocationEntity {
   Map<String, dynamic> toMap() => {
     'address': address,
     'city': city,
+    if (addressEn != null) 'address_en': addressEn,
+    if (addressAr != null) 'address_ar': addressAr,
+    if (cityEn != null) 'city_en': cityEn,
+    if (cityAr != null) 'city_ar': cityAr,
     'latitude': latitude,
     'longitude': longitude,
     if (geohash != null) 'geohash': geohash,
@@ -43,6 +67,10 @@ class EstateModel extends EstateEntity {
     required super.id,
     required super.title,
     required super.description,
+    super.titleEn,
+    super.titleAr,
+    super.descriptionEn,
+    super.descriptionAr,
     required super.price,
     super.pricePeriod,
     required super.listingType,
@@ -77,10 +105,28 @@ class EstateModel extends EstateEntity {
   }
 
   factory EstateModel.fromMap(Map<String, dynamic> map, String id) {
+    final titleEn = map['title_en'] as String? ?? map['titleEn'] as String?;
+    final titleAr = map['title_ar'] as String? ?? map['titleAr'] as String?;
+    final descriptionEn =
+        map['description_en'] as String? ?? map['descriptionEn'] as String?;
+    final descriptionAr =
+        map['description_ar'] as String? ?? map['descriptionAr'] as String?;
+    final rawTitle = map['title'] as String? ?? '';
+    final rawDescription = map['description'] as String? ?? '';
+
+    final title = rawTitle.isNotEmpty ? rawTitle : (titleEn ?? '');
+    final description =
+        rawDescription.isNotEmpty ? rawDescription : (descriptionEn ?? '');
+
     return EstateModel(
       id: id,
-      title: map['title'] as String? ?? '',
-      description: map['description'] as String? ?? '',
+      title: title,
+      description: description,
+      titleEn: titleEn ?? (rawTitle.isNotEmpty ? rawTitle : null),
+      titleAr: titleAr,
+      descriptionEn:
+          descriptionEn ?? (rawDescription.isNotEmpty ? rawDescription : null),
+      descriptionAr: descriptionAr,
       price: (map['price'] as num?)?.toDouble() ?? 0.0,
       pricePeriod: map['pricePeriod'] as String?,
       listingType: map['listingType'] as String? ?? 'sale',
@@ -135,6 +181,11 @@ class EstateModel extends EstateEntity {
   Map<String, dynamic> toFirestore() => {
     'title': title,
     'description': description,
+    if (titleEn != null || title.isNotEmpty) 'title_en': titleEn ?? title,
+    if (titleAr != null) 'title_ar': titleAr,
+    if (descriptionEn != null || description.isNotEmpty)
+      'description_en': descriptionEn ?? description,
+    if (descriptionAr != null) 'description_ar': descriptionAr,
     'price': price,
     'pricePeriod': pricePeriod,
     'listingType': listingType,
@@ -150,6 +201,10 @@ class EstateModel extends EstateEntity {
         : {
             'address': location.address,
             'city': location.city,
+            if (location.addressEn != null) 'address_en': location.addressEn,
+            if (location.addressAr != null) 'address_ar': location.addressAr,
+            if (location.cityEn != null) 'city_en': location.cityEn,
+            if (location.cityAr != null) 'city_ar': location.cityAr,
             'latitude': location.latitude,
             'longitude': location.longitude,
             'geohash': location.geohash,
