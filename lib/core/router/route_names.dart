@@ -35,4 +35,10 @@ abstract class AppRoutes {
   static const String accountSetupPayment = '/account-setup/payment';
   static const String accountSetupPersonalInfo = '/account-setup/personal-info';
   static const String accountSetupSuccess = '/account-setup/success';
+  static const String bookTour = '/book-tour';
+  static const String bookTourName = 'book-tour';
+  static const String myBookings = '/my-bookings';
+  static const String myBookingsName = 'my-bookings';
+  static const String bookingDetails = '/booking-details/:bookingId';
+  static const String bookingDetailsName = 'booking-details';
 }

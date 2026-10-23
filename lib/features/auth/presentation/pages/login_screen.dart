@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:real_estate_app/core/constants/app_assets.dart';
 import 'package:real_estate_app/core/helpers/auth_navigation_helper.dart';
+import 'package:real_estate_app/l10n/generated/app_localizations.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/helpers/spacing.dart';
@@ -48,6 +49,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is Authenticated) {
@@ -75,9 +78,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     AppBackButton(onTap: () => context.pop()),
                     verticalSpace(24),
 
-                    const AuthHeader(
-                      title: "Let's Sign In",
-                      subtitle: "quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+                    AuthHeader(
+                      title: l10n?.authLoginTitle ?? "Let's Sign In",
+                      subtitle: l10n?.authLoginSubtitle ??
+                          "Welcome back! Sign in to continue.",
                     ),
                     verticalSpace(28),
 
@@ -117,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     AuthTextField(
                       controller: _emailController,
-                      hintText: 'Email',
+                      hintText: l10n?.authEmailLabel ?? 'Email',
                       prefixIcon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
                       validator: AppValidators.email,
@@ -127,12 +131,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     AuthTextField(
                       controller: _passwordController,
-                      hintText: 'Password',
+                      hintText: l10n?.authPasswordLabel ?? 'Password',
                       prefixIcon: Icons.lock_outline_rounded,
                       isPassword: true,
                       textInputAction: TextInputAction.done,
                       validator: (val) => val == null || val.isEmpty
-                          ? 'Password is required'
+                          ? (l10n?.authPasswordRequiredField ??
+                              'Password is required')
                           : null,
                       hasError: _errorMessage != null,
                     ),
@@ -142,9 +147,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       alignment: Alignment.centerRight,
                       child: GestureDetector(
                         onTap: () => context.pushNamed('forgot-password'),
-                        child: const Text(
-                          'Forgot password?',
-                          style: TextStyle(
+                        child: Text(
+                          l10n?.authForgotPasswordLink ?? 'Forgot password?',
+                          style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                             color: AppColors.brandNavy,
@@ -175,9 +180,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   color: Colors.white,
                                 ),
                               )
-                            : const Text(
-                                'Login',
-                                style: TextStyle(
+                            : Text(
+                                l10n?.authLoginButton ?? 'Login',
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.white,
@@ -216,18 +221,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          "Don't have an account? ",
-                          style: TextStyle(
+                        Text(
+                          l10n?.authDontHaveAccountShort ??
+                              "Don't have an account? ",
+                          style: const TextStyle(
                             fontSize: 14,
                             color: AppColors.textSecondary,
                           ),
                         ),
                         GestureDetector(
                           onTap: () => context.pushReplacementNamed('register'),
-                          child: const Text(
-                            'Register',
-                            style: TextStyle(
+                          child: Text(
+                            l10n?.authRegisterLink ?? 'Register',
+                            style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
                               color: AppColors.brandGreen,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:real_estate_app/l10n/generated/app_localizations.dart';
 
 import '../../../../core/constants/app_colors.dart';
 
@@ -58,14 +59,15 @@ class OrDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Row(
       children: [
         Expanded(child: Container(height: 1, color: AppColors.divider)),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            'OR',
-            style: TextStyle(
+            (l10n?.commonOr ?? 'OR').toUpperCase(),
+            style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
               color: AppColors.textMuted,

@@ -149,38 +149,44 @@ class _ThemePreferenceTile extends StatelessWidget {
                     'Choose your preferred theme')
                 : (l10n?.commonLoading ?? 'Loading…'),
           ),
-          trailing: DropdownButton<AppThemePreference>(
-            value: preference,
-            underline: const SizedBox.shrink(),
-            borderRadius: BorderRadius.circular(12),
-            onChanged: state.isLoaded
-                ? (value) async {
-                    if (value == null || value == preference) return;
-                    final cubit = context.read<ThemeCubit>();
-                    final saved = await cubit.setPreference(value);
-                    if (!saved && context.mounted) {
-                      AppFeedback.error(
-                        context,
-                        cubit.state.error ??
-                            'Appearance preference could not be saved.',
-                      );
-                    }
-                  }
-                : null,
-            items: [
-              DropdownMenuItem(
-                value: AppThemePreference.system,
-                child: Text(l10n?.settingsThemeSystem ?? 'System'),
+          trailing: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 100),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<AppThemePreference>(
+                value: preference,
+                isDense: true,
+                isExpanded: true,
+                borderRadius: BorderRadius.circular(12),
+                onChanged: state.isLoaded
+                    ? (value) async {
+                        if (value == null || value == preference) return;
+                        final cubit = context.read<ThemeCubit>();
+                        final saved = await cubit.setPreference(value);
+                        if (!saved && context.mounted) {
+                          AppFeedback.error(
+                            context,
+                            cubit.state.error ??
+                                'Appearance preference could not be saved.',
+                          );
+                        }
+                      }
+                    : null,
+                items: [
+                  DropdownMenuItem(
+                    value: AppThemePreference.system,
+                    child: Text(l10n?.settingsThemeSystem ?? 'System'),
+                  ),
+                  DropdownMenuItem(
+                    value: AppThemePreference.light,
+                    child: Text(l10n?.settingsThemeLight ?? 'Light'),
+                  ),
+                  DropdownMenuItem(
+                    value: AppThemePreference.dark,
+                    child: Text(l10n?.settingsThemeDark ?? 'Dark'),
+                  ),
+                ],
               ),
-              DropdownMenuItem(
-                value: AppThemePreference.light,
-                child: Text(l10n?.settingsThemeLight ?? 'Light'),
-              ),
-              DropdownMenuItem(
-                value: AppThemePreference.dark,
-                child: Text(l10n?.settingsThemeDark ?? 'Dark'),
-              ),
-            ],
+            ),
           ),
         );
       },
@@ -222,31 +228,38 @@ class _LanguagePreferenceTile extends StatelessWidget {
             l10n?.settingsLanguageSubtitle ??
                 'Choose between Arabic and English',
           ),
-          trailing: DropdownButton<String>(
-            value: currentCode,
-            underline: const SizedBox.shrink(),
-            borderRadius: BorderRadius.circular(12),
-            onChanged: (code) async {
-              if (code == null || code == currentCode) return;
-              final cubit = context.read<LocaleCubit>();
-              final saved = await cubit.setLocale(Locale(code));
-              if (!saved && context.mounted) {
-                AppFeedback.error(
-                  context,
-                  cubit.state.error ?? 'Language preference could not be saved.',
-                );
-              }
-            },
-            items: [
-              DropdownMenuItem(
-                value: 'en',
-                child: Text(l10n?.settingsLanguageEn ?? 'English'),
+          trailing: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 100),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: currentCode,
+                isDense: true,
+                isExpanded: true,
+                borderRadius: BorderRadius.circular(12),
+                onChanged: (code) async {
+                  if (code == null || code == currentCode) return;
+                  final cubit = context.read<LocaleCubit>();
+                  final saved = await cubit.setLocale(Locale(code));
+                  if (!saved && context.mounted) {
+                    AppFeedback.error(
+                      context,
+                      cubit.state.error ??
+                          'Language preference could not be saved.',
+                    );
+                  }
+                },
+                items: [
+                  DropdownMenuItem(
+                    value: 'en',
+                    child: Text(l10n?.settingsLanguageEn ?? 'English'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'ar',
+                    child: Text(l10n?.settingsLanguageAr ?? 'العربية'),
+                  ),
+                ],
               ),
-              DropdownMenuItem(
-                value: 'ar',
-                child: Text(l10n?.settingsLanguageAr ?? 'العربية (Arabic)'),
-              ),
-            ],
+            ),
           ),
         );
       },

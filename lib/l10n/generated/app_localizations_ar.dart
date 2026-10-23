@@ -637,6 +637,322 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authPasswordTooShort => 'يجب أن تكون كلمة المرور 6 أحرف على الأقل';
 
   @override
+  String get authContinueWithEmail => 'المتابعة بالبريد الإلكتروني';
+
+  @override
+  String get authForgotPasswordLink => 'نسيت كلمة المرور؟';
+
+  @override
+  String get authDontHaveAccountShort => 'ليس لديك حساب؟ ';
+
+  @override
+  String get authAlreadyHaveAccountShort => 'لديك حساب بالفعل؟ ';
+
+  @override
+  String get authSignInLink => 'تسجيل الدخول';
+
+  @override
+  String get authRegisterLink => 'إنشاء حساب';
+
+  @override
+  String get authLoginTitle => 'لنبدأ بتسجيل الدخول';
+
+  @override
+  String get authLoginSubtitle => 'أهلاً بعودتك! سجّل الدخول للمتابعة.';
+
+  @override
+  String get authRegisterTitle => 'إنشاء حسابك';
+
+  @override
+  String get authRegisterSubtitle => 'انضم إلينا للعثور على عقار أحلامك.';
+
+  @override
+  String get authLoginButton => 'تسجيل الدخول';
+
+  @override
+  String get authRegisterButton => 'إنشاء حساب';
+
+  @override
+  String get authPasswordRequiredField => 'كلمة المرور مطلوبة';
+
+  @override
+  String get authTermsOfService =>
+      'بإنشاء الحساب، أنت توافق على شروط الخدمة وسياسة الخصوصية.';
+
+  @override
+  String get authFacebookLogin => 'تسجيل الدخول بفيسبوك';
+
+  @override
+  String get authFacebookLoginMessage =>
+      'تسجيل الدخول بفيسبوك يتطلب إعداد معرف تطبيق فيسبوك في كونسول Firebase.';
+
+  @override
+  String get authFacebookDialogOk => 'موافق';
+
+  @override
+  String get authReadyTo => 'هل أنت مستعد ';
+
+  @override
+  String get authExplore => 'للاستكشاف؟';
+
+  @override
+  String get authExploreSubtitle =>
+      'اعثر على منزل أحلامك بسهولة وعش راحة منزلك المستقبلي.';
+
+  @override
+  String get authForgotPasswordSubtitle =>
+      'أدخل بريدك الإلكتروني المسجل وسنرسل لك رابطاً لإعادة تعيين كلمة المرور.';
+
+  @override
+  String get authPasswordResetSent =>
+      'تم إرسال رابط إعادة تعيين كلمة المرور! تحقق من صندوق الوارد والبريد غير الهام.';
+
+  @override
+  String get authResendLink => 'إعادة إرسال الرابط';
+
+  @override
+  String get authOtpEnterAllDigits => 'يرجى إدخال جميع الأرقام الأربعة';
+
+  @override
+  String get authOtpDispatched => 'تم إرسال رمز تحقق جديد بنجاح.';
+
+  @override
+  String get authOtpResendIn => 'إعادة إرسال الرمز خلال';
+
+  @override
+  String get editProfileTitle => 'تعديل الملف الشخصي';
+
+  @override
+  String get editProfileFullName => 'الاسم بالكامل';
+
+  @override
+  String get editProfileEmail => 'البريد الإلكتروني';
+
+  @override
+  String get editProfileEmailHelper =>
+      'تغيير البريد الإلكتروني يتطلب التحقق من الحساب وغير متاح هنا.';
+
+  @override
+  String get editProfilePhone => 'رقم الهاتف';
+
+  @override
+  String get editProfileNameRequired => 'أدخل اسمك';
+
+  @override
+  String get editProfileSaveChanges => 'حفظ التغييرات';
+
+  @override
+  String get editProfileChangePhoto => 'تغيير الصورة الشخصية';
+
+  @override
+  String get editProfileTryAgain => 'إعادة المحاولة';
+
+  @override
+  String get editProfileLoadError => 'تعذر تحميل بيانات الملف الشخصي.';
+
+  @override
+  String get mapRefresh => 'تحديث';
+
+  @override
+  String get mapLoadAllProperties => 'تحميل جميع العقارات';
+
+  @override
+  String get agentDetailsTitle => 'تفاصيل الوكيل';
+
+  @override
+  String get agentDetailsTryAgain => 'إعادة المحاولة';
+
+  @override
+  String get agentDetailsPropertiesError => 'تعذر تحميل العقارات.';
+
+  @override
+  String get agentDetailsNoProperties =>
+      'هذا الوكيل ليس لديه عقارات منشورة بعد.';
+
+  @override
+  String get agentDetailsPropertiesTitle => 'عقارات الوكيل';
+
+  @override
+  String get agentDetailsPhone => 'الهاتف';
+
+  @override
+  String get agentDetailsEmail => 'البريد الإلكتروني';
+
+  @override
+  String get agentDetailsBio => 'نبذة';
+
+  @override
+  String get agentDetailsPublishedEstates => 'العقارات المنشورة';
+
+  @override
+  String get searchFilterPriceError =>
+      'يجب ألا يتجاوز الحد الأدنى للسعر الحد الأقصى.';
+
+  @override
+  String get searchFilterInvalidPrice => 'أدخل سعراً صحيحاً';
+
+  @override
+  String get searchFilterInvalidNumber => 'أدخل رقماً صحيحاً';
+
+  @override
+  String get chatNoMessages => 'لا توجد رسائل بعد. ابدأ المحادثة.';
+
+  @override
+  String get chatMessageHint => 'اكتب رسالة...';
+
+  @override
+  String get chatSignInToSend => 'سجّل الدخول لإرسال رسالة';
+
+  @override
+  String get chatSendTooltip => 'إرسال رسالة';
+
+  @override
+  String get galleryViewAll => 'عرض جميع الصور';
+
+  @override
+  String get onboarding1Title => 'مرحباً بك في تطبيق العقارات';
+
+  @override
+  String get onboarding1Subtitle => 'اكتشف منزل أحلامك بكل سهولة';
+
+  @override
+  String get onboarding2Title => 'بحث ذكي وفلاتر';
+
+  @override
+  String get onboarding2Subtitle => 'ابحث عن عقارات تناسب معاييرك';
+
+  @override
+  String get onboarding3Title => 'تواصل مع الوكلاء';
+
+  @override
+  String get onboarding3Subtitle => 'تحدث مباشرة مع وكلاء معتمدين';
+
+  @override
+  String get onboardingGetStarted => 'ابدأ الآن';
+
+  @override
+  String get onboardingSkip => 'تخطي';
+
+  @override
+  String get faqTitle => 'الأسئلة الشائعة';
+
+  @override
+  String get faqSearchHint => 'ابحث في الأسئلة...';
+
+  @override
+  String get faqNoResults => 'لم يتم العثور على أسئلة مطابقة لبحثك.';
+
+  @override
+  String get faqExpand => 'توسيع';
+
+  @override
+  String get faqCollapse => 'طي';
+
+  @override
+  String get commonOr => 'أو';
+
+  @override
+  String get commonBullet => ' • ';
+
+  @override
+  String get commonTermsAndPrivacy => 'شروط الخدمة وسياسة الخصوصية';
+
+  @override
   String get offlineNotice =>
       'لا يوجد اتصال بالإنترنت. قد لا تتوفر بعض الميزات.';
+
+  @override
+  String get bookingTitle => 'حجز موعد للمعاينة';
+
+  @override
+  String get bookingSuccess => 'تم حجز موعد المعاينة بنجاح!';
+
+  @override
+  String get bookingDuplicateError =>
+      'لديك بالفعل حجز لهذا التاريخ والوقت المحدد.';
+
+  @override
+  String get bookingError => 'فشل الحجز.';
+
+  @override
+  String get bookingCustomerSection => 'بياناتك الشخصية';
+
+  @override
+  String get bookingCustomerName => 'الاسم بالكامل';
+
+  @override
+  String get bookingFieldRequired => 'مطلوب';
+
+  @override
+  String get bookingCustomerEmail => 'البريد الإلكتروني';
+
+  @override
+  String get bookingEmailInvalid => 'أدخل بريداً إلكترونياً صالحاً';
+
+  @override
+  String get bookingCustomerPhone => 'رقم الهاتف';
+
+  @override
+  String get bookingPhoneInvalid => 'أدخل رقم هاتف صحيح';
+
+  @override
+  String get bookingScheduleSection => 'موعد المعاينة';
+
+  @override
+  String get bookingDateLabel => 'تاريخ المعاينة';
+
+  @override
+  String get bookingTimeSlotLabel => 'الوقت المحدد';
+
+  @override
+  String get bookingNotesLabel => 'ملاحظات إضافية (اختياري)';
+
+  @override
+  String get bookingNotesHint => 'أي طلبات خاصة أو أسئلة للوكيل...';
+
+  @override
+  String get bookingSubmit => 'تأكيد الحجز';
+
+  @override
+  String get myBookingsTitle => 'حجوزاتي';
+
+  @override
+  String get myBookingsEmpty => 'لا توجد حجوزات حتى الآن.';
+
+  @override
+  String get myBookingsSubtitle => 'احجز موعداً لمعاينة أي عقار للبدء.';
+
+  @override
+  String get bookingDetailsTitle => 'تفاصيل الحجز';
+
+  @override
+  String get bookingStatusLabel => 'الحالة';
+
+  @override
+  String get bookingPropertySnapshot => 'العقار';
+
+  @override
+  String get bookingCancelTitle => 'إلغاء الحجز؟';
+
+  @override
+  String get bookingCancelConfirm =>
+      'هل أنت متأكد من رغبتك في إلغاء هذا الحجز؟ لا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get bookingCancelButton => 'إلغاء الحجز';
+
+  @override
+  String get bookingCancelSuccess => 'تم إلغاء الحجز بنجاح.';
+
+  @override
+  String get detailsBookVisit => 'حجز معاينة';
+
+  @override
+  String get detailsBookVisitLoginPrompt => 'يرجى تسجيل الدخول لحجز معاينة.';
+
+  @override
+  String get detailsEstateUnavailable => 'هذا العقار غير متاح للحجز حالياً.';
+
+  @override
+  String get profileMyBookingsSubtitle => 'عرض وإدارة مواعيد معاينة العقارات';
 }

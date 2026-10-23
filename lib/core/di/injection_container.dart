@@ -31,6 +31,11 @@ import 'package:real_estate_app/features/chat/data/repositories/chat_repository_
 import 'package:real_estate_app/features/chat/domain/repositories/chat_repository.dart';
 import 'package:real_estate_app/features/chat/presentation/cubit/chat_cubit.dart';
 import 'package:real_estate_app/features/map/presentation/cubit/map_cubit.dart';
+import 'package:real_estate_app/features/booking/data/datasources/booking_remote_data_source.dart';
+import 'package:real_estate_app/features/booking/data/repositories/booking_repository_impl.dart';
+import 'package:real_estate_app/features/booking/domain/repositories/booking_repository.dart';
+import 'package:real_estate_app/features/booking/presentation/cubit/booking_cubit.dart';
+import 'package:real_estate_app/features/booking/presentation/cubit/booking_history_cubit.dart';
 
 // Connectivity
 import '../../core/cubits/connectivity/connectivity_cubit.dart';
@@ -287,6 +292,18 @@ Future<void> initDependencies() async {
   sl.registerFactory(
     () => ProfileEditCubit(firebaseAuth: sl(), accountSetupRepository: sl()),
   );
+  // ============================================================
+  // BOOKING DATA SOURCE & REPOSITORY
+  // ============================================================
+  sl.registerLazySingleton<BookingRemoteDataSource>(
+    () => BookingRemoteDataSourceImpl(sl()),
+  );
+  sl.registerLazySingleton<BookingRepository>(
+    () => BookingRepositoryImpl(sl()),
+  );
+  sl.registerFactory(() => BookingCubit(repository: sl()));
+  sl.registerFactory(() => BookingHistoryCubit(repository: sl()));
+
   sl.registerFactory(() => ThemeCubit(preferences: sl()));
   sl.registerFactory(() => LocaleCubit(preferences: sl()));
 }

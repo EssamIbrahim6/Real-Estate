@@ -67,7 +67,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonError => 'Something went wrong';
 
   @override
-  String get commonLoading => 'Loading…';
+  String get commonLoading => 'Loading...';
 
   @override
   String get commonEgp => 'EGP';
@@ -94,7 +94,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeCategories => 'Categories';
 
   @override
-  String get homeSearchHint => 'Search address, city, or property…';
+  String get homeSearchHint => 'Search address, city, or property...';
 
   @override
   String get homeFeaturedEstates => 'Featured Estates';
@@ -128,7 +128,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeNoAgents => 'No estate agents found.';
 
   @override
-  String get homeLoading => 'Loading properties…';
+  String get homeLoading => 'Loading properties...';
 
   @override
   String get homeLoadError => 'Failed to load home properties.';
@@ -137,7 +137,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchTitle => 'Search properties';
 
   @override
-  String get searchHint => 'Search estates…';
+  String get searchHint => 'Search estates...';
 
   @override
   String get searchFilters => 'Filters';
@@ -210,7 +210,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get listingsCategoryEmpty => 'No estates found for this category.';
 
   @override
-  String get listingsLoading => 'Loading properties…';
+  String get listingsLoading => 'Loading properties...';
 
   @override
   String get detailsTitle => 'Property Details';
@@ -286,7 +286,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get detailsYourRating => 'Your Rating';
 
   @override
-  String get detailsReviewCommentHint => 'Share details about this property…';
+  String get detailsReviewCommentHint => 'Share details about this property...';
 
   @override
   String get detailsNoReviews => 'No reviews yet. Be the first to review!';
@@ -487,7 +487,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLanguageEn => 'English';
 
   @override
-  String get settingsLanguageAr => 'العربية (Arabic)';
+  String get settingsLanguageAr => 'Arabic';
 
   @override
   String get settingsNotifications => 'Notifications';
@@ -641,6 +641,326 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authPasswordTooShort => 'Password must be at least 6 characters';
 
   @override
+  String get authContinueWithEmail => 'Continue with Email';
+
+  @override
+  String get authForgotPasswordLink => 'Forgot password?';
+
+  @override
+  String get authDontHaveAccountShort => 'Don\'t have an account? ';
+
+  @override
+  String get authAlreadyHaveAccountShort => 'Already have an account? ';
+
+  @override
+  String get authSignInLink => 'Sign In';
+
+  @override
+  String get authRegisterLink => 'Register';
+
+  @override
+  String get authLoginTitle => 'Let\'s Sign In';
+
+  @override
+  String get authLoginSubtitle => 'Welcome back! Sign in to continue.';
+
+  @override
+  String get authRegisterTitle => 'Create your account';
+
+  @override
+  String get authRegisterSubtitle => 'Join us to find your dream property.';
+
+  @override
+  String get authLoginButton => 'Login';
+
+  @override
+  String get authRegisterButton => 'Register';
+
+  @override
+  String get authPasswordRequiredField => 'Password is required';
+
+  @override
+  String get authTermsOfService =>
+      'By tapping Register, you agree to our Terms of Service & Privacy Policy.';
+
+  @override
+  String get authFacebookLogin => 'Facebook Login';
+
+  @override
+  String get authFacebookLoginMessage =>
+      'Facebook Login requires configuring the Facebook App ID in Firebase Console.';
+
+  @override
+  String get authFacebookDialogOk => 'OK';
+
+  @override
+  String get authReadyTo => 'Ready to ';
+
+  @override
+  String get authExplore => 'explore?';
+
+  @override
+  String get authExploreSubtitle =>
+      'Find your dream house easily and experience the comfort of your future home.';
+
+  @override
+  String get authForgotPasswordSubtitle =>
+      'Enter your registered email address and we will send you a link to reset your password.';
+
+  @override
+  String get authPasswordResetSent =>
+      'Password reset link sent! Check your inbox and spam folder.';
+
+  @override
+  String get authResendLink => 'Resend Link';
+
+  @override
+  String get authOtpEnterAllDigits => 'Please enter all 4 digits';
+
+  @override
+  String get authOtpDispatched =>
+      'A new verification code has been dispatched.';
+
+  @override
+  String get authOtpResendIn => 'Resend code in';
+
+  @override
+  String get editProfileTitle => 'Edit profile';
+
+  @override
+  String get editProfileFullName => 'Full name';
+
+  @override
+  String get editProfileEmail => 'Email address';
+
+  @override
+  String get editProfileEmailHelper =>
+      'Email changes require account verification and are not available here.';
+
+  @override
+  String get editProfilePhone => 'Phone number';
+
+  @override
+  String get editProfileNameRequired => 'Enter your name';
+
+  @override
+  String get editProfileSaveChanges => 'Save changes';
+
+  @override
+  String get editProfileChangePhoto => 'Change profile photo';
+
+  @override
+  String get editProfileTryAgain => 'Try again';
+
+  @override
+  String get editProfileLoadError => 'Profile details could not be loaded.';
+
+  @override
+  String get mapRefresh => 'Refresh';
+
+  @override
+  String get mapLoadAllProperties => 'Load All Properties';
+
+  @override
+  String get agentDetailsTitle => 'Agent Details';
+
+  @override
+  String get agentDetailsTryAgain => 'Try again';
+
+  @override
+  String get agentDetailsPropertiesError => 'Properties could not be loaded.';
+
+  @override
+  String get agentDetailsNoProperties =>
+      'This agent has no published properties yet.';
+
+  @override
+  String get agentDetailsPropertiesTitle => 'Agent\'s Properties';
+
+  @override
+  String get agentDetailsPhone => 'Phone';
+
+  @override
+  String get agentDetailsEmail => 'Email';
+
+  @override
+  String get agentDetailsBio => 'Bio';
+
+  @override
+  String get agentDetailsPublishedEstates => 'Published estates';
+
+  @override
+  String get searchFilterPriceError =>
+      'Minimum price must not exceed maximum price.';
+
+  @override
+  String get searchFilterInvalidPrice => 'Enter a valid price';
+
+  @override
+  String get searchFilterInvalidNumber => 'Enter a whole number';
+
+  @override
+  String get chatNoMessages => 'No messages yet. Start the conversation.';
+
+  @override
+  String get chatMessageHint => 'Write a message...';
+
+  @override
+  String get chatSignInToSend => 'Sign in to send a message';
+
+  @override
+  String get chatSendTooltip => 'Send message';
+
+  @override
+  String get galleryViewAll => 'View all photos';
+
+  @override
+  String get onboarding1Title => 'Welcome to Real Estate App';
+
+  @override
+  String get onboarding1Subtitle => 'Discover your dream home with ease';
+
+  @override
+  String get onboarding2Title => 'Smart Search & Filters';
+
+  @override
+  String get onboarding2Subtitle => 'Find properties that match your criteria';
+
+  @override
+  String get onboarding3Title => 'Connect with Agents';
+
+  @override
+  String get onboarding3Subtitle => 'Chat directly with verified agents';
+
+  @override
+  String get onboardingGetStarted => 'Get Started';
+
+  @override
+  String get onboardingSkip => 'Skip';
+
+  @override
+  String get faqTitle => 'Frequently Asked Questions';
+
+  @override
+  String get faqSearchHint => 'Search questions...';
+
+  @override
+  String get faqNoResults => 'No questions found matching your search.';
+
+  @override
+  String get faqExpand => 'Expand';
+
+  @override
+  String get faqCollapse => 'Collapse';
+
+  @override
+  String get commonOr => 'Or';
+
+  @override
+  String get commonBullet => ' • ';
+
+  @override
+  String get commonTermsAndPrivacy => 'Terms of Service & Privacy Policy';
+
+  @override
   String get offlineNotice =>
       'No internet connection. Some features may be unavailable.';
+
+  @override
+  String get bookingTitle => 'Book a Visit';
+
+  @override
+  String get bookingSuccess => 'Visit booked successfully!';
+
+  @override
+  String get bookingDuplicateError =>
+      'You already have a booking for this date and time slot.';
+
+  @override
+  String get bookingError => 'Booking failed.';
+
+  @override
+  String get bookingCustomerSection => 'Your Details';
+
+  @override
+  String get bookingCustomerName => 'Full Name';
+
+  @override
+  String get bookingFieldRequired => 'Required';
+
+  @override
+  String get bookingCustomerEmail => 'Email';
+
+  @override
+  String get bookingEmailInvalid => 'Enter a valid email';
+
+  @override
+  String get bookingCustomerPhone => 'Phone Number';
+
+  @override
+  String get bookingPhoneInvalid => 'Enter a valid phone number';
+
+  @override
+  String get bookingScheduleSection => 'Visit Schedule';
+
+  @override
+  String get bookingDateLabel => 'Visit Date';
+
+  @override
+  String get bookingTimeSlotLabel => 'Time Slot';
+
+  @override
+  String get bookingNotesLabel => 'Additional Notes (optional)';
+
+  @override
+  String get bookingNotesHint =>
+      'Any special requests or questions for the agent...';
+
+  @override
+  String get bookingSubmit => 'Confirm Booking';
+
+  @override
+  String get myBookingsTitle => 'My Bookings';
+
+  @override
+  String get myBookingsEmpty => 'No bookings yet.';
+
+  @override
+  String get myBookingsSubtitle =>
+      'Book a visit to any property to get started.';
+
+  @override
+  String get bookingDetailsTitle => 'Booking Details';
+
+  @override
+  String get bookingStatusLabel => 'Status';
+
+  @override
+  String get bookingPropertySnapshot => 'Property';
+
+  @override
+  String get bookingCancelTitle => 'Cancel Booking?';
+
+  @override
+  String get bookingCancelConfirm =>
+      'Are you sure you want to cancel this booking? This action cannot be undone.';
+
+  @override
+  String get bookingCancelButton => 'Cancel Booking';
+
+  @override
+  String get bookingCancelSuccess => 'Booking cancelled.';
+
+  @override
+  String get detailsBookVisit => 'Book a Visit';
+
+  @override
+  String get detailsBookVisitLoginPrompt => 'Please sign in to book a visit.';
+
+  @override
+  String get detailsEstateUnavailable =>
+      'This property is currently unavailable for booking.';
+
+  @override
+  String get profileMyBookingsSubtitle => 'View and manage your tour requests';
 }

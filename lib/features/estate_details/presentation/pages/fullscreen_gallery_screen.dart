@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/router/route_names.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 
 class FullscreenGalleryRequest {
   final List<String> images;
@@ -60,29 +61,30 @@ class _FullscreenGalleryScreenState extends State<FullscreenGalleryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
         leading: IconButton(
-          tooltip: 'Close gallery',
+          tooltip: l10n?.commonClose ?? 'Close',
           onPressed: _close,
           icon: const Icon(Icons.close),
         ),
         title: Text(
           widget.images.isEmpty
-              ? 'Photos'
+              ? (l10n?.galleryViewAll ?? 'Photos')
               : '${_currentIndex + 1} / ${widget.images.length}',
           style: const TextStyle(color: Colors.white),
         ),
         centerTitle: true,
       ),
       body: widget.images.isEmpty
-          ? const Center(
+          ? Center(
               child: Text(
-                'No photos available.',
-                style: TextStyle(color: Colors.white70),
+                l10n?.detailsNoAmenities ?? 'No photos available.',
+                style: const TextStyle(color: Colors.white70),
               ),
             )
           : PageView.builder(

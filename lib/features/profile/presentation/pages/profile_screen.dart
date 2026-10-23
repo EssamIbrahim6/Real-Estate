@@ -129,6 +129,13 @@ class ProfileScreen extends StatelessWidget {
                             'Continue your conversations',
                         onTap: () => context.go(AppRoutes.chat),
                       ),
+                      ProfileActionTile(
+                        icon: Icons.calendar_month_outlined,
+                        title: l10n?.myBookingsTitle ?? 'My Bookings',
+                        subtitle: l10n?.profileMyBookingsSubtitle ??
+                            'View and manage your tour requests',
+                        onTap: () => context.push(AppRoutes.myBookings),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 24),

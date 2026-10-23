@@ -6,6 +6,7 @@ import '../../../../core/helpers/spacing.dart';
 import '../../../../core/router/route_names.dart';
 import '../../../../core/widgets/person_avatar.dart';
 import '../../../../core/widgets/app_skeleton.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../home/presentation/widgets/estate_card.dart';
 import '../../domain/entities/agent_entity.dart';
 import '../cubit/agent_details_cubit.dart';
@@ -19,6 +20,7 @@ class AgentDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -29,7 +31,7 @@ class AgentDetailsScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
         ),
-        title: const Text('Agent Details'),
+        title: Text(l10n?.agentDetailsTitle ?? 'Agent Details'),
       ),
       body: BlocBuilder<AgentDetailsCubit, AgentDetailsState>(
         builder: (context, state) {
@@ -42,7 +44,9 @@ class AgentDetailsScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Text(
-                  state.error ?? 'Agent details could not be loaded.',
+                  state.error ??
+                      l10n?.commonError ??
+                      'Agent details could not be loaded.',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: colors.onSurfaceVariant),
                 ),
@@ -52,9 +56,9 @@ class AgentDetailsScreen extends StatelessWidget {
 
           final agent = state.agent!;
           final publishedEstatesCount = state.isEstatesLoading
-              ? 'Loading...'
+              ? (l10n?.commonLoading ?? 'Loading...')
               : state.estatesError != null
-              ? 'Unavailable'
+              ? (l10n?.commonError ?? 'Unavailable')
               : state.estates.length.toString();
           return SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
@@ -69,7 +73,7 @@ class AgentDetailsScreen extends StatelessWidget {
                 ),
                 verticalSpace(24),
                 Text(
-                  "Agent's Properties",
+                  l10n?.agentDetailsPropertiesTitle ?? "Agent's Properties",
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -101,14 +105,17 @@ class AgentDetailsScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Properties could not be loaded.',
+                          l10n?.agentDetailsPropertiesError ??
+                              'Properties could not be loaded.',
                           style: TextStyle(color: colors.onSurfaceVariant),
                         ),
                         TextButton(
                           onPressed: () => context
                               .read<AgentDetailsCubit>()
                               .loadAgentDetails(agentId),
-                          child: const Text('Try again'),
+                          child: Text(
+                            l10n?.agentDetailsTryAgain ?? 'Try again',
+                          ),
                         ),
                       ],
                     ),
@@ -123,7 +130,8 @@ class AgentDetailsScreen extends StatelessWidget {
                       border: Border.all(color: colors.outlineVariant),
                     ),
                     child: Text(
-                      'This agent has no published properties yet.',
+                      l10n?.agentDetailsNoProperties ??
+                          'This agent has no published properties yet.',
                       style: TextStyle(color: colors.onSurfaceVariant),
                     ),
                   )
@@ -245,17 +253,31 @@ class _InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
     final items = <_InfoRowData>[
       if (agent.phone.trim().isNotEmpty)
-        _InfoRowData(Icons.phone_outlined, 'Phone', agent.phone),
+        _InfoRowData(
+          Icons.phone_outlined,
+          l10n?.agentDetailsPhone ?? 'Phone',
+          agent.phone,
+        ),
       if (agent.email.trim().isNotEmpty)
-        _InfoRowData(Icons.email_outlined, 'Email', agent.email),
+        _InfoRowData(
+          Icons.email_outlined,
+          l10n?.agentDetailsEmail ?? 'Email',
+          agent.email,
+        ),
       if (agent.bio.trim().isNotEmpty)
-        _InfoRowData(Icons.info_outline, 'Bio', agent.bio),
+        _InfoRowData(
+          Icons.info_outline,
+          l10n?.agentDetailsBio ?? 'Bio',
+          agent.bio,
+        ),
       _InfoRowData(
         Icons.home_work_outlined,
-        'Published estates',
+        l10n?.agentDetailsPublishedEstates ?? 'Published estates',
         publishedEstatesCount,
+        isPublishedEstates: true,
       ),
     ];
 
@@ -294,7 +316,7 @@ class _InfoCard extends StatelessWidget {
                       verticalSpace(4),
                       Text(
                         item.value,
-                        key: item.label == 'Published estates'
+                        key: item.isPublishedEstates
                             ? const Key('published-estates-count')
                             : null,
                         style: TextStyle(
@@ -319,6 +341,12 @@ class _InfoRowData {
   final IconData icon;
   final String label;
   final String value;
+  final bool isPublishedEstates;
 
-  const _InfoRowData(this.icon, this.label, this.value);
+  const _InfoRowData(
+    this.icon,
+    this.label,
+    this.value, {
+    this.isPublishedEstates = false,
+  });
 }

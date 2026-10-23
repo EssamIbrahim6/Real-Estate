@@ -23,6 +23,7 @@ import '../widgets/image_gallery.dart';
 import '../widgets/property_info_section.dart';
 import '../widgets/submit_review_bottom_sheet.dart';
 import '../../../map/domain/models/map_screen_args.dart';
+import '../../../booking/presentation/pages/book_tour_screen.dart';
 
 class EstateDetailsScreen extends StatefulWidget {
   final String estateId;
@@ -68,6 +69,39 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
         'The conversation was created, but could not be opened.',
       );
     }
+  }
+
+  void _bookTour(EstateEntity estate) {
+    final cubit = context.read<EstateDetailsCubit>();
+    if (!cubit.isAuthenticated) {
+      context.push(AppRoutes.login);
+      return;
+    }
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      context.push(AppRoutes.login);
+      return;
+    }
+
+    if (!estate.isAvailable) {
+      AppFeedback.error(
+        context,
+        AppLocalizations.of(context)?.detailsEstateUnavailable ??
+            'This property is currently unavailable for booking.',
+      );
+      return;
+    }
+
+    context.pushNamed(
+      AppRoutes.bookTourName,
+      extra: BookTourArgs(
+        estate: estate,
+        customerId: user.uid,
+        customerName: user.displayName ?? '',
+        customerEmail: user.email ?? '',
+        customerPhone: user.phoneNumber ?? '',
+      ),
+    );
   }
 
   bool _isOwner(EstateEntity estate, AgentEntity? agent) {
@@ -710,17 +744,26 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                   ),
                   child: Row(
                     children: [
-                      if (!isOwnedByCurrentUser)
+                      if (!isOwnedByCurrentUser) ...[
                         Expanded(
                           child: AppButton(
                             text: l10n?.detailsContactAgent ?? 'Contact Agent',
+                            type: AppButtonType.outlined,
                             isLoading:
                                 state.contactAgentStatus ==
                                 ContactAgentStatus.loading,
                             onPressed: _contactAgent,
                           ),
-                        )
-                      else
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: AppButton(
+                            text: l10n?.detailsBookVisit ?? 'Book a Visit',
+                            type: AppButtonType.primary,
+                            onPressed: () => _bookTour(estate),
+                          ),
+                        ),
+                      ] else
                         Expanded(
                           child: AppButton(
                             text: 'Your Property',

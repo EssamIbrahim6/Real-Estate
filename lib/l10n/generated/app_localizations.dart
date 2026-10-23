@@ -215,7 +215,7 @@ abstract class AppLocalizations {
   /// No description provided for @commonLoading.
   ///
   /// In en, this message translates to:
-  /// **'Loading…'**
+  /// **'Loading...'**
   String get commonLoading;
 
   /// No description provided for @commonEgp.
@@ -269,7 +269,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeSearchHint.
   ///
   /// In en, this message translates to:
-  /// **'Search address, city, or property…'**
+  /// **'Search address, city, or property...'**
   String get homeSearchHint;
 
   /// No description provided for @homeFeaturedEstates.
@@ -335,7 +335,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeLoading.
   ///
   /// In en, this message translates to:
-  /// **'Loading properties…'**
+  /// **'Loading properties...'**
   String get homeLoading;
 
   /// No description provided for @homeLoadError.
@@ -353,7 +353,7 @@ abstract class AppLocalizations {
   /// No description provided for @searchHint.
   ///
   /// In en, this message translates to:
-  /// **'Search estates…'**
+  /// **'Search estates...'**
   String get searchHint;
 
   /// No description provided for @searchFilters.
@@ -497,7 +497,7 @@ abstract class AppLocalizations {
   /// No description provided for @listingsLoading.
   ///
   /// In en, this message translates to:
-  /// **'Loading properties…'**
+  /// **'Loading properties...'**
   String get listingsLoading;
 
   /// No description provided for @detailsTitle.
@@ -629,7 +629,7 @@ abstract class AppLocalizations {
   /// No description provided for @detailsReviewCommentHint.
   ///
   /// In en, this message translates to:
-  /// **'Share details about this property…'**
+  /// **'Share details about this property...'**
   String get detailsReviewCommentHint;
 
   /// No description provided for @detailsNoReviews.
@@ -1007,7 +1007,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsLanguageAr.
   ///
   /// In en, this message translates to:
-  /// **'العربية (Arabic)'**
+  /// **'Arabic'**
   String get settingsLanguageAr;
 
   /// No description provided for @settingsNotifications.
@@ -1304,11 +1304,623 @@ abstract class AppLocalizations {
   /// **'Password must be at least 6 characters'**
   String get authPasswordTooShort;
 
+  /// No description provided for @authContinueWithEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Email'**
+  String get authContinueWithEmail;
+
+  /// No description provided for @authForgotPasswordLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get authForgotPasswordLink;
+
+  /// No description provided for @authDontHaveAccountShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account? '**
+  String get authDontHaveAccountShort;
+
+  /// No description provided for @authAlreadyHaveAccountShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? '**
+  String get authAlreadyHaveAccountShort;
+
+  /// No description provided for @authSignInLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get authSignInLink;
+
+  /// No description provided for @authRegisterLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get authRegisterLink;
+
+  /// No description provided for @authLoginTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s Sign In'**
+  String get authLoginTitle;
+
+  /// No description provided for @authLoginSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back! Sign in to continue.'**
+  String get authLoginSubtitle;
+
+  /// No description provided for @authRegisterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your account'**
+  String get authRegisterTitle;
+
+  /// No description provided for @authRegisterSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join us to find your dream property.'**
+  String get authRegisterSubtitle;
+
+  /// No description provided for @authLoginButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get authLoginButton;
+
+  /// No description provided for @authRegisterButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get authRegisterButton;
+
+  /// No description provided for @authPasswordRequiredField.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is required'**
+  String get authPasswordRequiredField;
+
+  /// No description provided for @authTermsOfService.
+  ///
+  /// In en, this message translates to:
+  /// **'By tapping Register, you agree to our Terms of Service & Privacy Policy.'**
+  String get authTermsOfService;
+
+  /// No description provided for @authFacebookLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Facebook Login'**
+  String get authFacebookLogin;
+
+  /// No description provided for @authFacebookLoginMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Facebook Login requires configuring the Facebook App ID in Firebase Console.'**
+  String get authFacebookLoginMessage;
+
+  /// No description provided for @authFacebookDialogOk.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get authFacebookDialogOk;
+
+  /// No description provided for @authReadyTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to '**
+  String get authReadyTo;
+
+  /// No description provided for @authExplore.
+  ///
+  /// In en, this message translates to:
+  /// **'explore?'**
+  String get authExplore;
+
+  /// No description provided for @authExploreSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Find your dream house easily and experience the comfort of your future home.'**
+  String get authExploreSubtitle;
+
+  /// No description provided for @authForgotPasswordSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your registered email address and we will send you a link to reset your password.'**
+  String get authForgotPasswordSubtitle;
+
+  /// No description provided for @authPasswordResetSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset link sent! Check your inbox and spam folder.'**
+  String get authPasswordResetSent;
+
+  /// No description provided for @authResendLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend Link'**
+  String get authResendLink;
+
+  /// No description provided for @authOtpEnterAllDigits.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter all 4 digits'**
+  String get authOtpEnterAllDigits;
+
+  /// No description provided for @authOtpDispatched.
+  ///
+  /// In en, this message translates to:
+  /// **'A new verification code has been dispatched.'**
+  String get authOtpDispatched;
+
+  /// No description provided for @authOtpResendIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code in'**
+  String get authOtpResendIn;
+
+  /// No description provided for @editProfileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit profile'**
+  String get editProfileTitle;
+
+  /// No description provided for @editProfileFullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name'**
+  String get editProfileFullName;
+
+  /// No description provided for @editProfileEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email address'**
+  String get editProfileEmail;
+
+  /// No description provided for @editProfileEmailHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Email changes require account verification and are not available here.'**
+  String get editProfileEmailHelper;
+
+  /// No description provided for @editProfilePhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number'**
+  String get editProfilePhone;
+
+  /// No description provided for @editProfileNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your name'**
+  String get editProfileNameRequired;
+
+  /// No description provided for @editProfileSaveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get editProfileSaveChanges;
+
+  /// No description provided for @editProfileChangePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Change profile photo'**
+  String get editProfileChangePhoto;
+
+  /// No description provided for @editProfileTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get editProfileTryAgain;
+
+  /// No description provided for @editProfileLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile details could not be loaded.'**
+  String get editProfileLoadError;
+
+  /// No description provided for @mapRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get mapRefresh;
+
+  /// No description provided for @mapLoadAllProperties.
+  ///
+  /// In en, this message translates to:
+  /// **'Load All Properties'**
+  String get mapLoadAllProperties;
+
+  /// No description provided for @agentDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Agent Details'**
+  String get agentDetailsTitle;
+
+  /// No description provided for @agentDetailsTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get agentDetailsTryAgain;
+
+  /// No description provided for @agentDetailsPropertiesError.
+  ///
+  /// In en, this message translates to:
+  /// **'Properties could not be loaded.'**
+  String get agentDetailsPropertiesError;
+
+  /// No description provided for @agentDetailsNoProperties.
+  ///
+  /// In en, this message translates to:
+  /// **'This agent has no published properties yet.'**
+  String get agentDetailsNoProperties;
+
+  /// No description provided for @agentDetailsPropertiesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Agent\'s Properties'**
+  String get agentDetailsPropertiesTitle;
+
+  /// No description provided for @agentDetailsPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get agentDetailsPhone;
+
+  /// No description provided for @agentDetailsEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get agentDetailsEmail;
+
+  /// No description provided for @agentDetailsBio.
+  ///
+  /// In en, this message translates to:
+  /// **'Bio'**
+  String get agentDetailsBio;
+
+  /// No description provided for @agentDetailsPublishedEstates.
+  ///
+  /// In en, this message translates to:
+  /// **'Published estates'**
+  String get agentDetailsPublishedEstates;
+
+  /// No description provided for @searchFilterPriceError.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum price must not exceed maximum price.'**
+  String get searchFilterPriceError;
+
+  /// No description provided for @searchFilterInvalidPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid price'**
+  String get searchFilterInvalidPrice;
+
+  /// No description provided for @searchFilterInvalidNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a whole number'**
+  String get searchFilterInvalidNumber;
+
+  /// No description provided for @chatNoMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages yet. Start the conversation.'**
+  String get chatNoMessages;
+
+  /// No description provided for @chatMessageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a message...'**
+  String get chatMessageHint;
+
+  /// No description provided for @chatSignInToSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to send a message'**
+  String get chatSignInToSend;
+
+  /// No description provided for @chatSendTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Send message'**
+  String get chatSendTooltip;
+
+  /// No description provided for @galleryViewAll.
+  ///
+  /// In en, this message translates to:
+  /// **'View all photos'**
+  String get galleryViewAll;
+
+  /// No description provided for @onboarding1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Real Estate App'**
+  String get onboarding1Title;
+
+  /// No description provided for @onboarding1Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover your dream home with ease'**
+  String get onboarding1Subtitle;
+
+  /// No description provided for @onboarding2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Search & Filters'**
+  String get onboarding2Title;
+
+  /// No description provided for @onboarding2Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Find properties that match your criteria'**
+  String get onboarding2Subtitle;
+
+  /// No description provided for @onboarding3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect with Agents'**
+  String get onboarding3Title;
+
+  /// No description provided for @onboarding3Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat directly with verified agents'**
+  String get onboarding3Subtitle;
+
+  /// No description provided for @onboardingGetStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get onboardingGetStarted;
+
+  /// No description provided for @onboardingSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get onboardingSkip;
+
+  /// No description provided for @faqTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequently Asked Questions'**
+  String get faqTitle;
+
+  /// No description provided for @faqSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search questions...'**
+  String get faqSearchHint;
+
+  /// No description provided for @faqNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No questions found matching your search.'**
+  String get faqNoResults;
+
+  /// No description provided for @faqExpand.
+  ///
+  /// In en, this message translates to:
+  /// **'Expand'**
+  String get faqExpand;
+
+  /// No description provided for @faqCollapse.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse'**
+  String get faqCollapse;
+
+  /// No description provided for @commonOr.
+  ///
+  /// In en, this message translates to:
+  /// **'Or'**
+  String get commonOr;
+
+  /// No description provided for @commonBullet.
+  ///
+  /// In en, this message translates to:
+  /// **' • '**
+  String get commonBullet;
+
+  /// No description provided for @commonTermsAndPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Service & Privacy Policy'**
+  String get commonTermsAndPrivacy;
+
   /// No description provided for @offlineNotice.
   ///
   /// In en, this message translates to:
   /// **'No internet connection. Some features may be unavailable.'**
   String get offlineNotice;
+
+  /// No description provided for @bookingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Book a Visit'**
+  String get bookingTitle;
+
+  /// No description provided for @bookingSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit booked successfully!'**
+  String get bookingSuccess;
+
+  /// No description provided for @bookingDuplicateError.
+  ///
+  /// In en, this message translates to:
+  /// **'You already have a booking for this date and time slot.'**
+  String get bookingDuplicateError;
+
+  /// No description provided for @bookingError.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking failed.'**
+  String get bookingError;
+
+  /// No description provided for @bookingCustomerSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Details'**
+  String get bookingCustomerSection;
+
+  /// No description provided for @bookingCustomerName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Name'**
+  String get bookingCustomerName;
+
+  /// No description provided for @bookingFieldRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get bookingFieldRequired;
+
+  /// No description provided for @bookingCustomerEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get bookingCustomerEmail;
+
+  /// No description provided for @bookingEmailInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email'**
+  String get bookingEmailInvalid;
+
+  /// No description provided for @bookingCustomerPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone Number'**
+  String get bookingCustomerPhone;
+
+  /// No description provided for @bookingPhoneInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid phone number'**
+  String get bookingPhoneInvalid;
+
+  /// No description provided for @bookingScheduleSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit Schedule'**
+  String get bookingScheduleSection;
+
+  /// No description provided for @bookingDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit Date'**
+  String get bookingDateLabel;
+
+  /// No description provided for @bookingTimeSlotLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Time Slot'**
+  String get bookingTimeSlotLabel;
+
+  /// No description provided for @bookingNotesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional Notes (optional)'**
+  String get bookingNotesLabel;
+
+  /// No description provided for @bookingNotesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Any special requests or questions for the agent...'**
+  String get bookingNotesHint;
+
+  /// No description provided for @bookingSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Booking'**
+  String get bookingSubmit;
+
+  /// No description provided for @myBookingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My Bookings'**
+  String get myBookingsTitle;
+
+  /// No description provided for @myBookingsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No bookings yet.'**
+  String get myBookingsEmpty;
+
+  /// No description provided for @myBookingsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Book a visit to any property to get started.'**
+  String get myBookingsSubtitle;
+
+  /// No description provided for @bookingDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking Details'**
+  String get bookingDetailsTitle;
+
+  /// No description provided for @bookingStatusLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get bookingStatusLabel;
+
+  /// No description provided for @bookingPropertySnapshot.
+  ///
+  /// In en, this message translates to:
+  /// **'Property'**
+  String get bookingPropertySnapshot;
+
+  /// No description provided for @bookingCancelTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Booking?'**
+  String get bookingCancelTitle;
+
+  /// No description provided for @bookingCancelConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to cancel this booking? This action cannot be undone.'**
+  String get bookingCancelConfirm;
+
+  /// No description provided for @bookingCancelButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Booking'**
+  String get bookingCancelButton;
+
+  /// No description provided for @bookingCancelSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking cancelled.'**
+  String get bookingCancelSuccess;
+
+  /// No description provided for @detailsBookVisit.
+  ///
+  /// In en, this message translates to:
+  /// **'Book a Visit'**
+  String get detailsBookVisit;
+
+  /// No description provided for @detailsBookVisitLoginPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Please sign in to book a visit.'**
+  String get detailsBookVisitLoginPrompt;
+
+  /// No description provided for @detailsEstateUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This property is currently unavailable for booking.'**
+  String get detailsEstateUnavailable;
+
+  /// No description provided for @profileMyBookingsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'View and manage your tour requests'**
+  String get profileMyBookingsSubtitle;
 }
 
 class _AppLocalizationsDelegate
