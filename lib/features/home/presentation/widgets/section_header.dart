@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/generated/app_localizations.dart';
+
 class SectionHeader extends StatelessWidget {
   final String title;
   final VoidCallback? onSeeAll;
@@ -9,6 +11,7 @@ class SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -25,7 +28,7 @@ class SectionHeader extends StatelessWidget {
           TextButton(
             onPressed: onSeeAll,
             child: Text(
-              'See all',
+              l10n?.commonSeeAll ?? 'See all',
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,

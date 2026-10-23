@@ -19,6 +19,7 @@ abstract class EstateRemoteDataSource {
     bool? isAvailable,
   });
   Future<List<EstateModel>> getEstatesByAgentId(String agentId);
+  Future<String> createEstate(EstateModel estate);
 }
 
 class EstateRemoteDataSourceImpl implements EstateRemoteDataSource {
@@ -26,9 +27,24 @@ class EstateRemoteDataSourceImpl implements EstateRemoteDataSource {
 
   const EstateRemoteDataSourceImpl(this._firestore);
 
-  // In abstract class EstateRemoteDataSource:
+  @override
+  Future<String> createEstate(EstateModel estate) async {
+    try {
+      final data = estate.toFirestore();
+      if (estate.id.isNotEmpty) {
+        await _firestore.collection('estates').doc(estate.id).set(data);
+        return estate.id;
+      } else {
+        final docRef = await _firestore.collection('estates').add(data);
+        return docRef.id;
+      }
+    } on FirebaseException catch (e) {
+      throw ServerException(message: e.message ?? 'Failed to create estate');
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
 
-  // In EstateRemoteDataSourceImpl:
   @override
   Future<EstateModel> getEstateById(String id) async {
     try {

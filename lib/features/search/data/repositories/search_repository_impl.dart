@@ -37,9 +37,17 @@ class SearchRepositoryImpl implements SearchRepository {
       final searchableText = _normalizeSearchText(
         [
           estate.title,
+          estate.titleEn ?? '',
+          estate.titleAr ?? '',
           estate.description,
+          estate.descriptionEn ?? '',
+          estate.descriptionAr ?? '',
           estate.location.city,
+          estate.location.cityEn ?? '',
+          estate.location.cityAr ?? '',
           estate.location.address,
+          estate.location.addressEn ?? '',
+          estate.location.addressAr ?? '',
           ...estate.amenities,
         ].join(' '),
       );

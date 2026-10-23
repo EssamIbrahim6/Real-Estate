@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/helpers/spacing.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../estate/domain/entities/estate_entity.dart';
 
 class EstateCard extends StatelessWidget {
@@ -21,6 +22,11 @@ class EstateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
+    final langCode = Localizations.localeOf(context).languageCode;
+    final displayTitle = estate.localizedTitle(langCode);
+    final displayCity = estate.location.localizedCity(langCode);
+    final displayAddress = estate.location.localizedAddress(langCode);
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -135,10 +141,10 @@ class EstateCard extends StatelessWidget {
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: .min,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    estate.title,
+                    displayTitle,
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -159,10 +165,10 @@ class EstateCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           distanceKm != null
-                              ? '${distanceKm!.toStringAsFixed(1)} km • ${estate.location.city}'
-                              : estate.location.city.isNotEmpty
-                              ? estate.location.city
-                              : estate.location.address,
+                              ? '${distanceKm!.toStringAsFixed(1)} km • $displayCity'
+                              : displayCity.isNotEmpty
+                              ? displayCity
+                              : displayAddress,
                           style: TextStyle(
                             fontSize: 12,
                             color: colors.onSurfaceVariant,
@@ -227,7 +233,7 @@ class EstateCard extends StatelessWidget {
                   ),
                   verticalSpace(8),
                   Text(
-                    'EGP ${estate.price.toInt()} ${estate.pricePeriod != null ? '/ ${estate.pricePeriod}' : ''}',
+                    '${l10n?.commonEgp ?? "EGP"} ${estate.price.toInt()} ${estate.pricePeriod != null ? '/ ${estate.pricePeriod}' : ''}',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w800,

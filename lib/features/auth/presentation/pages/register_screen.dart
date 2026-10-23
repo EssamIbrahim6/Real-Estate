@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:real_estate_app/core/helpers/auth_navigation_helper.dart';
+import 'package:real_estate_app/l10n/generated/app_localizations.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/helpers/spacing.dart';
@@ -46,6 +47,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is Authenticated) {
@@ -70,15 +73,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     AppBackButton(onTap: () => context.pop()),
                     verticalSpace(24),
 
-                    const AuthHeader(
-                      title: 'Create your account',
-                      subtitle: 'quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+                    AuthHeader(
+                      title: l10n?.authRegisterTitle ?? 'Create your account',
+                      subtitle: l10n?.authRegisterSubtitle ??
+                          'Join us to find your dream property.',
                     ),
                     verticalSpace(28),
 
                     AuthTextField(
                       controller: _nameController,
-                      hintText: 'Full Name',
+                      hintText: l10n?.authFullNameLabel ?? 'Full Name',
                       prefixIcon: Icons.person_outline_rounded,
                       validator: (val) =>
                           AppValidators.required(val, 'Full name is required'),
@@ -87,7 +91,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                     AuthTextField(
                       controller: _emailController,
-                      hintText: 'Email',
+                      hintText: l10n?.authEmailLabel ?? 'Email',
                       prefixIcon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
                       validator: AppValidators.email,
@@ -96,7 +100,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                     AuthTextField(
                       controller: _passwordController,
-                      hintText: 'Password',
+                      hintText: l10n?.authPasswordLabel ?? 'Password',
                       prefixIcon: Icons.lock_outline_rounded,
                       isPassword: true,
                       textInputAction: TextInputAction.done,
@@ -104,9 +108,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     verticalSpace(16),
 
-                    const Text(
-                      'By tapping Register, you agree to our Terms of Service & Privacy Policy.',
-                      style: TextStyle(
+                    Text(
+                      l10n?.authTermsOfService ??
+                          'By tapping Register, you agree to our Terms of Service & Privacy Policy.',
+                      style: const TextStyle(
                         fontSize: 12,
                         color: AppColors.textSecondary,
                         height: 1.4,
@@ -135,9 +140,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   color: Colors.white,
                                 ),
                               )
-                            : const Text(
-                                'Register',
-                                style: TextStyle(
+                            : Text(
+                                l10n?.authRegisterButton ?? 'Register',
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.white,
@@ -150,18 +155,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          'Already have an account? ',
-                          style: TextStyle(
+                        Text(
+                          l10n?.authAlreadyHaveAccountShort ??
+                              'Already have an account? ',
+                          style: const TextStyle(
                             fontSize: 14,
                             color: AppColors.textSecondary,
                           ),
                         ),
                         GestureDetector(
                           onTap: () => context.pushReplacementNamed('login'),
-                          child: const Text(
-                            'Sign In',
-                            style: TextStyle(
+                          child: Text(
+                            l10n?.authSignInLink ?? 'Sign In',
+                            style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
                               color: AppColors.brandGreen,

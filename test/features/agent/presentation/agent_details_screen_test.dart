@@ -219,4 +219,8 @@ class _FakeEstateRepository implements EstateRepository {
   @override
   ResultFuture<List<EstateEntity>> getFeaturedEstates() async =>
       (failure: null, data: estates);
+
+  @override
+  ResultFuture<String> createEstate(EstateEntity estate) async =>
+      (failure: null, data: estate.id);
 }

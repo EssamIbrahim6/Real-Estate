@@ -137,5 +137,72 @@ service cloud.firestore {
         allow update, delete: if false;
       }
     }
+
+    function isAssignedAgent(agentId) {
+      let agentPath = /databases/$(database)/documents/agents/$(agentId);
+      return signedIn() && exists(agentPath) && get(agentPath).data.userId == request.auth.uid;
+    }
+
+    function validBookingCreate() {
+      let data = request.resource.data;
+      let estatePath = /databases/$(database)/documents/estates/$(data.estateId);
+      let agentPath = /databases/$(database)/documents/agents/$(data.agentId);
+      return signedIn() &&
+        data.customerId == request.auth.uid &&
+        data.status == 'pending' &&
+        data.createdAt == request.time &&
+        data.updatedAt == request.time &&
+        data.bookingDate is timestamp &&
+        data.bookingDate > request.time &&
+        data.timeSlot is string && data.timeSlot.size() > 0 &&
+        data.customerName is string && data.customerName.size() > 0 &&
+        data.customerEmail is string && data.customerEmail.size() > 0 &&
+        data.customerPhone is string && data.customerPhone.size() > 0 &&
+        data.estateId is string && data.estateId.size() > 0 &&
+        data.agentId is string && data.agentId.size() > 0 &&
+        exists(estatePath) &&
+        get(estatePath).data.get('isAvailable', true) == true &&
+        get(estatePath).data.agentId == data.agentId &&
+        exists(agentPath) &&
+        (data.agentUserId == null || get(agentPath).data.userId == data.agentUserId);
+    }
+
+    function validBookingCustomerCancel() {
+      let changed = request.resource.data.diff(resource.data).affectedKeys();
+      return request.auth.uid == resource.data.customerId &&
+        changed.hasOnly(['status', 'updatedAt']) &&
+        resource.data.status in ['pending', 'confirmed'] &&
+        request.resource.data.status == 'cancelled' &&
+        request.resource.data.updatedAt == request.time;
+    }
+
+    function validBookingAgentUpdate() {
+      let changed = request.resource.data.diff(resource.data).affectedKeys();
+      let isAgent = isAssignedAgent(resource.data.agentId);
+      let validTransition =
+        (resource.data.status == 'pending' && request.resource.data.status in ['confirmed', 'cancelled']) ||
+        (resource.data.status == 'confirmed' && request.resource.data.status in ['completed', 'cancelled']);
+      return isAgent &&
+        changed.hasOnly(['status', 'updatedAt']) &&
+        validTransition &&
+        request.resource.data.updatedAt == request.time;
+    }
+
+    match /bookings/{bookingId} {
+      allow create: if validBookingCreate();
+      allow get: if signedIn() && (
+        resource.data.customerId == request.auth.uid ||
+        isAssignedAgent(resource.data.agentId)
+      );
+      allow list: if signedIn() && (
+        resource.data.customerId == request.auth.uid ||
+        isAssignedAgent(resource.data.agentId)
+      );
+      allow update: if signedIn() && (
+        validBookingCustomerCancel() ||
+        validBookingAgentUpdate()
+      );
+      allow delete: if false;
+    }
   }
 }

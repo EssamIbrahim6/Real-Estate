@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/widgets/person_avatar.dart';
 import '../../../../core/widgets/app_feedback.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../cubit/profile_edit_cubit.dart';
 import '../cubit/profile_edit_state.dart';
 
@@ -38,6 +39,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return BlocConsumer<ProfileEditCubit, ProfileEditState>(
       listener: (context, state) {
         if (state.status == ProfileEditStatus.ready) {
@@ -58,7 +60,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         final isSaving = state.status == ProfileEditStatus.saving;
         if (state.status == ProfileEditStatus.loadError) {
           return Scaffold(
-            appBar: AppBar(title: const Text('Edit profile')),
+            appBar: AppBar(
+              title: Text(l10n?.editProfileTitle ?? 'Edit profile'),
+            ),
             body: Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
@@ -66,14 +70,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      state.message ?? 'Profile details could not be loaded.',
+                      state.message ??
+                          l10n?.editProfileLoadError ??
+                          'Profile details could not be loaded.',
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 16),
                     OutlinedButton.icon(
                       onPressed: context.read<ProfileEditCubit>().loadProfile,
                       icon: const Icon(Icons.refresh_rounded),
-                      label: const Text('Try again'),
+                      label: Text(l10n?.editProfileTryAgain ?? 'Try again'),
                     ),
                   ],
                 ),
@@ -95,7 +101,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               );
 
         return Scaffold(
-          appBar: AppBar(title: const Text('Edit profile')),
+          appBar: AppBar(
+            title: Text(l10n?.editProfileTitle ?? 'Edit profile'),
+          ),
           body:
               state.status == ProfileEditStatus.initial ||
                   state.status == ProfileEditStatus.loading
@@ -109,7 +117,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         Center(
                           child: Semantics(
                             button: true,
-                            label: 'Change profile photo',
+                            label: l10n?.editProfileChangePhoto ??
+                                'Change profile photo',
                             child: InkWell(
                               onTap: isSaving
                                   ? null
@@ -151,13 +160,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           controller: _nameController,
                           textCapitalization: TextCapitalization.words,
                           textInputAction: TextInputAction.next,
-                          decoration: const InputDecoration(
-                            labelText: 'Full name',
-                            prefixIcon: Icon(Icons.person_outline_rounded),
+                          decoration: InputDecoration(
+                            labelText:
+                                l10n?.editProfileFullName ?? 'Full name',
+                            prefixIcon:
+                                const Icon(Icons.person_outline_rounded),
                           ),
                           validator: (value) =>
                               value == null || value.trim().isEmpty
-                              ? 'Enter your name'
+                              ? (l10n?.editProfileNameRequired ??
+                                  'Enter your name')
                               : null,
                         ),
                         const SizedBox(height: 16),
@@ -165,10 +177,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           initialValue: state.email,
                           readOnly: true,
                           keyboardType: TextInputType.emailAddress,
-                          decoration: const InputDecoration(
-                            labelText: 'Email address',
-                            helperText: 'Email changes require account verification and are not available here.',
-                            prefixIcon: Icon(Icons.mail_outline_rounded),
+                          decoration: InputDecoration(
+                            labelText:
+                                l10n?.editProfileEmail ?? 'Email address',
+                            helperText: l10n?.editProfileEmailHelper ??
+                                'Email changes require account verification and are not available here.',
+                            prefixIcon: const Icon(Icons.mail_outline_rounded),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -176,9 +190,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           controller: _phoneController,
                           keyboardType: TextInputType.phone,
                           textInputAction: TextInputAction.done,
-                          decoration: const InputDecoration(
-                            labelText: 'Phone number',
-                            prefixIcon: Icon(Icons.phone_outlined),
+                          decoration: InputDecoration(
+                            labelText:
+                                l10n?.editProfilePhone ?? 'Phone number',
+                            prefixIcon: const Icon(Icons.phone_outlined),
                           ),
                         ),
                         if (state.warning != null) ...[
@@ -214,7 +229,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                       strokeWidth: 2,
                                     ),
                                   )
-                                : const Text('Save changes'),
+                                : Text(
+                                    l10n?.editProfileSaveChanges ??
+                                        'Save changes',
+                                  ),
                           ),
                         ),
                       ],

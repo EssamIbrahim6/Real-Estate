@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:real_estate_app/core/constants/app_assets.dart';
 import 'package:real_estate_app/core/helpers/auth_navigation_helper.dart';
+import 'package:real_estate_app/l10n/generated/app_localizations.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/helpers/spacing.dart';
@@ -19,6 +20,7 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final l10n = AppLocalizations.of(context);
 
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
@@ -97,27 +99,32 @@ class WelcomeScreen extends StatelessWidget {
                       // Title
                       RichText(
                         textAlign: TextAlign.center,
-                        text: const TextSpan(
-                          style: TextStyle(
+                        text: TextSpan(
+                          style: const TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.w700,
                             color: AppColors.brandNavy,
                             letterSpacing: -0.5,
                           ),
                           children: [
-                            TextSpan(text: 'Ready to '),
                             TextSpan(
-                              text: 'explore?',
-                              style: TextStyle(color: AppColors.brandGreen),
+                              text: l10n?.authReadyTo ?? 'Ready to ',
+                            ),
+                            TextSpan(
+                              text: l10n?.authExplore ?? 'explore?',
+                              style: const TextStyle(
+                                color: AppColors.brandGreen,
+                              ),
                             ),
                           ],
                         ),
                       ),
                       verticalSpace(10),
-                      const Text(
-                        'Find your dream house easily and experience the comfort of your future home.',
+                      Text(
+                        l10n?.authExploreSubtitle ??
+                            'Find your dream house easily and experience the comfort of your future home.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 13,
                           color: AppColors.textSecondary,
                           height: 1.5,
@@ -138,18 +145,19 @@ class WelcomeScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(16),
                             ),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.email_outlined,
                                 color: Colors.white,
                                 size: 20,
                               ),
-                              SizedBox(width: 10),
+                              const SizedBox(width: 10),
                               Text(
-                                'Continue with Email',
-                                style: TextStyle(
+                                l10n?.authContinueWithEmail ??
+                                    'Continue with Email',
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.white,
@@ -194,18 +202,19 @@ class WelcomeScreen extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text(
-                            "Don't have an account? ",
-                            style: TextStyle(
+                          Text(
+                            l10n?.authDontHaveAccountShort ??
+                                "Don't have an account? ",
+                            style: const TextStyle(
                               fontSize: 14,
                               color: AppColors.textSecondary,
                             ),
                           ),
                           GestureDetector(
                             onTap: () => context.pushNamed('register'),
-                            child: const Text(
-                              'Register',
-                              style: TextStyle(
+                            child: Text(
+                              l10n?.authRegisterLink ?? 'Register',
+                              style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.brandGreen,
@@ -251,17 +260,19 @@ class WelcomeScreen extends StatelessWidget {
   }
 
   void _showFacebookNotice(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Facebook Login'),
-        content: const Text(
-          'Facebook Login requires configuring the Facebook App ID in Firebase Console.',
+        title: Text(l10n?.authFacebookLogin ?? 'Facebook Login'),
+        content: Text(
+          l10n?.authFacebookLoginMessage ??
+              'Facebook Login requires configuring the Facebook App ID in Firebase Console.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('OK'),
+            child: Text(l10n?.authFacebookDialogOk ?? 'OK'),
           ),
         ],
       ),

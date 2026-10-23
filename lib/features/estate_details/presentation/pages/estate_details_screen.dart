@@ -8,6 +8,7 @@ import '../../../../core/helpers/spacing.dart';
 import '../../../../core/router/route_names.dart';
 import '../../../agent/domain/entities/agent_entity.dart';
 import '../../../estate/domain/entities/estate_entity.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_error_view.dart';
 import '../../../../core/widgets/app_feedback.dart';
@@ -22,6 +23,7 @@ import '../widgets/image_gallery.dart';
 import '../widgets/property_info_section.dart';
 import '../widgets/submit_review_bottom_sheet.dart';
 import '../../../map/domain/models/map_screen_args.dart';
+import '../../../booking/presentation/pages/book_tour_screen.dart';
 
 class EstateDetailsScreen extends StatefulWidget {
   final String estateId;
@@ -67,6 +69,39 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
         'The conversation was created, but could not be opened.',
       );
     }
+  }
+
+  void _bookTour(EstateEntity estate) {
+    final cubit = context.read<EstateDetailsCubit>();
+    if (!cubit.isAuthenticated) {
+      context.push(AppRoutes.login);
+      return;
+    }
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      context.push(AppRoutes.login);
+      return;
+    }
+
+    if (!estate.isAvailable) {
+      AppFeedback.error(
+        context,
+        AppLocalizations.of(context)?.detailsEstateUnavailable ??
+            'This property is currently unavailable for booking.',
+      );
+      return;
+    }
+
+    context.pushNamed(
+      AppRoutes.bookTourName,
+      extra: BookTourArgs(
+        estate: estate,
+        customerId: user.uid,
+        customerName: user.displayName ?? '',
+        customerEmail: user.email ?? '',
+        customerPhone: user.phoneNumber ?? '',
+      ),
+    );
   }
 
   bool _isOwner(EstateEntity estate, AgentEntity? agent) {
@@ -147,6 +182,8 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
         },
         builder: (context, state) {
           final colors = Theme.of(context).colorScheme;
+          final l10n = AppLocalizations.of(context);
+          final langCode = Localizations.localeOf(context).languageCode;
           if (state.estateStatus == EstateLoadingStatus.loading) {
             return const Scaffold(body: EstateDetailsSkeleton());
           }
@@ -198,7 +235,7 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                             children: [
                               Expanded(
                                 child: Text(
-                                  estate.title,
+                                  estate.localizedTitle(langCode),
                                   style: TextStyle(
                                     fontSize: 22,
                                     fontWeight: FontWeight.w800,
@@ -212,7 +249,7 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Text(
-                                    'EGP ${estate.price.toInt()}',
+                                    '${l10n?.commonEgp ?? "EGP"} ${estate.price.toInt()}',
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w800,
@@ -244,7 +281,7 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                               horizontalSpace(4),
                               Expanded(
                                 child: Text(
-                                  '${estate.location.address}, ${estate.location.city}',
+                                  '${estate.location.localizedAddress(langCode)}, ${estate.location.localizedCity(langCode)}',
                                   style: TextStyle(
                                     fontSize: 13,
                                     color: colors.onSurfaceVariant,
@@ -284,7 +321,7 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
 
                           // 4. Description
                           Text(
-                            'Description',
+                            l10n?.detailsDescription ?? 'Description',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
@@ -293,7 +330,7 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                           ),
                           verticalSpace(8),
                           Text(
-                            estate.description,
+                            estate.localizedDescription(langCode),
                             style: TextStyle(
                               fontSize: 14,
                               color: colors.onSurfaceVariant,
@@ -304,7 +341,7 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                                 ? TextOverflow.visible
                                 : TextOverflow.ellipsis,
                           ),
-                          if (estate.description.length > 120)
+                          if (estate.localizedDescription(langCode).length > 120)
                             GestureDetector(
                               onTap: () => setState(
                                 () => _isDescriptionExpanded =
@@ -314,8 +351,8 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Text(
                                   _isDescriptionExpanded
-                                      ? 'Show less'
-                                      : 'Read more',
+                                      ? (l10n?.detailsShowLess ?? 'Show less')
+                                      : (l10n?.detailsReadMore ?? 'Read more'),
                                   style: TextStyle(
                                     fontWeight: FontWeight.w700,
                                     color: colors.tertiary,
@@ -327,7 +364,7 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
 
                           // 5. Amenities
                           Text(
-                            'Amenities',
+                            l10n?.detailsAmenities ?? 'Amenities',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
@@ -382,7 +419,7 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
 
                           // 6. Location Map
                           Text(
-                            'Location',
+                            l10n?.detailsLocation ?? 'Location',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
@@ -397,7 +434,7 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                                 AppRoutes.map,
                                 extra: MapScreenArgs(
                                   targetEstate: estate,
-                                  title: estate.title,
+                                  title: estate.localizedTitle(langCode),
                                 ),
                               );
                             },
@@ -429,7 +466,7 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                               ),
                             ],
                             Text(
-                              'Listing Agent',
+                              l10n?.detailsListingAgent ?? 'Listing Agent',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
@@ -707,17 +744,26 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                   ),
                   child: Row(
                     children: [
-                      if (!isOwnedByCurrentUser)
+                      if (!isOwnedByCurrentUser) ...[
                         Expanded(
                           child: AppButton(
-                            text: 'Contact Agent',
+                            text: l10n?.detailsContactAgent ?? 'Contact Agent',
+                            type: AppButtonType.outlined,
                             isLoading:
                                 state.contactAgentStatus ==
                                 ContactAgentStatus.loading,
                             onPressed: _contactAgent,
                           ),
-                        )
-                      else
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: AppButton(
+                            text: l10n?.detailsBookVisit ?? 'Book a Visit',
+                            type: AppButtonType.primary,
+                            onPressed: () => _bookTour(estate),
+                          ),
+                        ),
+                      ] else
                         Expanded(
                           child: AppButton(
                             text: 'Your Property',

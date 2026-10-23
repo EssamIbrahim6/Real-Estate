@@ -15,6 +15,7 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/router/route_names.dart';
 import '../../../../core/widgets/app_error_view.dart';
 import '../../../../core/widgets/app_loading_indicator.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../home/presentation/widgets/estate_card.dart';
 import '../cubit/listing_cubit.dart';
 import '../cubit/listing_state.dart';
@@ -29,6 +30,7 @@ class CategoryEstatesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -38,7 +40,7 @@ class CategoryEstatesScreen extends StatelessWidget {
         actions: [
           BlocBuilder<ListingCubit, ListingState>(
             builder: (context, state) => IconButton(
-              tooltip: 'View on map',
+              tooltip: l10n?.searchViewOnMap ?? 'View on map',
               icon: const Icon(Icons.map_outlined),
               onPressed: () {
                 context.push(
@@ -58,21 +60,26 @@ class CategoryEstatesScreen extends StatelessWidget {
           switch (state.status) {
             case ListingStatus.initial:
             case ListingStatus.loading:
-              return const AppLoadingIndicator(message: 'Loading estates...');
+              return AppLoadingIndicator(
+                message: l10n?.listingsLoading ?? 'Loading estates...',
+              );
             case ListingStatus.error:
               return AppErrorView(
-                message: state.error ?? 'Failed to load estates.',
+                message: state.error ??
+                    l10n?.listingsLoading ??
+                    'Failed to load estates.',
                 onRetry: () => context.read<ListingCubit>().load(request),
               );
             case ListingStatus.success:
               if (state.estates.isEmpty) {
-                return const Center(
+                return Center(
                   child: Padding(
-                    padding: EdgeInsets.all(AppDimensions.p20),
+                    padding: const EdgeInsets.all(AppDimensions.p20),
                     child: Text(
-                      'No estates found for this category.',
+                      l10n?.listingsCategoryEmpty ??
+                          'No estates found for this category.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: AppColors.textSecondary),
+                      style: const TextStyle(color: AppColors.textSecondary),
                     ),
                   ),
                 );

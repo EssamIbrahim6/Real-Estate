@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:real_estate_app/core/errors/failures.dart';
+import 'package:real_estate_app/core/localization/locale_cubit.dart';
 import 'package:real_estate_app/core/theme/theme_cubit.dart';
 import 'package:real_estate_app/core/utils/typedefs.dart';
 import 'package:real_estate_app/features/account_setup/domain/entities/user_profile_entity.dart';
@@ -111,13 +112,15 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
     final authCubit = _FakeAuthCubit();
     SharedPreferences.setMockInitialValues({});
-    final themeCubit = ThemeCubit(
-      preferences: await SharedPreferences.getInstance(),
-    );
+    final prefs = await SharedPreferences.getInstance();
+    final themeCubit = ThemeCubit(preferences: prefs);
     await themeCubit.loadPreference();
+    final localeCubit = LocaleCubit(preferences: prefs);
+    await localeCubit.loadPreference();
     addTearDown(() async {
       await authCubit.close();
       await themeCubit.close();
+      await localeCubit.close();
     });
 
     await tester.pumpWidget(
@@ -125,6 +128,7 @@ void main() {
         providers: [
           BlocProvider<AuthCubit>.value(value: authCubit),
           BlocProvider<ThemeCubit>.value(value: themeCubit),
+          BlocProvider<LocaleCubit>.value(value: localeCubit),
         ],
         child: const MaterialApp(
           home: SettingsScreen(email: 'user@example.com'),

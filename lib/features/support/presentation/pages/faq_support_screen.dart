@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/helpers/spacing.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../auth/presentation/widgets/app_back_button.dart';
 import '../../domain/entities/faq_item.dart';
 import '../cubit/support_cubit.dart';
@@ -25,6 +26,7 @@ class _FaqSupportView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: AppColors.surface,
       body: SafeArea(
@@ -36,9 +38,9 @@ class _FaqSupportView extends StatelessWidget {
               AppBackButton(onTap: () => context.pop()),
               verticalSpace(20),
 
-              const Text(
-                'FAQ & Support',
-                style: TextStyle(
+              Text(
+                l10n?.faqTitle ?? 'FAQ & Support',
+                style: const TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.w700,
                   color: AppColors.brandNavy,
@@ -82,7 +84,7 @@ class _FaqSupportView extends StatelessWidget {
               TextField(
                 onChanged: (q) => context.read<SupportCubit>().search(q),
                 decoration: InputDecoration(
-                  hintText: 'Search questions...',
+                  hintText: l10n?.faqSearchHint ?? 'Search questions...',
                   hintStyle: const TextStyle(
                     fontSize: 14,
                     color: AppColors.textMuted,
@@ -146,7 +148,10 @@ class _FaqSupportView extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 36),
                       child: Center(
                         child: Text(
-                          'No questions found matching "${state.searchQuery}".',
+                          state.searchQuery.isEmpty
+                              ? (l10n?.faqNoResults ??
+                                  'No questions found.')
+                              : 'No questions found matching "${state.searchQuery}".',
                           style: const TextStyle(
                             color: AppColors.textSecondary,
                             fontSize: 13,

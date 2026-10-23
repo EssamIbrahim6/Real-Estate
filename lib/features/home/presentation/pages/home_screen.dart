@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/route_names.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/helpers/spacing.dart';
@@ -30,6 +31,7 @@ class HomeScreen extends StatelessWidget {
         child: BlocBuilder<HomeCubit, HomeState>(
           builder: (context, state) {
             final colors = Theme.of(context).colorScheme;
+            final l10n = AppLocalizations.of(context);
             if (state.status == HomeStatus.loading &&
                 state.featuredEstates.isEmpty) {
               return RefreshIndicator(
@@ -61,7 +63,7 @@ class HomeScreen extends StatelessWidget {
                     verticalSpace(24),
 
                     // 3. Property Categories
-                    const SectionHeader(title: 'Categories'),
+                    SectionHeader(title: l10n?.homeCategories ?? 'Categories'),
                     verticalSpace(12),
                     if (state.categoriesError != null)
                       Text(
@@ -103,11 +105,14 @@ class HomeScreen extends StatelessWidget {
 
                     // 4. Featured Estates Section
                     SectionHeader(
-                      title: 'Featured Estates',
+                      title: l10n?.homeFeaturedEstates ?? 'Featured Estates',
                       onSeeAll: () => context.pushNamed(
                         AppRoutes.listingsName,
                         pathParameters: {'type': 'featured'},
-                        queryParameters: {'title': 'Featured Estates'},
+                        queryParameters: {
+                          'title':
+                              l10n?.homeFeaturedEstates ?? 'Featured Estates',
+                        },
                       ),
                     ),
                     verticalSpace(12),
@@ -121,7 +126,8 @@ class HomeScreen extends StatelessWidget {
                       )
                     else if (state.featuredEstates.isEmpty)
                       Text(
-                        'No featured estates available right now.',
+                        l10n?.homeNoFeatured ??
+                            'No featured estates available right now.',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 13,
@@ -152,7 +158,9 @@ class HomeScreen extends StatelessWidget {
                     verticalSpace(24),
 
                     // 5. Top Locations Section
-                    const SectionHeader(title: 'Top Locations'),
+                    SectionHeader(
+                      title: l10n?.homeTopLocations ?? 'Top Locations',
+                    ),
                     verticalSpace(12),
                     if (state.topLocations.isEmpty)
                       Text(
@@ -188,7 +196,9 @@ class HomeScreen extends StatelessWidget {
                     verticalSpace(24),
 
                     // 6. Top Estate Agents Section
-                    const SectionHeader(title: 'Top Estate Agents'),
+                    SectionHeader(
+                      title: l10n?.homeTopAgents ?? 'Top Estate Agents',
+                    ),
                     verticalSpace(12),
                     if (state.agentsError != null)
                       Text(
@@ -197,7 +207,7 @@ class HomeScreen extends StatelessWidget {
                       )
                     else if (state.topAgents.isEmpty)
                       Text(
-                        'No agents available right now.',
+                        l10n?.homeNoAgents ?? 'No agents available right now.',
                         style: TextStyle(
                           color: colors.onSurfaceVariant,
                           fontSize: 13,
@@ -227,7 +237,7 @@ class HomeScreen extends StatelessWidget {
 
                     // 7. Explore Nearby Estates Section
                     SectionHeader(
-                      title: 'Explore Nearby Estates',
+                      title: l10n?.homeExploreNearby ?? 'Explore Nearby Estates',
                       onSeeAll: () async {
                         final homeCubit = context.read<HomeCubit>();
                         await homeCubit.requestLocationPermission();
@@ -245,7 +255,8 @@ class HomeScreen extends StatelessWidget {
                           pathParameters: {'type': 'nearby'},
                           extra: ListingRequest(
                             type: ListingType.nearby,
-                            title: 'Nearby Estates',
+                            title:
+                                l10n?.homeExploreNearby ?? 'Nearby Estates',
                             estates: homeState.nearbyEstates,
                             distancesKm: homeState.estateDistancesKm,
                           ),

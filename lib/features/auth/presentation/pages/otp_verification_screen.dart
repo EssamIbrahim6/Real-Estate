@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:real_estate_app/l10n/generated/app_localizations.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/helpers/spacing.dart';
@@ -54,6 +55,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   }
 
   void _onVerifyPressed() {
+    final l10n = AppLocalizations.of(context);
     if (_enteredOtp.length == 4) {
       setState(() => _errorMessage = null);
       context.read<AuthCubit>().verifyOtp(
@@ -61,7 +63,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
         otp: _enteredOtp,
       );
     } else {
-      setState(() => _errorMessage = 'Please enter all 4 digits');
+      setState(() =>
+          _errorMessage = l10n?.authOtpEnterAllDigits ?? 'Please enter all 4 digits');
     }
   }
 
@@ -74,6 +77,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is OtpVerificationSuccessState) {
@@ -83,7 +88,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
         } else if (state is OtpResentSuccessState) {
           AppFeedback.success(
             context,
-            'A new verification code has been dispatched.',
+            l10n?.authOtpDispatched ??
+                'A new verification code has been dispatched.',
           );
         }
       },
@@ -101,9 +107,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   AppBackButton(onTap: () => context.pop()),
                   verticalSpace(24),
 
-                  const AuthHeader(
-                    title: 'Enter the code',
-                    subtitle: 'Enter the 4-digit verification code sent to your email:',
+                  AuthHeader(
+                    title: l10n?.authOtpTitle ?? 'Enter the code',
+                    subtitle: l10n?.authOtpSubtitle ??
+                        'Enter the 4-digit verification code sent to your email:',
                   ),
                   verticalSpace(6),
 
@@ -150,7 +157,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   Center(
                     child: _secondsRemaining > 0
                         ? Text(
-                            'Resend code in 00:${_secondsRemaining.toString().padLeft(2, '0')}',
+                            '${l10n?.authOtpResendIn ?? "Resend code in"} 00:${_secondsRemaining.toString().padLeft(2, '0')}',
                             style: const TextStyle(
                               fontSize: 13,
                               color: AppColors.textSecondary,
@@ -158,9 +165,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                           )
                         : GestureDetector(
                             onTap: _onResendPressed,
-                            child: const Text(
-                              'Resend OTP',
-                              style: TextStyle(
+                            child: Text(
+                              l10n?.authResendOtp ?? 'Resend OTP',
+                              style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.brandGreen,
@@ -191,9 +198,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                 color: Colors.white,
                               ),
                             )
-                          : const Text(
-                              'Verify',
-                              style: TextStyle(
+                          : Text(
+                              l10n?.authVerify ?? 'Verify',
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.white,

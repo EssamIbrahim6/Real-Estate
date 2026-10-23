@@ -18,6 +18,7 @@ class EstateMapPreviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final langCode = Localizations.localeOf(context).languageCode;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -131,7 +132,7 @@ class EstateMapPreviewCard extends StatelessWidget {
 
                       // Title
                       Text(
-                        estate.title,
+                        estate.localizedTitle(langCode),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -153,7 +154,7 @@ class EstateMapPreviewCard extends StatelessWidget {
                           const SizedBox(width: 3),
                           Expanded(
                             child: Text(
-                              '${estate.location.address}, ${estate.location.city}',
+                              '${estate.location.localizedAddress(langCode)}, ${estate.location.localizedCity(langCode)}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(

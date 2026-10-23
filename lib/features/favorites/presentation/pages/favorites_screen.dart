@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/route_names.dart';
 import '../../../../core/widgets/app_skeleton.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../home/presentation/widgets/estate_card.dart';
 import '../cubit/favorites_cubit.dart';
 import '../cubit/favorites_state.dart';
@@ -13,14 +14,15 @@ class FavoritesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Favorites'),
+        title: Text(l10n?.favoritesTitle ?? 'Favorites'),
         backgroundColor: Theme.of(context).colorScheme.surface,
         actions: [
           IconButton(
-            tooltip: 'Refresh favorites',
+            tooltip: l10n?.commonRefresh ?? 'Refresh favorites',
             onPressed: () => context.read<FavoritesCubit>().loadFavorites(),
             icon: const Icon(Icons.refresh),
           ),
@@ -43,7 +45,9 @@ class FavoritesScreen extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      state.error ?? 'Favorites could not be loaded.',
+                      state.error ??
+                          l10n?.favoritesLoadError ??
+                          'Favorites could not be loaded.',
                       textAlign: TextAlign.center,
                       style: TextStyle(color: colors.onSurfaceVariant),
                     ),
@@ -51,12 +55,12 @@ class FavoritesScreen extends StatelessWidget {
                     if (!cubit.isAuthenticated)
                       FilledButton(
                         onPressed: () => context.push(AppRoutes.login),
-                        child: const Text('Sign in'),
+                        child: Text(l10n?.favoritesSignInButton ?? 'Sign in'),
                       )
                     else
                       TextButton(
                         onPressed: cubit.loadFavorites,
-                        child: const Text('Try again'),
+                        child: Text(l10n?.commonRetry ?? 'Try again'),
                       ),
                   ],
                 ),
@@ -70,8 +74,10 @@ class FavoritesScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(24),
                 child: Text(
                   state.unavailableCount > 0
-                      ? 'Your saved properties are currently unavailable.'
-                      : 'You have not saved any properties yet.',
+                      ? (l10n?.favoritesUnavailableNotice ??
+                          'Your saved properties are currently unavailable.')
+                      : (l10n?.favoritesEmpty ??
+                          'You have not saved any properties yet.'),
                   textAlign: TextAlign.center,
                   style: TextStyle(color: colors.onSurfaceVariant),
                 ),
@@ -85,7 +91,8 @@ class FavoritesScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
                   child: Text(
-                    'Some saved properties are no longer available.',
+                    l10n?.favoritesUnavailableNotice ??
+                        'Some saved properties are no longer available.',
                     style: TextStyle(color: colors.onSurfaceVariant),
                   ),
                 ),

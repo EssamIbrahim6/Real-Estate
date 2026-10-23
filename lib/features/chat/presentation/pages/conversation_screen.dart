@@ -7,6 +7,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/widgets/app_error_view.dart';
 import '../../../../core/widgets/app_feedback.dart';
 import '../../../../core/widgets/app_loading_indicator.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../cubit/chat_cubit.dart';
 import '../cubit/chat_state.dart';
 import '../../domain/entities/message_entity.dart';
@@ -121,6 +122,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return BlocListener<ChatCubit, ChatState>(
       listenWhen: (previous, current) =>
           previous.sendingFailure != current.sendingFailure ||
@@ -153,14 +155,18 @@ class _ConversationScreenState extends State<ConversationScreen> {
                         ),
                       );
                     case ChatLoadStatus.empty:
-                      return const Center(
-                        child: Text('No messages yet. Start the conversation.'),
+                      return Center(
+                        child: Text(
+                          l10n?.chatNoMessages ??
+                              'No messages yet. Start the conversation.',
+                        ),
                       );
                     case ChatLoadStatus.success:
                       if (state.messages.isEmpty) {
-                        return const Center(
+                        return Center(
                           child: Text(
-                            'No messages yet. Start the conversation.',
+                            l10n?.chatNoMessages ??
+                                'No messages yet. Start the conversation.',
                           ),
                         );
                       }
@@ -268,6 +274,7 @@ class _MessageComposer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return SafeArea(
       top: false,
       child: Material(
@@ -289,8 +296,9 @@ class _MessageComposer extends StatelessWidget {
                   textAlign: TextAlign.start,
                   decoration: InputDecoration(
                     hintText: enabled
-                        ? 'Write a message...'
-                        : 'Sign in to send a message',
+                        ? (l10n?.chatMessageHint ?? 'Write a message...')
+                        : (l10n?.chatSignInToSend ??
+                            'Sign in to send a message'),
                     filled: true,
                     fillColor: AppColors.inputBackground,
                     contentPadding: const EdgeInsets.symmetric(
@@ -323,7 +331,7 @@ class _MessageComposer extends StatelessWidget {
                           ),
                         )
                       : const Icon(Icons.send),
-                  tooltip: 'Send message',
+                  tooltip: l10n?.chatSendTooltip ?? 'Send message',
                 ),
               ),
             ],

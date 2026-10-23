@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:real_estate_app/l10n/generated/app_localizations.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/helpers/spacing.dart';
@@ -46,6 +47,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is PasswordResetSentState) {
@@ -70,9 +73,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     AppBackButton(onTap: () => context.pop()),
                     verticalSpace(24),
 
-                    const AuthHeader(
-                      title: 'Forgot Password',
-                      subtitle: 'Enter your registered email address and we will send you a link to reset your password.',
+                    AuthHeader(
+                      title: l10n?.authForgotPassword ?? 'Forgot Password',
+                      subtitle: l10n?.authForgotPasswordSubtitle ??
+                          'Enter your registered email address and we will send you a link to reset your password.',
                     ),
                     verticalSpace(28),
 
@@ -94,10 +98,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               size: 24,
                             ),
                             horizontalSpace(12),
-                            const Expanded(
+                            Expanded(
                               child: Text(
-                                'Password reset link sent! Check your inbox and spam folder.',
-                                style: TextStyle(
+                                l10n?.authPasswordResetSent ??
+                                    'Password reset link sent! Check your inbox and spam folder.',
+                                style: const TextStyle(
                                   color: AppColors.brandNavy,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
@@ -112,7 +117,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                     AuthTextField(
                       controller: _emailController,
-                      hintText: 'Email address',
+                      hintText: l10n?.authEmailLabel ?? 'Email address',
                       prefixIcon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
                       textInputAction: TextInputAction.done,
@@ -142,7 +147,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 ),
                               )
                             : Text(
-                                _emailSent ? 'Resend Link' : 'Send Reset Link',
+                                _emailSent
+                                    ? (l10n?.authResendLink ?? 'Resend Link')
+                                    : (l10n?.authSendResetLink ??
+                                        'Send Reset Link'),
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,

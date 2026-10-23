@@ -11,7 +11,6 @@ import 'package:real_estate_app/features/home/presentation/pages/home_screen.dar
 import 'package:real_estate_app/features/estate_details/presentation/pages/fullscreen_gallery_screen.dart';
 import 'package:real_estate_app/features/listing/presentation/cubit/listing_cubit.dart';
 import 'package:real_estate_app/features/listing/presentation/pages/category_estates_screen.dart';
-import 'package:real_estate_app/features/listing/presentation/pages/listings_screen.dart';
 import 'package:real_estate_app/features/search/presentation/cubit/search_cubit.dart';
 import 'package:real_estate_app/features/search/presentation/pages/search_screen.dart';
 import 'package:real_estate_app/features/chat/presentation/pages/chat_screen.dart';
@@ -27,11 +26,18 @@ import 'package:real_estate_app/features/favorites/presentation/pages/favorites_
 import 'package:real_estate_app/features/map/domain/models/map_screen_args.dart';
 import 'package:real_estate_app/features/map/presentation/cubit/map_cubit.dart';
 import 'package:real_estate_app/features/map/presentation/pages/estate_map_screen.dart';
+import 'package:real_estate_app/features/booking/domain/entities/booking_entity.dart';
+import 'package:real_estate_app/features/booking/presentation/cubit/booking_cubit.dart';
+import 'package:real_estate_app/features/booking/presentation/cubit/booking_history_cubit.dart';
+import 'package:real_estate_app/features/booking/presentation/pages/book_tour_screen.dart';
+import 'package:real_estate_app/features/booking/presentation/pages/booking_details_screen.dart';
+import 'package:real_estate_app/features/booking/presentation/pages/booking_history_screen.dart';
 
 import '../di/injection_container.dart';
 import '../navigation/main_navigation_shell.dart';
 import 'route_names.dart';
 import '../../features/estate/domain/entities/estate_entity.dart';
+import '../../features/estate/presentation/pages/add_property_screen.dart';
 
 // Splash & Onboarding
 import '../../features/splash/screens/splash_screen.dart';
@@ -396,6 +402,55 @@ class AppRouter {
           return BlocProvider(
             create: (_) => sl<MapCubit>(),
             child: EstateMapScreen(args: args),
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.addProperty,
+        name: 'add-property',
+        builder: (context, state) => const AddPropertyScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.bookTour,
+        name: AppRoutes.bookTourName,
+        builder: (context, state) {
+          final args = state.extra is BookTourArgs
+              ? state.extra as BookTourArgs
+              : null;
+          if (args == null) {
+            return const Scaffold(
+              body: Center(child: Text('Invalid booking arguments.')),
+            );
+          }
+          return BlocProvider(
+            create: (_) => sl<BookingCubit>(),
+            child: BookTourScreen(args: args),
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.myBookings,
+        name: AppRoutes.myBookingsName,
+        builder: (context, state) => BlocProvider(
+          create: (_) => sl<BookingHistoryCubit>(),
+          child: const BookingHistoryScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.bookingDetails,
+        name: AppRoutes.bookingDetailsName,
+        builder: (context, state) {
+          final booking = state.extra is BookingEntity
+              ? state.extra as BookingEntity
+              : null;
+          if (booking == null) {
+            return const Scaffold(
+              body: Center(child: Text('Invalid booking details.')),
+            );
+          }
+          return BlocProvider(
+            create: (_) => sl<BookingCubit>(),
+            child: BookingDetailsScreen(booking: booking),
           );
         },
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:real_estate_app/core/constants/app_assets.dart';
 import 'package:real_estate_app/core/router/route_names.dart';
+import 'package:real_estate_app/l10n/generated/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -16,40 +17,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   int _currentPage = 0;
 
-  final List<OnboardingModel> _pages = [
-    OnboardingModel(
-      title: 'Find best place\nto stay in good price',
-      description: 'Find your perfect place to stay with the best prices.',
-      image: AppAssets.onboarding1,
-    ),
-    OnboardingModel(
-      title: 'Fast sell your property\nin just one click',
-      description: 'Sell your property easily and quickly with just one click.',
-      image: AppAssets.onboarding2,
-    ),
-    OnboardingModel(
-      title: 'Find perfect choice for\nyour future house',
-      description: 'Discover the perfect home that matches your needs.',
-      image: AppAssets.onboarding3,
-    ),
-  ];
-
-  // void _nextPage() {
-  //   if (_currentPage < _pages.length - 1) {
-  //     _pageController.nextPage(
-  //       duration: const Duration(milliseconds: 300),
-  //       curve: Curves.easeInOut,
-  //     );
-  //   } else {
-  //     // Navigate to your Home / Login screen
-  //     // Navigator.pushReplacement(...);
-  //   }
-  // }
-
-  // void _skip() {
-  //   // Navigate to your Home / Login screen
-  //   // Navigator.pushReplacement(...);
-  // }
+  List<OnboardingModel> _getPages(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return [
+      OnboardingModel(
+        title: l10n?.onboarding1Title ?? 'Find best place\nto stay in good price',
+        description: l10n?.onboarding1Subtitle ??
+            'Find your perfect place to stay with the best prices.',
+        image: AppAssets.onboarding1,
+      ),
+      OnboardingModel(
+        title: l10n?.onboarding2Title ?? 'Fast sell your property\nin just one click',
+        description: l10n?.onboarding2Subtitle ??
+            'Sell your property easily and quickly with just one click.',
+        image: AppAssets.onboarding2,
+      ),
+      OnboardingModel(
+        title: l10n?.onboarding3Title ?? 'Find perfect choice for\nyour future house',
+        description: l10n?.onboarding3Subtitle ??
+            'Discover the perfect home that matches your needs.',
+        image: AppAssets.onboarding3,
+      ),
+    ];
+  }
 
   Future<void> _completeOnboarding() async {
     final prefs = await SharedPreferences.getInstance();
@@ -59,8 +49,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
   }
 
-  void _nextPage() {
-    if (_currentPage < _pages.length - 1) {
+  void _nextPage(int pageCount) {
+    if (_currentPage < pageCount - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -82,26 +72,33 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final pages = _getPages(context);
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: PageView.builder(
           controller: _pageController,
-          itemCount: _pages.length,
+          itemCount: pages.length,
           onPageChanged: (index) {
             setState(() {
               _currentPage = index;
             });
           },
           itemBuilder: (context, index) {
-            return _buildOnboardingPage(_pages[index]);
+            return _buildOnboardingPage(pages[index], pages.length, l10n);
           },
         ),
       ),
     );
   }
 
-  Widget _buildOnboardingPage(OnboardingModel page) {
+  Widget _buildOnboardingPage(
+    OnboardingModel page,
+    int totalPages,
+    AppLocalizations? l10n,
+  ) {
     final size = MediaQuery.sizeOf(context);
 
     return Container(
@@ -138,9 +135,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       color: const Color(0xFFE5E5E5),
                       borderRadius: BorderRadius.circular(24),
                     ),
-                    child: const Text(
-                      'skip',
-                      style: TextStyle(color: Color(0xFF666666), fontSize: 13),
+                    child: Text(
+                      l10n?.onboardingSkip ?? 'skip',
+                      style: const TextStyle(
+                        color: Color(0xFF666666),
+                        fontSize: 13,
+                      ),
                     ),
                   ),
                 ),
@@ -247,7 +247,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           // Next button
                           Expanded(
                             child: GestureDetector(
-                              onTap: _nextPage,
+                              onTap: () => _nextPage(totalPages),
                               child: Container(
                                 height: 58,
                                 decoration: BoxDecoration(
@@ -256,9 +256,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    _currentPage == _pages.length - 1
-                                        ? 'Get Started'
-                                        : 'Next',
+                                    _currentPage == totalPages - 1
+                                        ? (l10n?.onboardingGetStarted ??
+                                            'Get Started')
+                                        : (l10n?.commonNext ?? 'Next'),
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 16,
@@ -280,7 +281,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       right: 0,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(_pages.length, (index) {
+                        children: List.generate(totalPages, (index) {
                           return AnimatedContainer(
                             duration: const Duration(milliseconds: 300),
                             margin: const EdgeInsets.symmetric(horizontal: 4),
