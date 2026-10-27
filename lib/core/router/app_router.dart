@@ -223,11 +223,12 @@ class AppRouter {
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => BlocProvider(
           create: (_) => sl<ChatCubit>(),
-          child: ConversationScreen(
-            conversationId: state.pathParameters['conversationId'] ?? '',
-            title: state.uri.queryParameters['title'] ?? 'Agent',
-            currentUserUid: FirebaseAuth.instance.currentUser?.uid,
-          ),
+            child: ConversationScreen(
+              conversationId: state.pathParameters['conversationId'] ?? '',
+              title: state.uri.queryParameters['title'] ?? 'Agent',
+              estateId: state.uri.queryParameters['estateId'],
+              currentUserUid: FirebaseAuth.instance.currentUser?.uid,
+            ),
         ),
       ),
       GoRoute(

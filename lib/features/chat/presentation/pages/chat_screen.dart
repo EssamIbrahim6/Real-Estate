@@ -152,7 +152,12 @@ class _ChatScreenState extends State<ChatScreen> {
                               pathParameters: {
                                 'conversationId': conversation.id,
                               },
-                              queryParameters: {'title': participantName},
+                              queryParameters: {
+                                'title': participantName,
+                                if (conversation.estateId != null &&
+                                    conversation.estateId!.isNotEmpty)
+                                  'estateId': conversation.estateId,
+                              },
                             ),
                           ),
                         );

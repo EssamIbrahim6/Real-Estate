@@ -6,7 +6,7 @@ class ConversationEntity extends Equatable {
   final String customerId;
   final String agentUserId;
   final String agentId;
-  final String estateId;
+  final String? estateId;
   final DateTime? createdAt;
   final String? lastMessage;
   final DateTime? lastMessageAt;
@@ -19,7 +19,7 @@ class ConversationEntity extends Equatable {
     required this.customerId,
     required this.agentUserId,
     required this.agentId,
-    required this.estateId,
+    this.estateId,
     this.createdAt,
     this.lastMessage,
     this.lastMessageAt,

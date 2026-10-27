@@ -4,9 +4,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/di/injection_container.dart';
+import '../../../../core/router/route_names.dart';
 import '../../../../core/widgets/app_error_view.dart';
 import '../../../../core/widgets/app_feedback.dart';
 import '../../../../core/widgets/app_loading_indicator.dart';
+import '../../../../features/estate/domain/entities/estate_entity.dart';
+import '../../../../features/estate/domain/repositories/estate_repository.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../cubit/chat_cubit.dart';
 import '../cubit/chat_state.dart';
@@ -17,11 +21,13 @@ class ConversationScreen extends StatefulWidget {
     super.key,
     required this.conversationId,
     required this.title,
+    this.estateId,
     this.currentUserUid,
   });
 
   final String conversationId;
   final String title;
+  final String? estateId;
   final String? currentUserUid;
 
   @override
@@ -32,6 +38,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
   final _messageController = TextEditingController();
   final _scrollController = ScrollController();
   late final String? _currentUserUid;
+  EstateEntity? _estate;
+  bool _estateLoading = false;
   int _previousMessageCount = 0;
   bool _isNearBottom = true;
   Object? _lastSendingFailure;
@@ -51,6 +59,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
         participantUid: _currentUserUid,
       );
     }
+    _loadEstate();
   }
 
   void _updateNearBottom() {
@@ -59,6 +68,18 @@ class _ConversationScreenState extends State<ConversationScreen> {
         _scrollController.position.maxScrollExtent -
             _scrollController.position.pixels <
         120;
+  }
+
+  Future<void> _loadEstate() async {
+    final estateId = widget.estateId?.trim();
+    if (estateId == null || estateId.isEmpty) return;
+    setState(() => _estateLoading = true);
+    final result = await sl<EstateRepository>().getEstateById(estateId);
+    if (!mounted) return;
+    setState(() {
+      _estate = result.data;
+      _estateLoading = false;
+    });
   }
 
   void _onChatStateChanged(BuildContext context, ChatState state) {
@@ -138,9 +159,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        body: Column(
-          children: [
-            Expanded(
+            body: Column(
+              children: [
+                if (_estateLoading)
+                  const LinearProgressIndicator(),
+                if (_estate != null)
+                  _EstateMentionHeader(estate: _estate!),
+                Expanded(
               child: BlocBuilder<ChatCubit, ChatState>(
                 builder: (context, state) {
                   switch (state.messagesStatus) {
@@ -342,6 +367,87 @@ class _MessageComposer extends StatelessWidget {
   }
 }
 
+class _EstateMentionHeader extends StatelessWidget {
+  const _EstateMentionHeader({required this.estate});
+
+  final EstateEntity estate;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final langCode = Localizations.localeOf(context).languageCode;
+    final title = estate.localizedTitle(langCode);
+    final address = estate.location.localizedAddress(langCode);
+    return InkWell(
+      onTap: () => context.push(
+        '${AppRoutes.propertyDetails}/${estate.id}',
+        extra: estate,
+      ),
+      child: Container(
+        margin: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: colors.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: colors.outlineVariant),
+        ),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                estate.coverImage,
+                width: 56,
+                height: 56,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  width: 56,
+                  height: 56,
+                  color: colors.surfaceContainerHighest,
+                  child: const Icon(Icons.home_work_outlined),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${estate.price.toInt()} EGP',
+                    style: TextStyle(
+                      color: colors.tertiary,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                  ),
+                  if (address.isNotEmpty)
+                    Text(
+                      address,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: colors.onSurfaceVariant,
+                        fontSize: 12,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right),
+          ],
+        ),
+      ),
+    );
+  }
+}
 String _safeError(String? message) {
   if (message == null ||
       message.toLowerCase().contains('firebase') ||

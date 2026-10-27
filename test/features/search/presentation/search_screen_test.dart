@@ -39,7 +39,7 @@ void main() {
 
       await tester.testTextInput.receiveAction(TextInputAction.search);
       await tester.pumpAndSettle();
-      expect(searchRepository.filters.last.query, 'cairo');
+      expect(searchRepository.filters.last.city, 'Cairo');
 
       await tester.enterText(searchField, 'القاهرة');
       await tester.pump();
@@ -48,7 +48,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 349));
       expect(searchRepository.filters, hasLength(2));
       await tester.pump(const Duration(milliseconds: 1));
-      expect(searchRepository.filters.last.query, 'القاهرة');
+      expect(searchRepository.filters.last.city, 'Cairo');
 
       await tester.enterText(searchField, '');
       await tester.pump();

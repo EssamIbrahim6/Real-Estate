@@ -1,9 +1,8 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-
+import 'package:speech_to_text/speech_to_text.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/router/route_names.dart';
 import '../../../../core/widgets/app_error_view.dart';
@@ -14,6 +13,7 @@ import '../../../home/presentation/widgets/estate_card.dart';
 import '../cubit/search_cubit.dart';
 import '../cubit/search_state.dart';
 import '../../domain/entities/search_filter.dart';
+import '../../domain/entities/smart_search_parser.dart';
 import '../widgets/search_filter_sheet.dart';
 import '../../../map/domain/models/map_screen_args.dart';
 
@@ -26,6 +26,9 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   final _queryController = TextEditingController();
+  final SpeechToText _speech = SpeechToText();
+  bool _isListening = false;
+  bool _speechAvailable = false;
 
   /// Debounce timer for live search — fires ~350 ms after the user stops typing.
   Timer? _debounceTimer;
@@ -43,11 +46,23 @@ class _SearchScreenState extends State<SearchScreen> {
     cubit.search(cubit.state.filter);
     // Wire live search: every keystroke resets the debounce timer.
     _queryController.addListener(_onQueryChanged);
+    _initSpeech();
+  }
+
+  Future<void> _initSpeech() async {
+    try {
+      _speechAvailable = await _speech.initialize();
+      if (mounted) setState(() {});
+    } catch (_) {
+      _speechAvailable = false;
+      if (mounted) setState(() {});
+    }
   }
 
   @override
   void dispose() {
     _debounceTimer?.cancel();
+    _speech.stop();
     _queryController
       ..removeListener(_onQueryChanged)
       ..dispose();
@@ -67,19 +82,29 @@ class _SearchScreenState extends State<SearchScreen> {
     if (!mounted) return;
     final current = context.read<SearchCubit>().state.filter;
     final rawQuery = _queryController.text.trim();
-    await context.read<SearchCubit>().search(
-      SearchFilter(
-        query: rawQuery.isEmpty ? null : rawQuery,
-        categoryId: current.categoryId,
-        city: current.city,
-        minPrice: current.minPrice,
-        maxPrice: current.maxPrice,
-        bedrooms: current.bedrooms,
-        bathrooms: current.bathrooms,
-        isFurnished: current.isFurnished,
-        listingType: current.listingType,
-        isAvailable: current.isAvailable,
-      ),
+    final parsed = SmartSearchParser.parse(rawQuery, existing: current);
+    await context.read<SearchCubit>().search(parsed);
+  }
+
+  Future<void> _toggleListening() async {
+    if (!_speechAvailable) return;
+    if (_isListening) {
+      await _speech.stop();
+      setState(() => _isListening = false);
+      return;
+    }
+    setState(() => _isListening = true);
+    await _speech.listen(
+      onResult: (result) {
+        if (!mounted) return;
+        _suppressQuerySearch = true;
+        _queryController.text = result.recognizedWords;
+        _suppressQuerySearch = false;
+        if (result.finalResult) {
+          _runSearch();
+        }
+      },
+      localeId: Localizations.localeOf(context).languageCode == 'ar' ? 'ar' : 'en',
     );
   }
 
@@ -199,6 +224,12 @@ class _SearchScreenState extends State<SearchScreen> {
                         ),
                       ),
                     ),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton.filledTonal(
+                    tooltip: 'Voice search',
+                    onPressed: _speechAvailable ? _toggleListening : null,
+                    icon: Icon(_isListening ? Icons.mic : Icons.mic_none),
                   ),
                   const SizedBox(width: 8),
                   IconButton.filledTonal(
