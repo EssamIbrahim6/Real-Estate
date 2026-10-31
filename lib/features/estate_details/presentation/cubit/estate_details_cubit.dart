@@ -189,57 +189,52 @@ class EstateDetailsCubit extends Cubit<EstateDetailsState> {
         );
       }
 
-      final agentResult = await _agentRepository.getAgentById(agentId);
-      final agent = agentResult.data;
-      if (agentResult.failure != null || agent == null) {
-        return _failContactAgent(
-          'We could not find the agent for this property.',
-        );
-      }
-      if (agent.id.trim() != agentId) {
-        return _failContactAgent(
-          'We could not find the agent for this property.',
-        );
-      }
+       final agentResult = await _agentRepository.getAgentById(agentId);
+       final agent = agentResult.data;
+       if (agentResult.failure != null || agent == null) {
+         return _failContactAgent(
+           'We could not find the agent for this property.',
+         );
+       }
 
-      final agentUserUid = agent.userId.trim();
-      if (agentUserUid.isEmpty ||
-          agentUserUid.length > 128 ||
-          agentUserUid.contains(RegExp(r'\s'))) {
-        return _failContactAgent(
-          'This agent is not set up to receive messages yet.',
-        );
-      }
-      if (customerUid == agentUserUid) {
-        return _failContactAgent(
-          'You cannot start a conversation with your own agent account.',
-        );
-      }
+       final agentUserUid = agent.userId.trim();
+       if (agentUserUid.isEmpty ||
+           agentUserUid.length > 128 ||
+           agentUserUid.contains(RegExp(r'\s'))) {
+         return _failContactAgent(
+           'This agent is not set up to receive messages yet.',
+         );
+       }
+       if (customerUid == agentUserUid) {
+         return _failContactAgent(
+           'You cannot start a conversation with your own agent account.',
+         );
+       }
 
-      final result = await _chatRepository.getOrCreateConversation(
-        customerUid: customerUid,
-        agentUserUid: agentUserUid,
-        agentId: agentId,
-        estateId: estateId,
-      );
-      if (result.failure != null || result.data == null) {
-        return _failContactAgent(
-          'We could not open this conversation. Please try again.',
-        );
-      }
+       final result = await _chatRepository.getOrCreateConversation(
+         customerUid: customerUid,
+         agentUserUid: agentUserUid,
+         agentId: agentId,
+         estateId: estateId,
+       );
+       if (result.failure != null || result.data == null) {
+         return _failContactAgent(
+           'We could not open this conversation. Please try again.',
+         );
+       }
 
-      emit(
-        state.copyWith(
-          contactAgentStatus: ContactAgentStatus.success,
-          conversationId: result.data!.id,
-        ),
-      );
-      return result.data!.id;
-    } catch (_) {
-      return _failContactAgent(
-        'We could not open this conversation. Please try again.',
-      );
-    }
+       emit(
+         state.copyWith(
+           contactAgentStatus: ContactAgentStatus.success,
+           conversationId: result.data!.id,
+         ),
+       );
+       return result.data!.id;
+     } catch (e) {
+       return _failContactAgent(
+         'We could not open this conversation. Please try again.',
+       );
+     }
   }
 
   String? _failContactAgent(String message) {

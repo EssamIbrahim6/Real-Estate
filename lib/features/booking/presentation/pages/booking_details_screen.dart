@@ -45,9 +45,12 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
             onPressed: () {
               Navigator.of(dialogCtx).pop(true);
               final uid = FirebaseAuth.instance.currentUser?.uid;
+              final langCode = Localizations.localeOf(ctx).languageCode;
               ctx.read<BookingCubit>().cancelBooking(
                 bookingId: widget.booking.id,
                 requesterId: uid ?? '',
+                agentUserId: widget.booking.agentUserId,
+                estateTitle: widget.booking.localizedEstateTitle(langCode),
               );
             },
             child: Text(l10n?.bookingCancelButton ?? 'Cancel Booking'),

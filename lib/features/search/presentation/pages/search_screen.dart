@@ -1,9 +1,8 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-
+import 'package:speech_to_text/speech_to_text.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/router/route_names.dart';
 import '../../../../core/widgets/app_error_view.dart';
@@ -26,6 +25,9 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   final _queryController = TextEditingController();
+  final SpeechToText _speech = SpeechToText();
+  bool _isListening = false;
+  bool _speechAvailable = false;
 
   /// Debounce timer for live search — fires ~350 ms after the user stops typing.
   Timer? _debounceTimer;
@@ -43,11 +45,23 @@ class _SearchScreenState extends State<SearchScreen> {
     cubit.search(cubit.state.filter);
     // Wire live search: every keystroke resets the debounce timer.
     _queryController.addListener(_onQueryChanged);
+    _initSpeech();
+  }
+
+  Future<void> _initSpeech() async {
+    try {
+      _speechAvailable = await _speech.initialize();
+      if (mounted) setState(() {});
+    } catch (_) {
+      _speechAvailable = false;
+      if (mounted) setState(() {});
+    }
   }
 
   @override
   void dispose() {
     _debounceTimer?.cancel();
+    _speech.stop();
     _queryController
       ..removeListener(_onQueryChanged)
       ..dispose();
@@ -59,27 +73,39 @@ class _SearchScreenState extends State<SearchScreen> {
     setState(() {});
     if (_suppressQuerySearch) return;
     _debounceTimer?.cancel();
-    _debounceTimer = Timer(_debounceDuration, _runSearch);
+    _debounceTimer = Timer(_debounceDuration, _runSmartSearch);
   }
 
-  Future<void> _runSearch() async {
+  Future<void> _runSmartSearch() async {
     _debounceTimer?.cancel();
     if (!mounted) return;
-    final current = context.read<SearchCubit>().state.filter;
     final rawQuery = _queryController.text.trim();
-    await context.read<SearchCubit>().search(
-      SearchFilter(
-        query: rawQuery.isEmpty ? null : rawQuery,
-        categoryId: current.categoryId,
-        city: current.city,
-        minPrice: current.minPrice,
-        maxPrice: current.maxPrice,
-        bedrooms: current.bedrooms,
-        bathrooms: current.bathrooms,
-        isFurnished: current.isFurnished,
-        listingType: current.listingType,
-        isAvailable: current.isAvailable,
-      ),
+    if (rawQuery.isEmpty) {
+      await context.read<SearchCubit>().search(const SearchFilter());
+      return;
+    }
+    await context.read<SearchCubit>().smartSearch(rawQuery);
+  }
+
+  Future<void> _toggleListening() async {
+    if (!_speechAvailable) return;
+    if (_isListening) {
+      await _speech.stop();
+      setState(() => _isListening = false);
+      return;
+    }
+    setState(() => _isListening = true);
+    await _speech.listen(
+      onResult: (result) {
+        if (!mounted) return;
+        _suppressQuerySearch = true;
+        _queryController.text = result.recognizedWords;
+        _suppressQuerySearch = false;
+        if (result.finalResult) {
+          _runSmartSearch();
+        }
+      },
+      localeId: Localizations.localeOf(context).languageCode == 'ar' ? 'ar' : 'en',
     );
   }
 
@@ -160,10 +186,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       textInputAction: TextInputAction.search,
                       // onChanged is handled by the listener added in initState.
                       // onSubmitted fires an immediate search (bypassing debounce).
-                      onSubmitted: (_) {
-                        _debounceTimer?.cancel();
-                        _runSearch();
-                      },
+                       onSubmitted: (_) => _runSmartSearch(),
                       decoration: InputDecoration(
                         hintText: l10n?.searchHint ?? 'Search estates…',
                         prefixIcon: const Icon(Icons.search_rounded),
@@ -177,16 +200,13 @@ class _SearchScreenState extends State<SearchScreen> {
                                   _debounceTimer?.cancel();
                                   _queryController.clear();
                                   // Clear runs the search immediately.
-                                  _runSearch();
+                                  _runSmartSearch();
                                 },
                                 icon: const Icon(Icons.close_rounded),
                               ),
                             IconButton(
                               tooltip: l10n?.commonSearch ?? 'Search',
-                              onPressed: () {
-                                _debounceTimer?.cancel();
-                                _runSearch();
-                              },
+                               onPressed: () => _runSmartSearch(),
                               icon: const Icon(Icons.arrow_forward_rounded),
                             ),
                           ],
@@ -199,6 +219,12 @@ class _SearchScreenState extends State<SearchScreen> {
                         ),
                       ),
                     ),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton.filledTonal(
+                    tooltip: 'Voice search',
+                    onPressed: _speechAvailable ? _toggleListening : null,
+                    icon: Icon(_isListening ? Icons.mic : Icons.mic_none),
                   ),
                   const SizedBox(width: 8),
                   IconButton.filledTonal(

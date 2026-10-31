@@ -32,6 +32,7 @@ import 'package:real_estate_app/features/booking/presentation/cubit/booking_hist
 import 'package:real_estate_app/features/booking/presentation/pages/book_tour_screen.dart';
 import 'package:real_estate_app/features/booking/presentation/pages/booking_details_screen.dart';
 import 'package:real_estate_app/features/booking/presentation/pages/booking_history_screen.dart';
+import 'package:real_estate_app/features/notifications/presentation/pages/notifications_screen.dart';
 
 import '../di/injection_container.dart';
 import '../navigation/main_navigation_shell.dart';
@@ -223,11 +224,12 @@ class AppRouter {
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => BlocProvider(
           create: (_) => sl<ChatCubit>(),
-          child: ConversationScreen(
-            conversationId: state.pathParameters['conversationId'] ?? '',
-            title: state.uri.queryParameters['title'] ?? 'Agent',
-            currentUserUid: FirebaseAuth.instance.currentUser?.uid,
-          ),
+            child: ConversationScreen(
+              conversationId: state.pathParameters['conversationId'] ?? '',
+              title: state.uri.queryParameters['title'] ?? 'Agent',
+              estateId: state.uri.queryParameters['estateId'],
+              currentUserUid: FirebaseAuth.instance.currentUser?.uid,
+            ),
         ),
       ),
       GoRoute(
@@ -453,6 +455,12 @@ class AppRouter {
             child: BookingDetailsScreen(booking: booking),
           );
         },
+      ),
+
+      GoRoute(
+        path: AppRoutes.notifications,
+        name: AppRoutes.notificationsName,
+        builder: (context, state) => const NotificationsScreen(),
       ),
       // Home Screen
       // GoRoute(

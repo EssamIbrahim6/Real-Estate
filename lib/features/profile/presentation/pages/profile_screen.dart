@@ -1,3 +1,4 @@
+import '../../../notifications/presentation/widgets/notification_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -32,6 +33,13 @@ class ProfileScreen extends StatelessWidget {
         appBar: AppBar(
           title: Text(l10n?.profileTitle ?? 'Your profile'),
           actions: [
+            NotificationBadge(
+              child: IconButton(
+                tooltip: l10n?.notificationsTitle ?? 'Notifications',
+                onPressed: () => context.pushNamed(AppRoutes.notificationsName),
+                icon: const Icon(Icons.notifications_outlined),
+              ),
+            ),
             IconButton(
               tooltip: l10n?.profileSettingsTitle ?? 'Settings',
               onPressed: () => context.pushNamed(
@@ -135,6 +143,12 @@ class ProfileScreen extends StatelessWidget {
                         subtitle: l10n?.profileMyBookingsSubtitle ??
                             'View and manage your tour requests',
                         onTap: () => context.push(AppRoutes.myBookings),
+                      ),
+                      ProfileActionTile(
+                        icon: Icons.notifications_none_rounded,
+                        title: l10n?.notificationsTitle ?? 'Notifications',
+                        subtitle: l10n?.profileNotificationsSubtitle ?? 'View your activity and updates',
+                        onTap: () => context.pushNamed(AppRoutes.notificationsName),
                       ),
                     ],
                   ),

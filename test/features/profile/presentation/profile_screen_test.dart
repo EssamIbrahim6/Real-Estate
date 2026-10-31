@@ -11,6 +11,9 @@ import 'package:real_estate_app/features/account_setup/domain/entities/user_prof
 import 'package:real_estate_app/features/account_setup/domain/repositories/account_setup_repository.dart';
 import 'package:real_estate_app/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:real_estate_app/features/auth/presentation/cubit/auth_state.dart';
+import 'package:real_estate_app/features/notifications/domain/entities/notification_entity.dart';
+import 'package:real_estate_app/features/notifications/domain/repositories/notification_repository.dart';
+import 'package:real_estate_app/features/notifications/presentation/cubit/notifications_cubit.dart';
 import 'package:real_estate_app/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:real_estate_app/features/profile/presentation/pages/profile_screen.dart';
 import 'package:real_estate_app/features/profile/presentation/pages/settings_screen.dart';
@@ -41,11 +44,15 @@ void main() {
     );
     await profileCubit.loadProfile();
     final authCubit = _FakeAuthCubit();
+    final notificationsCubit = NotificationsCubit(
+      repository: _FakeNotificationRepository(),
+    );
     final router = _testRouter();
     addTearDown(() async {
       router.dispose();
       await profileCubit.close();
       await authCubit.close();
+      await notificationsCubit.close();
     });
 
     await tester.pumpWidget(
@@ -53,6 +60,7 @@ void main() {
         providers: [
           BlocProvider<ProfileCubit>.value(value: profileCubit),
           BlocProvider<AuthCubit>.value(value: authCubit),
+          BlocProvider<NotificationsCubit>.value(value: notificationsCubit),
         ],
         child: MaterialApp.router(routerConfig: router),
       ),
@@ -74,11 +82,15 @@ void main() {
     );
     await profileCubit.loadProfile();
     final authCubit = _FakeAuthCubit();
+    final notificationsCubit = NotificationsCubit(
+      repository: _FakeNotificationRepository(),
+    );
     final router = _testRouter();
     addTearDown(() async {
       router.dispose();
       await profileCubit.close();
       await authCubit.close();
+      await notificationsCubit.close();
     });
 
     await tester.pumpWidget(
@@ -86,6 +98,7 @@ void main() {
         providers: [
           BlocProvider<ProfileCubit>.value(value: profileCubit),
           BlocProvider<AuthCubit>.value(value: authCubit),
+          BlocProvider<NotificationsCubit>.value(value: notificationsCubit),
         ],
         child: MaterialApp.router(routerConfig: router),
       ),
@@ -255,4 +268,25 @@ class _FakeAccountSetupRepository implements AccountSetupRepository {
     UserProfileEntity profile, {
     String? localImagePath,
   }) async => (failure: null, data: profile);
+}
+
+class _FakeNotificationRepository implements NotificationRepository {
+  @override
+  ResultVoid createNotification(NotificationEntity notification) async =>
+      (failure: null, isSuccess: true);
+
+  @override
+  Future<int> getUnreadCount(String uid) async => 0;
+
+  @override
+  ResultVoid markAllAsRead(String uid) async =>
+      (failure: null, isSuccess: true);
+
+  @override
+  ResultVoid markAsRead(String notificationId) async =>
+      (failure: null, isSuccess: true);
+
+  @override
+  Stream<List<NotificationEntity>> watchForUser(String uid) =>
+      const Stream.empty();
 }

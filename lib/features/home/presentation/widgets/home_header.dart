@@ -1,8 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/helpers/spacing.dart';
+import '../../../../core/router/route_names.dart';
 import '../../../../core/widgets/person_avatar.dart';
+import '../../../notifications/presentation/widgets/notification_badge.dart';
 
 class HomeHeader extends StatelessWidget {
   final String? locationName;
@@ -55,6 +58,13 @@ class HomeHeader extends StatelessWidget {
                 ],
               ),
             ],
+          ),
+        ),
+        NotificationBadge(
+          child: IconButton(
+            tooltip: 'Notifications',
+            onPressed: () => context.pushNamed(AppRoutes.notificationsName),
+            icon: Icon(Icons.notifications_outlined, color: colors.onSurface),
           ),
         ),
       ],

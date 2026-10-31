@@ -204,5 +204,52 @@ service cloud.firestore {
       );
       allow delete: if false;
     }
+
+    match /users/{userId} {
+      allow read: if signedIn();
+      allow write: if signedIn() && request.auth.uid == userId;
+    }
+
+    function validNotificationCreate() {
+      let data = request.resource.data;
+      let isBase = signedIn() &&
+        data.recipientId is string && data.recipientId.size() > 0 &&
+        data.type is string && data.type.size() > 0 &&
+        data.title is string && data.title.size() > 0 &&
+        data.body is string &&
+        data.isRead == false;
+
+      let isSelf = isBase && data.recipientId == request.auth.uid;
+
+      let isChatPeer = isBase &&
+        data.type == 'chatMessage' &&
+        data.entityType == 'conversation' &&
+        data.entityId is string &&
+        exists(/databases/$(database)/documents/conversations/$(data.entityId)) &&
+        request.auth.uid in get(/databases/$(database)/documents/conversations/$(data.entityId)).data.participants &&
+        data.recipientId in get(/databases/$(database)/documents/conversations/$(data.entityId)).data.participants;
+
+      let isBookingParty = isBase &&
+        (data.type == 'bookingReceived' || data.type == 'bookingStatusChanged') &&
+        data.entityType == 'booking' &&
+        data.entityId is string &&
+        exists(/databases/$(database)/documents/bookings/$(data.entityId)) &&
+        (
+          get(/databases/$(database)/documents/bookings/$(data.entityId)).data.customerId == request.auth.uid ||
+          isAssignedAgent(get(/databases/$(database)/documents/bookings/$(data.entityId)).data.agentId)
+        );
+
+      return isSelf || isChatPeer || isBookingParty;
+    }
+
+    match /notifications/{notificationId} {
+      allow get, list: if signedIn() && resource.data.recipientId == request.auth.uid;
+      allow create: if validNotificationCreate();
+      allow update: if signedIn() &&
+        resource.data.recipientId == request.auth.uid &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead']) &&
+        request.resource.data.isRead is bool;
+      allow delete: if false;
+    }
   }
 }
