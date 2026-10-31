@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/services/notification_service.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../../domain/usecases/auth_usecases.dart';
 import 'auth_state.dart';
@@ -15,6 +16,7 @@ class AuthCubit extends Cubit<AuthState> {
   final FacebookSignInUseCase _facebookSignInUseCase;
   final GetCurrentUserUseCase _getCurrentUserUseCase;
   final LogoutUseCase _logoutUseCase;
+  final NotificationService? _notificationService;
 
   AuthCubit({
     required this._loginUseCase,
@@ -26,7 +28,9 @@ class AuthCubit extends Cubit<AuthState> {
     required this._facebookSignInUseCase,
     required this._getCurrentUserUseCase,
     required this._logoutUseCase,
+    NotificationService? notificationService,
   }) : _registerUseCase = registerUseCase,
+       _notificationService = notificationService,
        super(const AuthInitial());
 
   Future<bool> _isAccountSetupCompleted(String userId) async {
@@ -80,6 +84,7 @@ class AuthCubit extends Cubit<AuthState> {
     if (result.failure != null) {
       emit(AuthFailureState(result.failure!.message));
     } else if (result.data != null) {
+      _notificationService?.notifyAccountCreated(uid: result.data!.id);
       emit(Authenticated(result.data!, accountSetupCompleted: false));
     }
   }

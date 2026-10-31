@@ -1,7 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 
+import '../../../../core/services/notification_service.dart';
+import '../../../account_setup/domain/repositories/account_setup_repository.dart';
 import '../../../category/domain/entities/category_entity.dart';
 import '../../../category/domain/repositories/category_repository.dart';
 import '../../../agent/domain/repositories/agent_repository.dart';
@@ -14,14 +17,20 @@ class HomeCubit extends Cubit<HomeState> {
   final EstateRepository _estateRepository;
   final AgentRepository _agentRepository;
   final CategoryRepository _categoryRepository;
+  final NotificationService? _notificationService;
+  final AccountSetupRepository? _accountSetupRepository;
 
   HomeCubit({
     required EstateRepository estateRepository,
     required AgentRepository agentRepository,
     required CategoryRepository categoryRepository,
+    NotificationService? notificationService,
+    AccountSetupRepository? accountSetupRepository,
   }) : _estateRepository = estateRepository,
        _agentRepository = agentRepository,
        _categoryRepository = categoryRepository,
+       _notificationService = notificationService,
+       _accountSetupRepository = accountSetupRepository,
        super(const HomeState());
 
   Future<void> loadHome() async {
@@ -50,6 +59,29 @@ class HomeCubit extends Cubit<HomeState> {
     // 5. Check and resolve user location for nearby exploration
     final locationData = await _resolveUserLocationAndDistances(allEstates);
 
+    // 6. Check personalized property matches for logged-in user without expensive scans
+    final currentUid = FirebaseAuth.instance.currentUser?.uid;
+    if (currentUid != null &&
+        _notificationService != null &&
+        _accountSetupRepository != null) {
+      try {
+        final profileResult =
+            await _accountSetupRepository.getProfile(currentUid);
+        final profile = profileResult.data;
+        if (profile != null && profile.preferredRealEstateTypes.isNotEmpty) {
+          final prefNames =
+              profile.preferredRealEstateTypes.map((t) => t.name).toList();
+          await _notificationService.checkPersonalizedPropertyMatches(
+            uid: currentUid,
+            preferredCategories: prefNames,
+            candidateEstates: allEstates,
+          );
+        }
+      } catch (_) {
+        // Fire-and-forget personalization check
+      }
+    }
+
     emit(
       state.copyWith(
         status: HomeStatus.success,
@@ -58,17 +90,17 @@ class HomeCubit extends Cubit<HomeState> {
         topLocations: topLocations,
         topAgents: topAgents,
         nearbyEstates: locationData.nearbyEstates,
-        estateDistancesKm: locationData.distances,
-        isLocationPermissionGranted: locationData.hasPermission,
-        currentLocationName: locationData.cityName,
+        isLocationPermissionGranted: locationData.isLocationEnabled,
+        currentLocationName: locationData.currentLocationName,
         featuredError: featuredError,
-        categoriesError: categoriesResult.failure?.message,
         agentsError: agentsError,
-        nearbyError: allEstatesResult.failure?.message,
       ),
     );
   }
 
+  /// Requests location permission from the system and updates the home state
+  /// accordingly. Does not reload the full home feed; callers can refresh
+  /// nearby estates by invoking [loadHome] again if needed.
   Future<void> requestLocationPermission() async {
     try {
       var permission = await Geolocator.checkPermission();
@@ -76,142 +108,135 @@ class HomeCubit extends Cubit<HomeState> {
         permission = await Geolocator.requestPermission();
       }
 
-      if (permission == LocationPermission.whileInUse ||
-          permission == LocationPermission.always) {
-        final allEstatesResult = await _estateRepository.getEstates(limit: 50);
-        final allEstates = allEstatesResult.data ?? const [];
-        final locationData = await _resolveUserLocationAndDistances(allEstates);
+      final granted = permission == LocationPermission.always ||
+          permission == LocationPermission.whileInUse;
 
-        emit(
-          state.copyWith(
-            nearbyEstates: locationData.nearbyEstates,
-            estateDistancesKm: locationData.distances,
-            isLocationPermissionGranted: locationData.hasPermission,
-            currentLocationName: locationData.cityName,
-          ),
-        );
-      }
-    } catch (_) {}
+      emit(state.copyWith(isLocationPermissionGranted: granted));
+    } catch (_) {
+      emit(state.copyWith(isLocationPermissionGranted: false));
+    }
   }
 
   List<LocationSummary> _deriveTopLocations(List<EstateEntity> estates) {
-    final Map<String, List<EstateEntity>> byCity = {};
+    if (estates.isEmpty) return const [];
+
+    final cityMap = <String, ({int count, String? image})>{};
+
     for (final estate in estates) {
       final city = estate.location.city.trim();
-      if (city.isNotEmpty) {
-        byCity.putIfAbsent(city, () => []).add(estate);
-      }
+      if (city.isEmpty) continue;
+
+      final existing = cityMap[city];
+      final newCount = (existing?.count ?? 0) + 1;
+      final image = existing?.image ?? estate.coverImage;
+
+      cityMap[city] = (count: newCount, image: image);
     }
 
-    final locations = byCity.entries.map((entry) {
-      final cover = entry.value
-          .firstWhere(
-            (e) => e.coverImage.isNotEmpty,
-            orElse: () => entry.value.first,
-          )
-          .coverImage;
+    final sortedCities = cityMap.entries.toList()
+      ..sort((a, b) => b.value.count.compareTo(a.value.count));
 
-      return LocationSummary(
-        city: entry.key,
-        estateCount: entry.value.length,
-        representativeImageUrl: cover.isNotEmpty ? cover : null,
-      );
-    }).toList();
-
-    locations.sort((a, b) => b.estateCount.compareTo(a.estateCount));
-    return locations;
+    return sortedCities
+        .take(5)
+        .map(
+          (entry) => LocationSummary(
+            city: entry.key,
+            estateCount: entry.value.count,
+            representativeImageUrl: entry.value.image,
+          ),
+        )
+        .toList();
   }
 
   Future<
     ({
       List<EstateEntity> nearbyEstates,
-      Map<String, double> distances,
-      bool hasPermission,
-      String? cityName,
+      bool isLocationEnabled,
+      String? currentLocationName,
     })
   >
-  _resolveUserLocationAndDistances(List<EstateEntity> estates) async {
+  _resolveUserLocationAndDistances(List<EstateEntity> allEstates) async {
     try {
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         return (
-          nearbyEstates: <EstateEntity>[],
-          distances: <String, double>{},
-          hasPermission: false,
-          cityName: null,
+          nearbyEstates: allEstates.take(5).toList(),
+          isLocationEnabled: false,
+          currentLocationName: null,
         );
       }
 
-      final permission = await Geolocator.checkPermission();
-      if (permission != LocationPermission.whileInUse &&
-          permission != LocationPermission.always) {
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          return (
+            nearbyEstates: allEstates.take(5).toList(),
+            isLocationEnabled: false,
+            currentLocationName: null,
+          );
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
         return (
-          nearbyEstates: <EstateEntity>[],
-          distances: <String, double>{},
-          hasPermission: false,
-          cityName: null,
+          nearbyEstates: allEstates.take(5).toList(),
+          isLocationEnabled: false,
+          currentLocationName: null,
         );
       }
 
       final position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.medium,
+          timeLimit: Duration(seconds: 5),
         ),
       );
 
-      String? city;
+      String? cityName;
       try {
-        //  final placemarks = await geocoding.placemarkFromCoordinates(
-        //     lat,
-        //     lng,
-        //   );
-
         final geocoding = Geocoding();
         final placemarks = await geocoding.placemarkFromCoordinates(
           position.latitude,
           position.longitude,
         );
         if (placemarks.isNotEmpty) {
-          city =
-              placemarks.first.locality ?? placemarks.first.administrativeArea;
+          cityName =
+              placemarks.first.locality ??
+              placemarks.first.administrativeArea ??
+              placemarks.first.country;
         }
-      } catch (_) {}
-
-      final Map<String, double> distanceMap = {};
-      final List<EstateEntity> validEstates = [];
-
-      for (final estate in estates) {
-        if (estate.location.latitude != 0.0 &&
-            estate.location.longitude != 0.0) {
-          final meters = Geolocator.distanceBetween(
-            position.latitude,
-            position.longitude,
-            estate.location.latitude,
-            estate.location.longitude,
-          );
-          final km = meters / 1000.0;
-          distanceMap[estate.id] = km;
-          validEstates.add(estate);
-        }
+      } catch (_) {
+        cityName = null;
       }
 
-      validEstates.sort(
-        (a, b) =>
-            (distanceMap[a.id] ?? 99999).compareTo(distanceMap[b.id] ?? 99999),
-      );
+      final scoredEstates = allEstates.map((estate) {
+        final distanceInMeters = Geolocator.distanceBetween(
+          position.latitude,
+          position.longitude,
+          estate.location.latitude,
+          estate.location.longitude,
+        );
+        return (estate: estate, distance: distanceInMeters);
+      }).toList();
+
+      scoredEstates.sort((a, b) => a.distance.compareTo(b.distance));
+
+      final sortedNearby = scoredEstates
+          .map((item) => item.estate)
+          .take(5)
+          .toList();
 
       return (
-        nearbyEstates: validEstates.take(10).toList(),
-        distances: distanceMap,
-        hasPermission: true,
-        cityName: city,
+        nearbyEstates: sortedNearby,
+        isLocationEnabled: true,
+        currentLocationName: cityName,
       );
     } catch (_) {
       return (
-        nearbyEstates: <EstateEntity>[],
-        distances: <String, double>{},
-        hasPermission: false,
-        cityName: null,
+        nearbyEstates: allEstates.take(5).toList(),
+        isLocationEnabled: false,
+        currentLocationName: null,
       );
     }
   }

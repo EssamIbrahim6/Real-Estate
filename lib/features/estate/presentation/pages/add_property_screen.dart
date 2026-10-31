@@ -4,6 +4,7 @@ import '../../../../core/di/injection_container.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../domain/entities/estate_entity.dart';
 import '../../domain/repositories/estate_repository.dart';
+import '../../../../core/services/notification_service.dart';
 
 class AddPropertyScreen extends StatefulWidget {
   const AddPropertyScreen({super.key});
@@ -152,6 +153,13 @@ class _AddPropertyScreenState extends State<AddPropertyScreen> {
         ),
       );
     } else {
+      if (currentUid != null) {
+        sl<NotificationService>().notifyListingPublished(
+          estateId: result.data ?? '',
+          ownerId: currentUid,
+          estateTitle: primaryTitle,
+        );
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(

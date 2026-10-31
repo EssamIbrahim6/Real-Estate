@@ -328,5 +328,9 @@
   "detailsBookVisit": "حجز معاينة",
   "detailsBookVisitLoginPrompt": "يرجى تسجيل الدخول لحجز معاينة.",
   "detailsEstateUnavailable": "هذا العقار غير متاح للحجز حالياً.",
-  "profileMyBookingsSubtitle": "عرض وإدارة مواعيد معاينة العقارات"
+  "profileMyBookingsSubtitle": "عرض وإدارة مواعيد معاينة العقارات",
+  "notificationsTitle": "الإشعارات",
+  "notificationsMarkAllRead": "تحديد الكل كمقروء",
+  "notificationsEmpty": "لا توجد إشعارات حتى الآن.",
+  "profileNotificationsSubtitle": "عرض نشاطك والتحديثات"
 }

@@ -24,6 +24,7 @@ import 'package:real_estate_app/features/category/domain/repositories/category_r
 import 'package:real_estate_app/features/home/presentation/cubit/home_cubit.dart';
 import 'package:real_estate_app/features/listing/presentation/cubit/listing_cubit.dart';
 import 'package:real_estate_app/features/search/data/repositories/search_repository_impl.dart';
+import 'package:real_estate_app/features/search/data/services/smart_search_ai_service.dart';
 import 'package:real_estate_app/features/search/domain/repositories/search_repository.dart';
 import 'package:real_estate_app/features/search/presentation/cubit/search_cubit.dart';
 import 'package:real_estate_app/features/chat/data/datasources/chat_remote_data_source.dart';
@@ -36,6 +37,13 @@ import 'package:real_estate_app/features/booking/data/repositories/booking_repos
 import 'package:real_estate_app/features/booking/domain/repositories/booking_repository.dart';
 import 'package:real_estate_app/features/booking/presentation/cubit/booking_cubit.dart';
 import 'package:real_estate_app/features/booking/presentation/cubit/booking_history_cubit.dart';
+
+// Notifications
+import 'package:real_estate_app/features/notifications/data/datasources/notification_remote_data_source.dart';
+import 'package:real_estate_app/features/notifications/data/repositories/notification_repository_impl.dart';
+import 'package:real_estate_app/features/notifications/domain/repositories/notification_repository.dart';
+import 'package:real_estate_app/features/notifications/presentation/cubit/notifications_cubit.dart';
+import 'package:real_estate_app/core/services/notification_service.dart';
 
 // Connectivity
 import '../../core/cubits/connectivity/connectivity_cubit.dart';
@@ -187,6 +195,7 @@ Future<void> initDependencies() async {
       facebookSignInUseCase: sl(),
       getCurrentUserUseCase: sl(),
       logoutUseCase: sl(),
+      notificationService: sl(),
     ),
   );
 
@@ -215,10 +224,11 @@ Future<void> initDependencies() async {
 
   sl.registerLazySingleton<EstateRepository>(() => EstateRepositoryImpl(sl()));
   sl.registerLazySingleton<SearchRepository>(() => SearchRepositoryImpl(sl()));
+  sl.registerLazySingleton<SmartSearchAiService>(() => SmartSearchAiService.fromFirebase());
 
   // Chat data source and repository
   sl.registerLazySingleton<ChatRemoteDataSource>(
-    () => ChatRemoteDataSourceImpl(sl()),
+    () => ChatRemoteDataSourceImpl(sl(), sl()),
   );
   sl.registerLazySingleton<ChatRepository>(() => ChatRepositoryImpl(sl()));
 
@@ -249,7 +259,11 @@ Future<void> initDependencies() async {
     () => ListingCubit(estateRepository: sl(), categoryRepository: sl()),
   );
   sl.registerFactory(
-    () => SearchCubit(searchRepository: sl(), categoryRepository: sl()),
+    () => SearchCubit(
+      searchRepository: sl(),
+      categoryRepository: sl(),
+      aiService: sl(),
+    ),
   );
   sl.registerFactory(() => ChatCubit(chatRepository: sl()));
   sl.registerFactory(() => MapCubit(estateRepository: sl()));
@@ -301,9 +315,25 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton<BookingRepository>(
     () => BookingRepositoryImpl(sl()),
   );
-  sl.registerFactory(() => BookingCubit(repository: sl()));
+  sl.registerFactory(() => BookingCubit(repository: sl(), notificationService: sl()));
   sl.registerFactory(() => BookingHistoryCubit(repository: sl()));
 
   sl.registerFactory(() => ThemeCubit(preferences: sl()));
   sl.registerFactory(() => LocaleCubit(preferences: sl()));
+
+  // ============================================================
+  // NOTIFICATIONS DATA SOURCE, REPOSITORY & SERVICE
+  // ============================================================
+  sl.registerLazySingleton<NotificationRemoteDataSource>(
+    () => NotificationRemoteDataSourceImpl(sl()),
+  );
+  sl.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton<NotificationService>(
+    () => NotificationService(sl()),
+  );
+  sl.registerFactory(
+    () => NotificationsCubit(repository: sl()),
+  );
 }

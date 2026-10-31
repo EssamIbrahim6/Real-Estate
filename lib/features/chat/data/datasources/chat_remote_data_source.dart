@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/services/notification_service.dart';
 import '../models/conversation_model.dart';
 import '../models/message_model.dart';
 
@@ -32,8 +33,9 @@ abstract class ChatRemoteDataSource {
 
 class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
   final FirebaseFirestore _firestore;
+  final NotificationService? _notificationService;
 
-  const ChatRemoteDataSourceImpl(this._firestore);
+  const ChatRemoteDataSourceImpl(this._firestore, [this._notificationService]);
 
   CollectionReference<Map<String, dynamic>> get _conversations =>
       _firestore.collection('conversations');
@@ -166,6 +168,29 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
       'lastSenderId': senderId,
     });
     await batch.commit();
+
+    try {
+      final convDoc = await conversationReference.get();
+      final participants =
+          (convDoc.data()?['participants'] as List<dynamic>? ?? [])
+              .map((e) => e.toString())
+              .toList();
+      final recipientId = participants.firstWhere(
+        (p) => p != senderId,
+        orElse: () => '',
+      );
+      if (recipientId.isNotEmpty) {
+        _notificationService?.notifyChatMessage(
+          messageId: messageReference.id,
+          recipientId: recipientId,
+          senderName: 'Chat',
+          conversationId: conversationId,
+          messagePreview: normalizedText,
+        );
+      }
+    } catch (_) {
+      // Fire-and-forget notification
+    }
   }
 
   @override

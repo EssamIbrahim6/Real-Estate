@@ -1921,6 +1921,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View and manage your tour requests'**
   String get profileMyBookingsSubtitle;
+
+  /// No description provided for @notificationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notificationsTitle;
+
+  /// No description provided for @notificationsMarkAllRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all read'**
+  String get notificationsMarkAllRead;
+
+  /// No description provided for @notificationsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications yet.'**
+  String get notificationsEmpty;
+
+  /// No description provided for @profileNotificationsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'View your activity and updates'**
+  String get profileNotificationsSubtitle;
 }
 
 class _AppLocalizationsDelegate

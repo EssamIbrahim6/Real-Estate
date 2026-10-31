@@ -10,6 +10,7 @@ import 'core/localization/locale_state.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_cubit.dart';
+import 'features/notifications/presentation/cubit/notifications_cubit.dart';
 import 'l10n/generated/app_localizations.dart';
 
 class RealEstateApp extends StatelessWidget {
@@ -22,6 +23,7 @@ class RealEstateApp extends StatelessWidget {
         BlocProvider(create: (_) => di.sl<ConnectivityCubit>()),
         BlocProvider(create: (_) => di.sl<ThemeCubit>()..loadPreference()),
         BlocProvider(create: (_) => di.sl<LocaleCubit>()..loadPreference()),
+        BlocProvider(create: (_) => di.sl<NotificationsCubit>()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(375, 812),

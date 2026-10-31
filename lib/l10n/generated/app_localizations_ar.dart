@@ -955,4 +955,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get profileMyBookingsSubtitle => 'عرض وإدارة مواعيد معاينة العقارات';
+
+  @override
+  String get notificationsTitle => 'الإشعارات';
+
+  @override
+  String get notificationsMarkAllRead => 'تحديد الكل كمقروء';
+
+  @override
+  String get notificationsEmpty => 'لا توجد إشعارات حتى الآن.';
+
+  @override
+  String get profileNotificationsSubtitle => 'عرض نشاطك والتحديثات';
 }

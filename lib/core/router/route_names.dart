@@ -41,4 +41,6 @@ abstract class AppRoutes {
   static const String myBookingsName = 'my-bookings';
   static const String bookingDetails = '/booking-details/:bookingId';
   static const String bookingDetailsName = 'booking-details';
+  static const String notifications = '/notifications';
+  static const String notificationsName = 'notifications';
 }

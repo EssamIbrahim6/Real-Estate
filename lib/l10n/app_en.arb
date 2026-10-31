@@ -354,5 +354,9 @@
   "detailsBookVisit": "Book a Visit",
   "detailsBookVisitLoginPrompt": "Please sign in to book a visit.",
   "detailsEstateUnavailable": "This property is currently unavailable for booking.",
-  "profileMyBookingsSubtitle": "View and manage your tour requests"
+  "profileMyBookingsSubtitle": "View and manage your tour requests",
+  "notificationsTitle": "Notifications",
+  "notificationsMarkAllRead": "Mark all read",
+  "notificationsEmpty": "No notifications yet.",
+  "profileNotificationsSubtitle": "View your activity and updates"
 }

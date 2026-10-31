@@ -13,7 +13,6 @@ import '../../../home/presentation/widgets/estate_card.dart';
 import '../cubit/search_cubit.dart';
 import '../cubit/search_state.dart';
 import '../../domain/entities/search_filter.dart';
-import '../../domain/entities/smart_search_parser.dart';
 import '../widgets/search_filter_sheet.dart';
 import '../../../map/domain/models/map_screen_args.dart';
 
@@ -74,16 +73,18 @@ class _SearchScreenState extends State<SearchScreen> {
     setState(() {});
     if (_suppressQuerySearch) return;
     _debounceTimer?.cancel();
-    _debounceTimer = Timer(_debounceDuration, _runSearch);
+    _debounceTimer = Timer(_debounceDuration, _runSmartSearch);
   }
 
-  Future<void> _runSearch() async {
+  Future<void> _runSmartSearch() async {
     _debounceTimer?.cancel();
     if (!mounted) return;
-    final current = context.read<SearchCubit>().state.filter;
     final rawQuery = _queryController.text.trim();
-    final parsed = SmartSearchParser.parse(rawQuery, existing: current);
-    await context.read<SearchCubit>().search(parsed);
+    if (rawQuery.isEmpty) {
+      await context.read<SearchCubit>().search(const SearchFilter());
+      return;
+    }
+    await context.read<SearchCubit>().smartSearch(rawQuery);
   }
 
   Future<void> _toggleListening() async {
@@ -101,7 +102,7 @@ class _SearchScreenState extends State<SearchScreen> {
         _queryController.text = result.recognizedWords;
         _suppressQuerySearch = false;
         if (result.finalResult) {
-          _runSearch();
+          _runSmartSearch();
         }
       },
       localeId: Localizations.localeOf(context).languageCode == 'ar' ? 'ar' : 'en',
@@ -185,10 +186,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       textInputAction: TextInputAction.search,
                       // onChanged is handled by the listener added in initState.
                       // onSubmitted fires an immediate search (bypassing debounce).
-                      onSubmitted: (_) {
-                        _debounceTimer?.cancel();
-                        _runSearch();
-                      },
+                       onSubmitted: (_) => _runSmartSearch(),
                       decoration: InputDecoration(
                         hintText: l10n?.searchHint ?? 'Search estates…',
                         prefixIcon: const Icon(Icons.search_rounded),
@@ -202,16 +200,13 @@ class _SearchScreenState extends State<SearchScreen> {
                                   _debounceTimer?.cancel();
                                   _queryController.clear();
                                   // Clear runs the search immediately.
-                                  _runSearch();
+                                  _runSmartSearch();
                                 },
                                 icon: const Icon(Icons.close_rounded),
                               ),
                             IconButton(
                               tooltip: l10n?.commonSearch ?? 'Search',
-                              onPressed: () {
-                                _debounceTimer?.cancel();
-                                _runSearch();
-                              },
+                               onPressed: () => _runSmartSearch(),
                               icon: const Icon(Icons.arrow_forward_rounded),
                             ),
                           ],
