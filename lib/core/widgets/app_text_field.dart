@@ -34,6 +34,7 @@ class AppTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return TextFormField(
       controller: controller,
       obscureText: obscureText,
@@ -43,12 +44,46 @@ class AppTextField extends StatelessWidget {
       onChanged: onChanged,
       enabled: enabled,
       maxLines: maxLines,
+      style: TextStyle(color: colors.onSurface, fontSize: 15),
       decoration: InputDecoration(
         labelText: labelText,
         hintText: hintText,
         errorText: errorText,
         prefixIcon: prefixIcon,
         suffixIcon: suffixIcon,
+        filled: true,
+        fillColor: colors.surfaceContainerLow,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(
+            color: colors.outlineVariant.withValues(alpha: 0.5),
+            width: 1,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: colors.primary, width: 1.5),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: colors.error, width: 1.2),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: colors.error, width: 1.5),
+        ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
       ),
     );
   }

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../core/constants/app_colors.dart';
@@ -91,10 +91,10 @@ class _OtpInputBoxesState extends State<OtpInputBoxes> {
             ),
           ),
           child: Center(
-            child: RawKeyboardListener(
+            child: KeyboardListener(
               focusNode: FocusNode(),
-              onKey: (event) {
-                if (event is RawKeyDownEvent &&
+              onKeyEvent: (event) {
+                if (event is KeyDownEvent &&
                     event.logicalKey == LogicalKeyboardKey.backspace) {
                   if (_controllers[index].text.isEmpty && index > 0) {
                     _focusNodes[index - 1].requestFocus();

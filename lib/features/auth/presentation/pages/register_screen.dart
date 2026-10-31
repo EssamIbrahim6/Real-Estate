@@ -48,6 +48,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
 
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
@@ -61,7 +62,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         final isLoading = state is AuthLoading;
 
         return Scaffold(
-          backgroundColor: AppColors.surface,
           body: SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -111,9 +111,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Text(
                       l10n?.authTermsOfService ??
                           'By tapping Register, you agree to our Terms of Service & Privacy Policy.',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSecondary,
+                        color: colors.onSurfaceVariant,
                         height: 1.4,
                       ),
                     ),
@@ -158,9 +158,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         Text(
                           l10n?.authAlreadyHaveAccountShort ??
                               'Already have an account? ',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
-                            color: AppColors.textSecondary,
+                            color: colors.onSurfaceVariant,
                           ),
                         ),
                         GestureDetector(

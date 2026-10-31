@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -19,10 +19,9 @@ class AccountSetupRemoteDataSourceImpl implements AccountSetupRemoteDataSource {
   final CloudinaryService _cloudinaryService;
 
   const AccountSetupRemoteDataSourceImpl({
-    required FirebaseFirestore firestore,
-    required CloudinaryService cloudinaryService,
-  }) : _firestore = firestore,
-       _cloudinaryService = cloudinaryService;
+    required this._firestore,
+    required this._cloudinaryService,
+  });
 
   @override
   Future<UserProfileModel> saveProfile(

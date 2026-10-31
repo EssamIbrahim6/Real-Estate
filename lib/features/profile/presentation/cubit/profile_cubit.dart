@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+﻿import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../account_setup/domain/repositories/account_setup_repository.dart';
@@ -9,11 +9,9 @@ class ProfileCubit extends Cubit<ProfileState> {
   final AccountSetupRepository _accountSetupRepository;
 
   ProfileCubit({
-    required FirebaseAuth firebaseAuth,
-    required AccountSetupRepository accountSetupRepository,
-  }) : _firebaseAuth = firebaseAuth,
-       _accountSetupRepository = accountSetupRepository,
-       super(const ProfileState());
+    required this._firebaseAuth,
+    required this._accountSetupRepository,
+  }) : super(const ProfileState());
 
   Future<void> loadProfile() async {
     final user = _firebaseAuth.currentUser;

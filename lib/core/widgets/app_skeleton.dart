@@ -326,3 +326,88 @@ class EstateDetailsSkeleton extends StatelessWidget {
     ],
   );
 }
+
+class NotificationListSkeleton extends StatelessWidget {
+  final int itemCount;
+
+  const NotificationListSkeleton({super.key, this.itemCount = 6});
+
+  @override
+  Widget build(BuildContext context) => ListView.separated(
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    itemCount: itemCount,
+    separatorBuilder: (_, _) => const SizedBox(height: 10),
+    itemBuilder: (context, index) => Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+      ),
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppSkeleton(
+            width: 44,
+            height: 44,
+            borderRadius: BorderRadius.all(Radius.circular(22)),
+          ),
+          SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AppSkeleton(width: 160, height: 16),
+                SizedBox(height: 8),
+                AppSkeleton(height: 14),
+                SizedBox(height: 6),
+                AppSkeleton(width: 90, height: 12),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+class BookingHistorySkeleton extends StatelessWidget {
+  final int itemCount;
+
+  const BookingHistorySkeleton({super.key, this.itemCount = 4});
+
+  @override
+  Widget build(BuildContext context) => ListView.separated(
+    padding: const EdgeInsets.all(16),
+    itemCount: itemCount,
+    separatorBuilder: (_, _) => const SizedBox(height: 12),
+    itemBuilder: (context, index) => Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+      ),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              AppSkeleton(width: 130, height: 16),
+              AppSkeleton(
+                width: 70,
+                height: 24,
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+              ),
+            ],
+          ),
+          SizedBox(height: 12),
+          AppSkeleton(height: 14),
+          SizedBox(height: 8),
+          AppSkeleton(width: 180, height: 14),
+        ],
+      ),
+    ),
+  );
+}

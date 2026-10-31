@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -87,7 +87,7 @@ class HomeScreen extends StatelessWidget {
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           itemCount: state.categories.length,
-                          separatorBuilder: (_, __) => horizontalSpace(10),
+                          separatorBuilder: (_, _) => horizontalSpace(10),
                           itemBuilder: (context, index) {
                             final category = state.categories[index];
                             return CategoryCard(
@@ -140,7 +140,7 @@ class HomeScreen extends StatelessWidget {
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           itemCount: state.featuredEstates.length,
-                          separatorBuilder: (_, __) => horizontalSpace(14),
+                          separatorBuilder: (_, _) => horizontalSpace(14),
                           itemBuilder: (context, index) {
                             final estate = state.featuredEstates[index];
                             return EstateCard(
@@ -220,7 +220,7 @@ class HomeScreen extends StatelessWidget {
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           itemCount: state.topAgents.length,
-                          separatorBuilder: (_, __) => horizontalSpace(12),
+                          separatorBuilder: (_, _) => horizontalSpace(12),
                           itemBuilder: (context, index) {
                             final agent = state.topAgents[index];
                             return AgentCard(
@@ -319,7 +319,7 @@ class HomeScreen extends StatelessWidget {
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           itemCount: state.nearbyEstates.length,
-                          separatorBuilder: (_, __) => horizontalSpace(14),
+                          separatorBuilder: (_, _) => horizontalSpace(14),
                           itemBuilder: (context, index) {
                             final estate = state.nearbyEstates[index];
                             final distance = state.estateDistancesKm[estate.id];

@@ -30,11 +30,13 @@ class _SplashScreenState extends State<SplashScreen> {
 
     try {
       final prefs = await SharedPreferences.getInstance();
+      if (!mounted) return;
       final hasCompletedOnboarding =
           prefs.getBool('has_completed_onboarding') ?? false;
 
       // 1. First-time user -> Onboarding
       if (!hasCompletedOnboarding) {
+        if (!mounted) return;
         context.go(AppRoutes.onBoarding);
         return;
       }
@@ -42,6 +44,7 @@ class _SplashScreenState extends State<SplashScreen> {
       // 2. Check Firebase Authentication session
       final currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser == null) {
+        if (!mounted) return;
         context.go(AppRoutes.welcome);
         return;
       }
@@ -51,6 +54,8 @@ class _SplashScreenState extends State<SplashScreen> {
           .collection('users')
           .doc(currentUser.uid)
           .get();
+
+      if (!mounted) return;
 
       final isSetupCompleted = userDoc.data()?['accountSetupCompleted'] == true;
 
@@ -72,7 +77,7 @@ class _SplashScreenState extends State<SplashScreen> {
         children: [
           SizedBox.expand(
             child: Image.asset(
-              "assets/images/Splash_Screen.jpg",
+              'assets/images/Splash_Screen.jpg',
               fit: BoxFit.cover,
             ),
           ),
@@ -81,7 +86,7 @@ class _SplashScreenState extends State<SplashScreen> {
             right: 0,
             bottom: 0,
             top: 0,
-            child: Center(child: Image.asset("assets/images/Mask group.png")),
+            child: Center(child: Image.asset('assets/images/Mask group.png')),
           ),
           Positioned(
             bottom: 380,
@@ -89,7 +94,7 @@ class _SplashScreenState extends State<SplashScreen> {
             right: 0,
             child: Center(
               child: Text(
-                "Rice",
+                'Apexie',
                 style: AppTextStyles.headlineLarge.copyWith(
                   color: Colors.white,
                 ),

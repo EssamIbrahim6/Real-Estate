@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+﻿import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -14,12 +14,10 @@ class AccountSetupCubit extends Cubit<AccountSetupState> {
   final ImagePicker _imagePicker;
 
   AccountSetupCubit({
-    required SaveAccountSetupUseCase saveUseCase,
-    required FirebaseAuth firebaseAuth,
+    required this._saveUseCase,
+    required this._firebaseAuth,
     ImagePicker? imagePicker,
-  }) : _saveUseCase = saveUseCase,
-       _firebaseAuth = firebaseAuth,
-       _imagePicker = imagePicker ?? ImagePicker(),
+  }) : _imagePicker = imagePicker ?? ImagePicker(),
        super(const AccountSetupInitial(AccountSetupData())) {
     _initPrefill();
   }

@@ -1,4 +1,4 @@
-// This file re-exports CategoryEstatesScreen which now lives in listings_screen.dart
+﻿// This file re-exports CategoryEstatesScreen which now lives in listings_screen.dart
 // and receives a ListingRequest parameter from the router.
 //
 // This file exists only so existing imports still compile.
@@ -87,7 +87,7 @@ class CategoryEstatesScreen extends StatelessWidget {
               return ListView.separated(
                 padding: const EdgeInsets.all(AppDimensions.p20),
                 itemCount: state.estates.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 16),
+                separatorBuilder: (_, _) => const SizedBox(height: 16),
                 itemBuilder: (context, index) {
                   final estate = state.estates[index];
                   return EstateCard(

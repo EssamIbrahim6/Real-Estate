@@ -1,4 +1,4 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
+﻿import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../features/category/domain/repositories/category_repository.dart';
 import '../../../../features/estate/domain/entities/estate_entity.dart';
@@ -30,11 +30,9 @@ class ListingCubit extends Cubit<ListingState> {
   final CategoryRepository _categoryRepository;
 
   ListingCubit({
-    required EstateRepository estateRepository,
-    required CategoryRepository categoryRepository,
-  }) : _estateRepository = estateRepository,
-       _categoryRepository = categoryRepository,
-       super(const ListingState());
+    required this._estateRepository,
+    required this._categoryRepository,
+  }) : super(const ListingState());
 
   Future<void> load(ListingRequest? request) async {
     if (request == null) {

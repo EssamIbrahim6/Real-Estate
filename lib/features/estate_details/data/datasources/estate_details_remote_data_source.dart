@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../../core/errors/exceptions.dart';
 import '../models/review_model.dart';
@@ -167,7 +167,7 @@ class EstateDetailsRemoteDataSourceImpl
       if (allReviews.docs.isNotEmpty) {
         final totalRating = allReviews.docs.fold<num>(
           0,
-          (sum, doc) => sum + ((doc.data()['rating'] as num?) ?? 5),
+          (accumulated, doc) => accumulated + ((doc.data()['rating'] as num?) ?? 5),
         );
         final count = allReviews.docs.length;
         final avgRating = double.parse(

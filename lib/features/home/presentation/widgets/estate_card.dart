@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/helpers/spacing.dart';
@@ -58,7 +58,7 @@ class EstateCard extends StatelessWidget {
                       ? Image.network(
                           estate.coverImage,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(
+                          errorBuilder: (_, _, _) => Container(
                             color: colors.surfaceContainerHighest,
                             child: Icon(
                               Icons.home_outlined,

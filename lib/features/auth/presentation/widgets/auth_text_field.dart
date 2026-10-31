@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
-
 class AuthTextField extends StatefulWidget {
   final TextEditingController? controller;
   final String hintText;
@@ -35,6 +33,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return TextFormField(
       controller: widget.controller,
       obscureText: widget.isPassword ? _obscureText : false,
@@ -42,27 +41,27 @@ class _AuthTextFieldState extends State<AuthTextField> {
       textInputAction: widget.textInputAction,
       validator: widget.validator,
       onChanged: widget.onChanged,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 15,
-        color: AppColors.brandNavy,
+        color: colors.onSurface,
         fontWeight: FontWeight.w500,
       ),
       decoration: InputDecoration(
         hintText: widget.hintText,
-        hintStyle: const TextStyle(
+        hintStyle: TextStyle(
           fontSize: 14,
-          color: AppColors.textMuted,
+          color: colors.onSurfaceVariant,
           fontWeight: FontWeight.normal,
         ),
         filled: true,
-        fillColor: AppColors.inputBackground,
+        fillColor: colors.surfaceContainerLow,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 16,
         ),
         prefixIcon: Icon(
           widget.prefixIcon,
-          color: AppColors.brandNavy.withValues(alpha: 0.65),
+          color: colors.onSurfaceVariant,
           size: 20,
         ),
         suffixIcon: widget.isPassword
@@ -71,7 +70,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
                   _obscureText
                       ? Icons.visibility_off_outlined
                       : Icons.visibility_outlined,
-                  color: AppColors.textMuted,
+                  color: colors.onSurfaceVariant,
                   size: 20,
                 ),
                 onPressed: () => setState(() => _obscureText = !_obscureText),
@@ -84,24 +83,26 @@ class _AuthTextFieldState extends State<AuthTextField> {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
-            color: widget.hasError ? AppColors.error : AppColors.transparent,
+            color: widget.hasError
+                ? colors.error
+                : colors.outlineVariant.withValues(alpha: 0.5),
             width: 1.2,
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
-            color: widget.hasError ? AppColors.error : AppColors.brandNavy,
+            color: widget.hasError ? colors.error : colors.primary,
             width: 1.5,
           ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.error, width: 1.2),
+          borderSide: BorderSide(color: colors.error, width: 1.2),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.error, width: 1.5),
+          borderSide: BorderSide(color: colors.error, width: 1.5),
         ),
       ),
     );

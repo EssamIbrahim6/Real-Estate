@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/helpers/spacing.dart';
@@ -114,15 +114,15 @@ class _SubmitReviewBottomSheetState extends State<SubmitReviewBottomSheet> {
                 : 'Submit Review',
             isLoading: _isLoading,
             onPressed: () async {
+              final navigator = Navigator.of(context);
               setState(() => _isLoading = true);
               final success = await widget.onSubmit(
                 _rating,
                 _commentController.text,
               );
-              if (mounted) {
-                setState(() => _isLoading = false);
-                if (success) Navigator.pop(context);
-              }
+              if (!mounted) return;
+              setState(() => _isLoading = false);
+              if (success) navigator.pop();
             },
           ),
         ],

@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+﻿import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -21,17 +21,12 @@ class HomeCubit extends Cubit<HomeState> {
   final AccountSetupRepository? _accountSetupRepository;
 
   HomeCubit({
-    required EstateRepository estateRepository,
-    required AgentRepository agentRepository,
-    required CategoryRepository categoryRepository,
-    NotificationService? notificationService,
-    AccountSetupRepository? accountSetupRepository,
-  }) : _estateRepository = estateRepository,
-       _agentRepository = agentRepository,
-       _categoryRepository = categoryRepository,
-       _notificationService = notificationService,
-       _accountSetupRepository = accountSetupRepository,
-       super(const HomeState());
+    required this._estateRepository,
+    required this._agentRepository,
+    required this._categoryRepository,
+    this._notificationService,
+    this._accountSetupRepository,
+  }) : super(const HomeState());
 
   Future<void> loadHome() async {
     emit(state.copyWith(status: HomeStatus.loading));

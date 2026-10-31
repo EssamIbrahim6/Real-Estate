@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/helpers/spacing.dart';
 
 class AuthHeader extends StatelessWidget {
@@ -11,24 +10,25 @@ class AuthHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.w700,
-            color: AppColors.brandNavy,
+            color: colors.onSurface,
             letterSpacing: -0.5,
           ),
         ),
         verticalSpace(8),
         Text(
           subtitle,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
-            color: AppColors.textSecondary,
+            color: colors.onSurfaceVariant,
             height: 1.5,
           ),
         ),

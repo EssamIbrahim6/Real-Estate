@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -74,7 +74,7 @@ class ListingsScreen extends StatelessWidget {
               return ListView.separated(
                 padding: const EdgeInsets.all(AppDimensions.p20),
                 itemCount: state.estates.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 16),
+                separatorBuilder: (_, _) => const SizedBox(height: 16),
                 itemBuilder: (context, index) {
                   final estate = state.estates[index];
                   return EstateCard(

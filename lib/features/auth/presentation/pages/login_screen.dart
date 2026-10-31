@@ -50,6 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
 
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
@@ -65,7 +66,6 @@ class _LoginScreenState extends State<LoginScreen> {
         final isLoading = state is AuthLoading;
 
         return Scaffold(
-          backgroundColor: AppColors.surface,
           body: SafeArea(
             child: SingleChildScrollView(
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
@@ -89,25 +89,25 @@ class _LoginScreenState extends State<LoginScreen> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: AppColors.error.withValues(alpha: 0.08),
+                          color: colors.error.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: AppColors.error.withValues(alpha: 0.3),
+                            color: colors.error.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.error_outline,
-                              color: AppColors.error,
+                              color: colors.error,
                               size: 20,
                             ),
                             horizontalSpace(10),
                             Expanded(
                               child: Text(
                                 _errorMessage!,
-                                style: const TextStyle(
-                                  color: AppColors.error,
+                                style: TextStyle(
+                                  color: colors.error,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -135,10 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       prefixIcon: Icons.lock_outline_rounded,
                       isPassword: true,
                       textInputAction: TextInputAction.done,
-                      validator: (val) => val == null || val.isEmpty
-                          ? (l10n?.authPasswordRequiredField ??
-                              'Password is required')
-                          : null,
+                      validator: AppValidators.loginPassword,
                       hasError: _errorMessage != null,
                     ),
                     verticalSpace(12),
@@ -149,10 +146,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         onTap: () => context.pushNamed('forgot-password'),
                         child: Text(
                           l10n?.authForgotPasswordLink ?? 'Forgot password?',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.brandNavy,
+                            color: colors.primary,
                           ),
                         ),
                       ),
@@ -224,9 +221,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         Text(
                           l10n?.authDontHaveAccountShort ??
                               "Don't have an account? ",
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
-                            color: AppColors.textSecondary,
+                            color: colors.onSurfaceVariant,
                           ),
                         ),
                         GestureDetector(

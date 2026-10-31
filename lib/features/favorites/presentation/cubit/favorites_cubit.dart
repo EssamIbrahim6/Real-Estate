@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,15 +15,11 @@ class FavoritesCubit extends Cubit<FavoritesState> {
   StreamSubscription<List<String>>? _favoritesSubscription;
   int _loadGeneration = 0;
 
-  // ignore: prefer_initializing_formals
   FavoritesCubit({
-    required FirebaseAuth firebaseAuth,
-    required EstateDetailsRepository estateDetailsRepository,
-    required EstateRepository estateRepository,
-  }) : _firebaseAuth = firebaseAuth,
-       _estateDetailsRepository = estateDetailsRepository,
-       _estateRepository = estateRepository,
-       super(const FavoritesState());
+    required this._firebaseAuth,
+    required this._estateDetailsRepository,
+    required this._estateRepository,
+  }) : super(const FavoritesState());
 
   bool get isAuthenticated => _firebaseAuth.currentUser != null;
 

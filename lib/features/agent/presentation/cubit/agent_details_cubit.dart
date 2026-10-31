@@ -1,4 +1,4 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
+﻿import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../estate/domain/repositories/estate_repository.dart';
 import '../../domain/repositories/agent_repository.dart';
@@ -9,11 +9,9 @@ class AgentDetailsCubit extends Cubit<AgentDetailsState> {
   final EstateRepository _estateRepository;
 
   AgentDetailsCubit({
-    required AgentRepository agentRepository,
-    required EstateRepository estateRepository,
-  }) : _agentRepository = agentRepository,
-       _estateRepository = estateRepository,
-       super(const AgentDetailsState());
+    required this._agentRepository,
+    required this._estateRepository,
+  }) : super(const AgentDetailsState());
 
   Future<void> loadAgentDetails(String agentId) async {
     final normalizedId = agentId.trim();

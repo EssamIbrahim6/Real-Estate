@@ -21,6 +21,7 @@ class WelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
 
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
@@ -36,7 +37,6 @@ class WelcomeScreen extends StatelessWidget {
         return Stack(
           children: [
             Scaffold(
-              backgroundColor: AppColors.surface,
               body: SafeArea(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(
@@ -59,6 +59,7 @@ class WelcomeScreen extends StatelessWidget {
                                     flex: 5,
                                     child: _buildImageCard(
                                       AppAssets.welcomeAuth1,
+                                      colors,
                                     ),
                                   ),
                                   verticalSpace(12),
@@ -66,6 +67,7 @@ class WelcomeScreen extends StatelessWidget {
                                     flex: 5,
                                     child: _buildImageCard(
                                       AppAssets.welcomeAuth2,
+                                      colors,
                                     ),
                                   ),
                                 ],
@@ -79,6 +81,7 @@ class WelcomeScreen extends StatelessWidget {
                                     flex: 5,
                                     child: _buildImageCard(
                                       AppAssets.welcomeAuth3,
+                                      colors,
                                     ),
                                   ),
                                   verticalSpace(12),
@@ -86,6 +89,7 @@ class WelcomeScreen extends StatelessWidget {
                                     flex: 5,
                                     child: _buildImageCard(
                                       AppAssets.welcomeAuth4,
+                                      colors,
                                     ),
                                   ),
                                 ],
@@ -100,10 +104,10 @@ class WelcomeScreen extends StatelessWidget {
                       RichText(
                         textAlign: TextAlign.center,
                         text: TextSpan(
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.brandNavy,
+                            color: colors.onSurface,
                             letterSpacing: -0.5,
                           ),
                           children: [
@@ -124,9 +128,9 @@ class WelcomeScreen extends StatelessWidget {
                         l10n?.authExploreSubtitle ??
                             'Find your dream house easily and experience the comfort of your future home.',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
-                          color: AppColors.textSecondary,
+                          color: colors.onSurfaceVariant,
                           height: 1.5,
                         ),
                       ),
@@ -205,9 +209,9 @@ class WelcomeScreen extends StatelessWidget {
                           Text(
                             l10n?.authDontHaveAccountShort ??
                                 "Don't have an account? ",
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
-                              color: AppColors.textSecondary,
+                              color: colors.onSurfaceVariant,
                             ),
                           ),
                           GestureDetector(
@@ -240,18 +244,18 @@ class WelcomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildImageCard(String assetPath) {
+  Widget _buildImageCard(String assetPath, ColorScheme colors) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: Image.asset(
         assetPath,
         width: double.infinity,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => Container(
-          color: AppColors.inputBackground,
-          child: const Icon(
+        errorBuilder: (_, _, _) => Container(
+          color: colors.surfaceContainerLow,
+          child: Icon(
             Icons.home_outlined,
-            color: AppColors.textMuted,
+            color: colors.onSurfaceVariant,
             size: 36,
           ),
         ),

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:real_estate_app/l10n/generated/app_localizations.dart';
 
-import '../../../../core/constants/app_colors.dart';
-
 class SocialAuthButton extends StatelessWidget {
   final String label;
   final Widget icon;
@@ -17,14 +15,15 @@ class SocialAuthButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Expanded(
       child: SizedBox(
         height: 52,
         child: OutlinedButton(
           onPressed: onTap,
           style: OutlinedButton.styleFrom(
-            backgroundColor: AppColors.surface,
-            side: const BorderSide(color: AppColors.border, width: 1),
+            backgroundColor: colors.surface,
+            side: BorderSide(color: colors.outlineVariant, width: 1),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(14),
             ),
@@ -39,10 +38,10 @@ class SocialAuthButton extends StatelessWidget {
                 child: Text(
                   label,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.brandNavy,
+                    color: colors.onSurface,
                   ),
                 ),
               ),
@@ -60,21 +59,26 @@ class OrDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
     return Row(
       children: [
-        Expanded(child: Container(height: 1, color: AppColors.divider)),
+        Expanded(
+          child: Container(height: 1, color: colors.outlineVariant),
+        ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
             (l10n?.commonOr ?? 'OR').toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: AppColors.textMuted,
+              color: colors.onSurfaceVariant,
             ),
           ),
         ),
-        Expanded(child: Container(height: 1, color: AppColors.divider)),
+        Expanded(
+          child: Container(height: 1, color: colors.outlineVariant),
+        ),
       ],
     );
   }

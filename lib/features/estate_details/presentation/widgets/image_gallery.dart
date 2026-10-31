@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_colors.dart';
 
@@ -145,7 +145,7 @@ class _ImageGalleryState extends State<ImageGallery> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               scrollDirection: Axis.horizontal,
               itemCount: images.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              separatorBuilder: (_, _) => const SizedBox(width: 8),
               itemBuilder: (context, index) => GestureDetector(
                 onTap: () => widget.onImageTap?.call(index),
                 child: ClipRRect(

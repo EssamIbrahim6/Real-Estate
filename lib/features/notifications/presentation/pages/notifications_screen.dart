@@ -4,6 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/route_names.dart';
+import '../../../../core/widgets/app_empty_state.dart';
+import '../../../../core/widgets/app_error_view.dart';
+import '../../../../core/widgets/app_skeleton.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../domain/entities/notification_entity.dart';
 import '../../domain/entities/notification_type.dart';
@@ -54,63 +57,28 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         builder: (context, state) {
           if (state.status == NotificationsStatus.initial ||
               state.status == NotificationsStatus.loading) {
-            return const Center(child: CircularProgressIndicator());
+            return const NotificationListSkeleton();
           }
 
           if (state.status == NotificationsStatus.error) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(28),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      state.error ??
-                          (l10n?.commonError ?? 'Something went wrong'),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-                    OutlinedButton.icon(
-                      onPressed: () {
-                        final uid = FirebaseAuth.instance.currentUser?.uid;
-                        if (uid != null) {
-                          context
-                              .read<NotificationsCubit>()
-                              .watchNotifications(uid);
-                        }
-                      },
-                      icon: const Icon(Icons.refresh_rounded),
-                      label: Text(l10n?.commonRetry ?? 'Try again'),
-                    ),
-                  ],
-                ),
-              ),
+            return AppErrorView(
+              message:
+                  state.error ?? (l10n?.commonError ?? 'Something went wrong'),
+              onRetry: () {
+                final uid = FirebaseAuth.instance.currentUser?.uid;
+                if (uid != null) {
+                  context.read<NotificationsCubit>().watchNotifications(uid);
+                }
+              },
             );
           }
 
           if (state.notifications.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(28),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.notifications_none_rounded,
-                      size: 56,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withValues(alpha: 0.4),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      l10n?.notificationsEmpty ?? 'No notifications yet.',
-                      style: Theme.of(context).textTheme.titleMedium,
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
+            return AppEmptyState(
+              icon: Icons.notifications_none_rounded,
+              title: l10n?.notificationsEmpty ?? 'No notifications yet',
+              description:
+                  "You're all caught up! We'll let you know when something needs your attention.",
             );
           }
 
@@ -168,4 +136,3 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 }
-

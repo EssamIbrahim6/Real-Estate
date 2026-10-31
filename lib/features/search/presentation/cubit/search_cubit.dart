@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -17,13 +17,10 @@ class SearchCubit extends Cubit<SearchState> {
   int _searchGeneration = 0;
 
   SearchCubit({
-    required SearchRepository searchRepository,
-    required CategoryRepository categoryRepository,
-    SmartSearchAiService? aiService,
-  }) : _searchRepository = searchRepository,
-       _categoryRepository = categoryRepository,
-       _aiService = aiService,
-       super(const SearchState());
+    required this._searchRepository,
+    required this._categoryRepository,
+    this._aiService,
+  }) : super(const SearchState());
 
   Future<void> loadCategories() async {
     final result = await _categoryRepository.getCategories();

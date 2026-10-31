@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../../domain/entities/location_summary.dart';
 
@@ -29,7 +29,7 @@ class LocationCard extends StatelessWidget {
               Image.network(
                 location.representativeImageUrl!,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
+                errorBuilder: (_, _, _) =>
                     Container(color: colors.surfaceContainerHighest),
               )
             else

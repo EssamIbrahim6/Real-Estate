@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,16 +20,12 @@ class EstateDetailsCubit extends Cubit<EstateDetailsState> {
   StreamSubscription<List<String>>? _favoriteSubscription;
 
   EstateDetailsCubit({
-    required EstateRepository estateRepository,
-    required AgentRepository agentRepository,
-    required EstateDetailsRepository estateDetailsRepository,
-    required FirebaseAuth firebaseAuth,
+    required this._estateRepository,
+    required this._agentRepository,
+    required this._estateDetailsRepository,
+    required this._firebaseAuth,
     required this._chatRepository,
-  }) : _estateRepository = estateRepository,
-       _agentRepository = agentRepository,
-       _estateDetailsRepository = estateDetailsRepository,
-       _firebaseAuth = firebaseAuth,
-       super(const EstateDetailsState());
+  }) : super(const EstateDetailsState());
 
   bool get isAuthenticated => _firebaseAuth.currentUser != null;
 

@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+﻿import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -12,12 +12,10 @@ class ProfileEditCubit extends Cubit<ProfileEditState> {
   final ImagePicker _imagePicker;
 
   ProfileEditCubit({
-    required FirebaseAuth firebaseAuth,
-    required AccountSetupRepository accountSetupRepository,
+    required this._firebaseAuth,
+    required this._accountSetupRepository,
     ImagePicker? imagePicker,
-  }) : _firebaseAuth = firebaseAuth,
-       _accountSetupRepository = accountSetupRepository,
-       _imagePicker = imagePicker ?? ImagePicker(),
+  }) : _imagePicker = imagePicker ?? ImagePicker(),
        super(const ProfileEditState());
 
   Future<void> loadProfile() async {

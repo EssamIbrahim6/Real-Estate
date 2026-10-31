@@ -4,6 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/route_names.dart';
+import '../../../../core/widgets/app_empty_state.dart';
+import '../../../../core/widgets/app_error_view.dart';
+import '../../../../core/widgets/app_skeleton.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../cubit/booking_history_cubit.dart';
 import '../widgets/booking_card.dart';
@@ -39,66 +42,28 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
         builder: (context, state) {
           if (state.status == BookingHistoryStatus.initial ||
               state.status == BookingHistoryStatus.loading) {
-            return const Center(child: CircularProgressIndicator());
+            return const BookingHistorySkeleton();
           }
 
           if (state.status == BookingHistoryStatus.error) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      state.error ?? 'Could not load bookings.',
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-                    OutlinedButton.icon(
-                      onPressed: () {
-                        final uid = FirebaseAuth.instance.currentUser?.uid;
-                        if (uid != null) {
-                          context.read<BookingHistoryCubit>().loadBookings(uid);
-                        }
-                      },
-                      icon: const Icon(Icons.refresh_rounded),
-                      label: Text(l10n?.commonRetry ?? 'Try again'),
-                    ),
-                  ],
-                ),
-              ),
+            return AppErrorView(
+              message: state.error ?? 'Could not load bookings.',
+              onRetry: () {
+                final uid = FirebaseAuth.instance.currentUser?.uid;
+                if (uid != null) {
+                  context.read<BookingHistoryCubit>().loadBookings(uid);
+                }
+              },
             );
           }
 
           if (state.bookings.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(28),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.event_available_outlined,
-                      size: 56,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      l10n?.myBookingsEmpty ?? 'No bookings yet.',
-                      style: Theme.of(context).textTheme.titleMedium,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Book a visit to any property to get started.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            return AppEmptyState(
+              icon: Icons.event_available_outlined,
+              title: l10n?.myBookingsEmpty ?? 'No bookings yet',
+              description: 'Book a visit to any property to get started.',
+              actionLabel: l10n?.navHome ?? 'Browse properties',
+              onAction: () => context.go('/home'),
             );
           }
 
@@ -131,4 +96,3 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
     );
   }
 }
-
