@@ -83,7 +83,7 @@ class AgentCardSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     width: 150,
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
       borderRadius: BorderRadius.circular(16),
@@ -93,14 +93,14 @@ class AgentCardSkeleton extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         AppSkeleton(
-          width: 52,
-          height: 52,
+          width: 44,
+          height: 44,
           borderRadius: BorderRadius.all(Radius.circular(32)),
         ),
-        SizedBox(height: 10),
-        AppSkeleton(width: 94, height: 14),
-        SizedBox(height: 7),
-        AppSkeleton(width: 70, height: 12),
+        SizedBox(height: 6),
+        AppSkeleton(width: 94, height: 12),
+        SizedBox(height: 4),
+        AppSkeleton(width: 70, height: 10),
       ],
     ),
   );

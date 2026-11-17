@@ -266,6 +266,18 @@ abstract class AppLocalizations {
   /// **'Categories'**
   String get homeCategories;
 
+  /// No description provided for @homeHeroTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Find a place to call home'**
+  String get homeHeroTitle;
+
+  /// No description provided for @homeHeroSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A home that fits your life is just a search away.'**
+  String get homeHeroSubtitle;
+
   /// No description provided for @homeSearchHint.
   ///
   /// In en, this message translates to:
@@ -355,6 +367,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search estates...'**
   String get searchHint;
+
+  /// No description provided for @searchAiTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI-powered search'**
+  String get searchAiTitle;
+
+  /// No description provided for @searchAiHint.
+  ///
+  /// In en, this message translates to:
+  /// **'AI search understands everyday phrases. Try “2 bedrooms near Giza”.'**
+  String get searchAiHint;
+
+  /// No description provided for @searchVoiceSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice search'**
+  String get searchVoiceSearch;
 
   /// No description provided for @searchFilters.
   ///
@@ -488,6 +518,18 @@ abstract class AppLocalizations {
   /// **'No properties found.'**
   String get listingsEmpty;
 
+  /// No description provided for @listingsResultsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Homes to explore'**
+  String get listingsResultsTitle;
+
+  /// No description provided for @listingsResultsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} properties selected for you'**
+  String listingsResultsCount(int count);
+
   /// No description provided for @listingsCategoryEmpty.
   ///
   /// In en, this message translates to:
@@ -523,6 +565,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Overview'**
   String get detailsOverview;
+
+  /// No description provided for @detailsBedroomsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Bedrooms'**
+  String get detailsBedroomsLabel;
+
+  /// No description provided for @detailsBathroomsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Bathrooms'**
+  String get detailsBathroomsLabel;
+
+  /// No description provided for @detailsAreaLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total area'**
+  String get detailsAreaLabel;
+
+  /// No description provided for @detailsInteriorLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Interior'**
+  String get detailsInteriorLabel;
 
   /// No description provided for @detailsBedrooms.
   ///
@@ -1466,6 +1532,18 @@ abstract class AppLocalizations {
   /// **'Edit profile'**
   String get editProfileTitle;
 
+  /// No description provided for @editProfileIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep your details up to date so agents can reach you.'**
+  String get editProfileIntro;
+
+  /// No description provided for @editProfileSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal information'**
+  String get editProfileSection;
+
   /// No description provided for @editProfileFullName.
   ///
   /// In en, this message translates to:
@@ -1586,6 +1664,30 @@ abstract class AppLocalizations {
   /// **'Published estates'**
   String get agentDetailsPublishedEstates;
 
+  /// No description provided for @agentReviewSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Client rating'**
+  String get agentReviewSummary;
+
+  /// No description provided for @agentVerifiedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified agent'**
+  String get agentVerifiedLabel;
+
+  /// No description provided for @agentReviewCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} reviews'**
+  String agentReviewCount(int count);
+
+  /// No description provided for @agentExperienceYears.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} years experience'**
+  String agentExperienceYears(int count);
+
   /// No description provided for @searchFilterPriceError.
   ///
   /// In en, this message translates to:
@@ -1633,6 +1735,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View all photos'**
   String get galleryViewAll;
+
+  /// No description provided for @galleryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No photos available'**
+  String get galleryEmpty;
+
+  /// No description provided for @galleryImageLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'This photo could not be loaded.'**
+  String get galleryImageLoadError;
 
   /// No description provided for @onboarding1Title.
   ///
@@ -1844,6 +1958,18 @@ abstract class AppLocalizations {
   /// **'My Bookings'**
   String get myBookingsTitle;
 
+  /// No description provided for @bookingHistorySummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep your property visits and requests in one place.'**
+  String get bookingHistorySummary;
+
+  /// No description provided for @bookingHistoryCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No visits} =1{1 visit} other{{count} visits}}'**
+  String bookingHistoryCount(int count);
+
   /// No description provided for @myBookingsEmpty.
   ///
   /// In en, this message translates to:
@@ -1867,6 +1993,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Status'**
   String get bookingStatusLabel;
+
+  /// No description provided for @bookingStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get bookingStatusPending;
+
+  /// No description provided for @bookingStatusConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed'**
+  String get bookingStatusConfirmed;
+
+  /// No description provided for @bookingStatusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get bookingStatusCancelled;
+
+  /// No description provided for @bookingStatusCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get bookingStatusCompleted;
 
   /// No description provided for @bookingPropertySnapshot.
   ///
@@ -1934,11 +2084,59 @@ abstract class AppLocalizations {
   /// **'Mark all read'**
   String get notificationsMarkAllRead;
 
+  /// No description provided for @notificationsRecentActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent activity'**
+  String get notificationsRecentActivity;
+
+  /// No description provided for @notificationsUnreadSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} unread'**
+  String notificationsUnreadSummary(int count);
+
   /// No description provided for @notificationsEmpty.
   ///
   /// In en, this message translates to:
   /// **'No notifications yet.'**
   String get notificationsEmpty;
+
+  /// No description provided for @notificationsEmptyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re all caught up. New property updates will appear here.'**
+  String get notificationsEmptyDescription;
+
+  /// No description provided for @notificationsJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Just now'**
+  String get notificationsJustNow;
+
+  /// No description provided for @notificationsMinutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}m ago'**
+  String notificationsMinutesAgo(Object count);
+
+  /// No description provided for @notificationsHoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}h ago'**
+  String notificationsHoursAgo(Object count);
+
+  /// No description provided for @notificationsYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get notificationsYesterday;
+
+  /// No description provided for @notificationsDaysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}d ago'**
+  String notificationsDaysAgo(Object count);
 
   /// No description provided for @profileNotificationsSubtitle.
   ///

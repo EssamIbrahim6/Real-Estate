@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:real_estate_app/core/constants/app_assets.dart';
 import 'package:real_estate_app/core/helpers/auth_navigation_helper.dart';
 import 'package:real_estate_app/l10n/generated/app_localizations.dart';
 
@@ -75,8 +76,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                     AuthHeader(
                       title: l10n?.authRegisterTitle ?? 'Create your account',
-                      subtitle: l10n?.authRegisterSubtitle ??
+                      subtitle:
+                          l10n?.authRegisterSubtitle ??
                           'Join us to find your dream property.',
+                      imageAsset: AppAssets.welcomeAuth3,
                     ),
                     verticalSpace(28),
 
@@ -109,8 +112,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     verticalSpace(16),
 
                     Text(
-                      l10n?.authTermsOfService ??
-                          'By tapping Register, you agree to our Terms of Service & Privacy Policy.',
+                      l10n?.authTermsOfService ?? 'By tapping Register, you agree to our Terms of Service & Privacy Policy.',
                       style: TextStyle(
                         fontSize: 12,
                         color: colors.onSurfaceVariant,

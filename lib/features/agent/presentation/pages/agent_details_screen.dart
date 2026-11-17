@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/helpers/spacing.dart';
 import '../../../../core/router/route_names.dart';
+import '../../../../core/widgets/app_error_view.dart';
 import '../../../../core/widgets/person_avatar.dart';
 import '../../../../core/widgets/app_skeleton.dart';
 import '../../../../l10n/generated/app_localizations.dart';
@@ -40,17 +41,13 @@ class AgentDetailsScreen extends StatelessWidget {
           }
 
           if (state.status == AgentDetailsStatus.error || state.agent == null) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text(
+            return AppErrorView(
+              message:
                   state.error ??
-                      l10n?.commonError ??
-                      'Agent details could not be loaded.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: colors.onSurfaceVariant),
-                ),
-              ),
+                  l10n?.commonError ??
+                  'Agent details could not be loaded.',
+              onRetry: () =>
+                  context.read<AgentDetailsCubit>().loadAgentDetails(agentId),
             );
           }
 
@@ -66,7 +63,9 @@ class AgentDetailsScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _AgentHeader(agent: agent),
-                verticalSpace(20),
+                verticalSpace(14),
+                _AgentRatingSummary(agent: agent),
+                verticalSpace(18),
                 _InfoCard(
                   agent: agent,
                   publishedEstatesCount: publishedEstatesCount,
@@ -83,7 +82,7 @@ class AgentDetailsScreen extends StatelessWidget {
                 verticalSpace(12),
                 if (state.isEstatesLoading)
                   SizedBox(
-                    height: 260,
+                    height: 268,
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
                       itemCount: 3,
@@ -137,7 +136,7 @@ class AgentDetailsScreen extends StatelessWidget {
                   )
                 else
                   SizedBox(
-                    height: 260,
+                    height: 268,
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
                       itemCount: state.estates.length,
@@ -176,8 +175,124 @@ class _AgentHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: AlignmentDirectional.topStart,
+          end: AlignmentDirectional.bottomEnd,
+          colors: [colors.primary, colors.primary.withValues(alpha: 0.78)],
+        ),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              PersonAvatar(
+                photoUrl: agent.primaryPhotoUrl,
+                radius: 38,
+                iconSize: 36,
+              ),
+              const Spacer(),
+              if (agent.isVerified)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 11,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colors.onPrimary.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.verified_rounded,
+                        color: colors.onPrimary,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        l10n?.agentVerifiedLabel ?? 'Verified agent',
+                        style: TextStyle(
+                          color: colors.onPrimary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+          verticalSpace(15),
+          Text(
+            agent.displayName,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.3,
+              color: colors.onPrimary,
+            ),
+          ),
+          if (agent.agencyName.trim().isNotEmpty) ...[
+            verticalSpace(4),
+            Text(
+              agent.agencyName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: colors.onPrimary.withValues(alpha: 0.76),
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+          if (agent.yearsOfExperience > 0) ...[
+            verticalSpace(14),
+            Row(
+              children: [
+                Icon(
+                  Icons.workspace_premium_outlined,
+                  color: colors.onPrimary.withValues(alpha: 0.9),
+                  size: 18,
+                ),
+                const SizedBox(width: 7),
+                Text(
+                  l10n?.agentExperienceYears(agent.yearsOfExperience) ??
+                      '${agent.yearsOfExperience} years experience',
+                  style: TextStyle(
+                    color: colors.onPrimary.withValues(alpha: 0.9),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _AgentRatingSummary extends StatelessWidget {
+  const _AgentRatingSummary({required this.agent});
+
+  final AgentEntity agent;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
+    return Container(
+      padding: const EdgeInsets.all(17),
       decoration: BoxDecoration(
         color: colors.surface,
         borderRadius: BorderRadius.circular(20),
@@ -185,57 +300,59 @@ class _AgentHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          PersonAvatar(
-            photoUrl: agent.primaryPhotoUrl,
-            radius: 42,
-            iconSize: 40,
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFB547).withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: const Icon(
+              Icons.star_rounded,
+              color: Color(0xFFE99A20),
+              size: 26,
+            ),
           ),
-          horizontalSpace(16),
+          horizontalSpace(12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        agent.displayName,
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w800,
-                          color: colors.onSurface,
-                        ),
-                      ),
-                    ),
-                    if (agent.isVerified) ...[
-                      horizontalSpace(6),
-                      Icon(Icons.verified, color: colors.tertiary, size: 18),
-                    ],
-                  ],
+                Text(
+                  l10n?.agentReviewSummary ?? 'Client rating',
+                  style: TextStyle(
+                    color: colors.onSurface,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-                verticalSpace(6),
-                Row(
-                  children: [
-                    Icon(Icons.star_rounded, size: 18, color: Colors.amber),
-                    horizontalSpace(4),
-                    Text(
-                      agent.rating.toStringAsFixed(1),
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: colors.onSurfaceVariant,
-                      ),
-                    ),
-                    const Text(' • '),
-                    Text(
+                verticalSpace(4),
+                Text(
+                  l10n?.agentReviewCount(agent.reviewCount) ??
                       '${agent.reviewCount} reviews',
-                      style: TextStyle(
-                        color: colors.onSurfaceVariant,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
+                  style: TextStyle(
+                    color: colors.onSurfaceVariant,
+                    fontSize: 12,
+                  ),
                 ),
               ],
+            ),
+          ),
+          Text(
+            agent.rating.toStringAsFixed(1),
+            style: TextStyle(
+              color: colors.onSurface,
+              fontSize: 24,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(width: 3),
+          Text(
+            '/ 5',
+            style: TextStyle(
+              color: colors.onSurfaceVariant,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],

@@ -341,7 +341,8 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                                 ? TextOverflow.visible
                                 : TextOverflow.ellipsis,
                           ),
-                          if (estate.localizedDescription(langCode).length > 120)
+                          if (estate.localizedDescription(langCode).length >
+                              120)
                             GestureDetector(
                               onTap: () => setState(
                                 () => _isDescriptionExpanded =
@@ -724,54 +725,58 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
                 bottom: 0,
                 left: 0,
                 right: 0,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 14,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colors.surface,
-                    border: Border(
-                      top: BorderSide(color: colors.outlineVariant),
+                child: SafeArea(
+                  top: false,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 14,
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, -4),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      border: Border(
+                        top: BorderSide(color: colors.outlineVariant),
                       ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      if (!isOwnedByCurrentUser) ...[
-                        Expanded(
-                          child: AppButton(
-                            text: l10n?.detailsContactAgent ?? 'Contact Agent',
-                            type: AppButtonType.outlined,
-                            isLoading:
-                                state.contactAgentStatus ==
-                                ContactAgentStatus.loading,
-                            onPressed: _contactAgent,
-                          ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, -4),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: AppButton(
-                            text: l10n?.detailsBookVisit ?? 'Book a Visit',
-                            type: AppButtonType.primary,
-                            onPressed: () => _bookTour(estate),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        if (!isOwnedByCurrentUser) ...[
+                          Expanded(
+                            child: AppButton(
+                              text:
+                                  l10n?.detailsContactAgent ?? 'Contact Agent',
+                              type: AppButtonType.outlined,
+                              isLoading:
+                                  state.contactAgentStatus ==
+                                  ContactAgentStatus.loading,
+                              onPressed: _contactAgent,
+                            ),
                           ),
-                        ),
-                      ] else
-                        Expanded(
-                          child: AppButton(
-                            text: 'Your Property',
-                            type: AppButtonType.outlined,
-                            onPressed: null,
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: AppButton(
+                              text: l10n?.detailsBookVisit ?? 'Book a Visit',
+                              type: AppButtonType.primary,
+                              onPressed: () => _bookTour(estate),
+                            ),
                           ),
-                        ),
-                    ],
+                        ] else
+                          Expanded(
+                            child: AppButton(
+                              text: 'Your Property',
+                              type: AppButtonType.outlined,
+                              onPressed: null,
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ),

@@ -17,15 +17,21 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  Timer? _startupTimer;
+
   @override
   void initState() {
     super.initState();
-    _determineNextScreen();
+    _startupTimer = Timer(const Duration(seconds: 2), _determineNextScreen);
+  }
+
+  @override
+  void dispose() {
+    _startupTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _determineNextScreen() async {
-    // 2-second splash screen display
-    await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
 
     try {
@@ -34,44 +40,35 @@ class _SplashScreenState extends State<SplashScreen> {
       final hasCompletedOnboarding =
           prefs.getBool('has_completed_onboarding') ?? false;
 
-      // 1. First-time user -> Onboarding
       if (!hasCompletedOnboarding) {
-        if (!mounted) return;
         context.go(AppRoutes.onBoarding);
         return;
       }
 
-      // 2. Check Firebase Authentication session
       final currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser == null) {
-        if (!mounted) return;
         context.go(AppRoutes.welcome);
         return;
       }
 
-      // 3. Authenticated user -> Check if Account Setup was completed in Firestore
       final userDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(currentUser.uid)
           .get();
-
       if (!mounted) return;
 
       final isSetupCompleted = userDoc.data()?['accountSetupCompleted'] == true;
-
-      if (isSetupCompleted) {
-        context.go(AppRoutes.home);
-      } else {
-        context.go(AppRoutes.accountSetupLocation);
-      }
+      context.go(
+        isSetupCompleted ? AppRoutes.home : AppRoutes.accountSetupLocation,
+      );
     } catch (_) {
-      // Fallback safe route on network/storage failure
       if (mounted) context.go(AppRoutes.welcome);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.sizeOf(context).height;
     return Scaffold(
       body: Stack(
         children: [
@@ -81,15 +78,11 @@ class _SplashScreenState extends State<SplashScreen> {
               fit: BoxFit.cover,
             ),
           ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            top: 0,
+          Positioned.fill(
             child: Center(child: Image.asset('assets/images/Mask group.png')),
           ),
           Positioned(
-            bottom: 380,
+            bottom: screenHeight * 0.28,
             left: 0,
             right: 0,
             child: Center(

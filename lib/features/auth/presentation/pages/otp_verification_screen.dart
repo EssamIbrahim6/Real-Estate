@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:real_estate_app/core/constants/app_assets.dart';
 import 'package:real_estate_app/l10n/generated/app_localizations.dart';
 
 import '../../../../core/constants/app_colors.dart';
@@ -63,8 +64,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
         otp: _enteredOtp,
       );
     } else {
-      setState(() =>
-          _errorMessage = l10n?.authOtpEnterAllDigits ?? 'Please enter all 4 digits');
+      setState(
+        () => _errorMessage =
+            l10n?.authOtpEnterAllDigits ?? 'Please enter all 4 digits',
+      );
     }
   }
 
@@ -78,6 +81,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
 
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
@@ -97,7 +101,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
         final isLoading = state is AuthLoading;
 
         return Scaffold(
-          backgroundColor: AppColors.surface,
+          backgroundColor: colors.surface,
           body: SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -109,17 +113,17 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
                   AuthHeader(
                     title: l10n?.authOtpTitle ?? 'Enter the code',
-                    subtitle: l10n?.authOtpSubtitle ??
-                        'Enter the 4-digit verification code sent to your email:',
+                    subtitle: l10n?.authOtpSubtitle ?? 'Enter the 4-digit verification code sent to your email:',
+                    imageAsset: AppAssets.welcomeAuth1,
                   ),
                   verticalSpace(6),
 
                   Text(
                     widget.email,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.brandNavy,
+                      color: colors.onSurface,
                     ),
                   ),
                   verticalSpace(36),
@@ -144,8 +148,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     Center(
                       child: Text(
                         _errorMessage!,
-                        style: const TextStyle(
-                          color: AppColors.error,
+                        style: TextStyle(
+                          color: colors.error,
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
                         ),
@@ -158,19 +162,19 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     child: _secondsRemaining > 0
                         ? Text(
                             '${l10n?.authOtpResendIn ?? "Resend code in"} 00:${_secondsRemaining.toString().padLeft(2, '0')}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
-                              color: AppColors.textSecondary,
+                              color: colors.onSurfaceVariant,
                             ),
                           )
                         : GestureDetector(
                             onTap: _onResendPressed,
                             child: Text(
                               l10n?.authResendOtp ?? 'Resend OTP',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.brandGreen,
+                                color: colors.primary,
                               ),
                             ),
                           ),
@@ -184,6 +188,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       onPressed: isLoading ? null : _onVerifyPressed,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.brandGreen,
+                        foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),

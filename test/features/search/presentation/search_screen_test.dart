@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:real_estate_app/core/theme/app_theme.dart';
 import 'package:real_estate_app/core/utils/typedefs.dart';
 import 'package:real_estate_app/features/category/domain/entities/category_entity.dart';
 import 'package:real_estate_app/features/category/domain/repositories/category_repository.dart';
@@ -9,6 +10,7 @@ import 'package:real_estate_app/features/search/domain/entities/search_filter.da
 import 'package:real_estate_app/features/search/domain/repositories/search_repository.dart';
 import 'package:real_estate_app/features/search/presentation/cubit/search_cubit.dart';
 import 'package:real_estate_app/features/search/presentation/pages/search_screen.dart';
+import 'package:real_estate_app/l10n/generated/app_localizations.dart';
 
 void main() {
   testWidgets(
@@ -59,6 +61,38 @@ void main() {
       expect(searchRepository.filters.last.query, isNull);
     },
   );
+
+  testWidgets('AI search helper fits a compact Arabic dark layout', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final cubit = SearchCubit(
+      searchRepository: _FakeSearchRepository(),
+      categoryRepository: _FakeCategoryRepository(),
+    );
+    addTearDown(cubit.close);
+
+    await tester.pumpWidget(
+      BlocProvider.value(
+        value: cubit,
+        child: MaterialApp(
+          theme: AppTheme.darkTheme,
+          locale: const Locale('ar'),
+          supportedLocales: AppLocalizations.supportedLocales,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          home: const SearchScreen(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('بحث مدعوم بالذكاء الاصطناعي'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }
 
 class _FakeSearchRepository implements SearchRepository {

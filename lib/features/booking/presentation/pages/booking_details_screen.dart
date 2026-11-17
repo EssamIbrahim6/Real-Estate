@@ -30,8 +30,7 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
       builder: (dialogCtx) => AlertDialog(
         title: Text(l10n?.bookingCancelTitle ?? 'Cancel Booking?'),
         content: Text(
-          l10n?.bookingCancelConfirm ??
-              'Are you sure you want to cancel this booking? This action cannot be undone.',
+          l10n?.bookingCancelConfirm ?? 'Are you sure you want to cancel this booking? This action cannot be undone.',
         ),
         actions: [
           TextButton(
@@ -66,8 +65,7 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
     final l10n = AppLocalizations.of(context);
     final langCode = Localizations.localeOf(context).languageCode;
     final booking = widget.booking;
-    final dateStr =
-        DateFormat('EEEE, MMMM d, yyyy').format(booking.bookingDate);
+    final dateStr = DateFormat.yMMMMEEEEd(langCode).format(booking.bookingDate);
 
     return BlocListener<BookingCubit, BookingState>(
       listener: (context, state) {
@@ -91,89 +89,35 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
         body: ListView(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
           children: [
-            // Status Row
-            Row(
-              children: [
-                Text(
-                  l10n?.bookingStatusLabel ?? 'Status',
-                  style: const TextStyle(fontWeight: FontWeight.w600),
+            _BookingPropertyCard(booking: booking, langCode: langCode),
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsetsDirectional.fromSTEB(15, 13, 16, 13),
+              decoration: BoxDecoration(
+                color: colors.primaryContainer.withValues(alpha: 0.42),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: colors.primary.withValues(alpha: 0.16),
                 ),
-                const SizedBox(width: 12),
-                BookingStatusBadge(status: booking.status),
-              ],
-            ),
-            const SizedBox(height: 20),
-
-            // Estate Card
-            _InfoCard(
-              title: l10n?.bookingPropertySnapshot ?? 'Property',
+              ),
               child: Row(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: SizedBox(
-                      width: 72,
-                      height: 72,
-                      child: booking.estateCoverImage.isNotEmpty
-                          ? Image.network(
-                              booking.estateCoverImage,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, _, _) => Container(
-                                color: colors.surfaceContainerLow,
-                                child: Icon(
-                                  Icons.home_outlined,
-                                  color: colors.onSurfaceVariant,
-                                ),
-                              ),
-                            )
-                          : Container(
-                              color: colors.surfaceContainerLow,
-                              child: Icon(
-                                Icons.home_outlined,
-                                color: colors.onSurfaceVariant,
-                              ),
-                            ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
+                  Icon(Icons.event_available_rounded, color: colors.primary),
+                  const SizedBox(width: 11),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          booking.localizedEstateTitle(langCode),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 14,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          booking.estateAddress,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: colors.onSurfaceVariant,
-                          ),
-                          maxLines: 2,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'EGP ${booking.estatePrice.toInt()}${booking.estatePricePeriod != null ? ' / ${booking.estatePricePeriod}' : ''}',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: colors.tertiary,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      l10n?.bookingStatusLabel ?? 'Status',
+                      style: TextStyle(
+                        color: colors.onSurface,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
+                  BookingStatusBadge(status: booking.status),
                 ],
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 18),
 
             // Schedule
             _InfoCard(
@@ -239,7 +183,10 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
           ],
         ),
         bottomNavigationBar: booking.status.isCancellable
-            ? _CancelBar(onCancel: () => _confirmCancel(context))
+            ? SafeArea(
+                top: false,
+                child: _CancelBar(onCancel: () => _confirmCancel(context)),
+              )
             : null,
       ),
     );
@@ -276,6 +223,152 @@ class _InfoCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class _BookingPropertyCard extends StatelessWidget {
+  final BookingEntity booking;
+  final String langCode;
+
+  const _BookingPropertyCard({required this.booking, required this.langCode});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
+    final price = NumberFormat.decimalPattern(langCode)
+        .format(booking.estatePrice.toInt());
+    final priceText =
+        '${l10n?.commonEgp ?? 'EGP'} $price'
+        '${booking.estatePricePeriod == null ? '' : ' / ${booking.estatePricePeriod}'}';
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: colors.outlineVariant),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow.withValues(alpha: 0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(23)),
+            child: SizedBox(
+              height: 190,
+              width: double.infinity,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  if (booking.estateCoverImage.isNotEmpty)
+                    Image.network(
+                      booking.estateCoverImage,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) =>
+                          _PropertyImageFallback(colors: colors),
+                    )
+                  else
+                    _PropertyImageFallback(colors: colors),
+                  const DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Colors.transparent, Color(0x55000000)],
+                      ),
+                    ),
+                  ),
+                  PositionedDirectional(
+                    end: 14,
+                    bottom: 14,
+                    child: Container(
+                      constraints: const BoxConstraints(maxWidth: 280),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 13,
+                        vertical: 9,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colors.surface.withValues(alpha: 0.96),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        priceText,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: colors.tertiary,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 15, 16, 17),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  booking.localizedEstateTitle(langCode),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: colors.onSurface,
+                    fontWeight: FontWeight.w800,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 7),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.location_on_outlined,
+                      size: 18,
+                      color: colors.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 5),
+                    Expanded(
+                      child: Text(
+                        booking.estateAddress,
+                        style: Theme.of(context).textTheme.bodySmall
+                            ?.copyWith(color: colors.onSurfaceVariant),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PropertyImageFallback extends StatelessWidget {
+  final ColorScheme colors;
+
+  const _PropertyImageFallback({required this.colors});
+
+  @override
+  Widget build(BuildContext context) => Container(
+    color: colors.surfaceContainerLow,
+    child: Icon(
+      Icons.home_work_outlined,
+      color: colors.onSurfaceVariant,
+      size: 44,
+    ),
+  );
 }
 
 class _InfoRow extends StatelessWidget {
@@ -332,7 +425,7 @@ class _CancelBar extends StatelessWidget {
       builder: (context, state) {
         final isLoading = state.isCancelling;
         return Container(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
           decoration: BoxDecoration(
             color: colors.surface,
             border: Border(top: BorderSide(color: colors.outlineVariant)),
@@ -348,4 +441,3 @@ class _CancelBar extends StatelessWidget {
     );
   }
 }
-

@@ -48,7 +48,7 @@ class RealEstatePreferencesScreen extends StatelessWidget {
         final selectedTypes = state.data.preferredTypes;
 
         return Scaffold(
-          backgroundColor: AppColors.surface,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           body: SafeArea(
             child: Column(
               children: [

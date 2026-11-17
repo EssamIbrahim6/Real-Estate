@@ -32,6 +32,8 @@
 
   "homeGreeting": "Find your dream home",
   "homeCategories": "Categories",
+  "homeHeroTitle": "Find a place to call home",
+  "homeHeroSubtitle": "A home that fits your life is just a search away.",
   "homeSearchHint": "Search address, city, or property...",
   "homeFeaturedEstates": "Featured Estates",
   "homeExploreNearby": "Explore Nearby Estates",
@@ -48,6 +50,9 @@
 
   "searchTitle": "Search properties",
   "searchHint": "Search estates...",
+  "searchAiTitle": "AI-powered search",
+  "searchAiHint": "AI search understands everyday phrases. Try “2 bedrooms near Giza”.",
+  "searchVoiceSearch": "Voice search",
   "searchFilters": "Filters",
   "searchApplyFilters": "Apply filters",
   "searchClearFilters": "Clear filters",
@@ -71,6 +76,15 @@
   "listingsCategoryTitle": "Category Estates",
   "listingsNearbyTitle": "Nearby Estates",
   "listingsEmpty": "No properties found.",
+  "listingsResultsTitle": "Homes to explore",
+  "listingsResultsCount": "{count} properties selected for you",
+  "@listingsResultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "listingsCategoryEmpty": "No estates found for this category.",
   "listingsLoading": "Loading properties...",
 
@@ -89,6 +103,10 @@
     }
   },
   "detailsOverview": "Overview",
+  "detailsBedroomsLabel": "Bedrooms",
+  "detailsBathroomsLabel": "Bathrooms",
+  "detailsAreaLabel": "Total area",
+  "detailsInteriorLabel": "Interior",
   "detailsBedrooms": "{count} Beds",
   "@detailsBedrooms": {
     "placeholders": {
@@ -269,6 +287,8 @@
   "authOtpResendIn": "Resend code in",
 
   "editProfileTitle": "Edit profile",
+  "editProfileIntro": "Keep your details up to date so agents can reach you.",
+  "editProfileSection": "Personal information",
   "editProfileFullName": "Full name",
   "editProfileEmail": "Email address",
   "editProfileEmailHelper": "Email changes require account verification and are not available here.",
@@ -291,6 +311,24 @@
   "agentDetailsEmail": "Email",
   "agentDetailsBio": "Bio",
   "agentDetailsPublishedEstates": "Published estates",
+  "agentReviewSummary": "Client rating",
+  "agentVerifiedLabel": "Verified agent",
+  "agentReviewCount": "{count} reviews",
+  "@agentReviewCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "agentExperienceYears": "{count} years experience",
+  "@agentExperienceYears": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
 
   "searchFilterPriceError": "Minimum price must not exceed maximum price.",
   "searchFilterInvalidPrice": "Enter a valid price",
@@ -302,6 +340,8 @@
   "chatSendTooltip": "Send message",
 
   "galleryViewAll": "View all photos",
+  "galleryEmpty": "No photos available",
+  "galleryImageLoadError": "This photo could not be loaded.",
 
   "onboarding1Title": "Welcome to Real Estate App",
   "onboarding1Subtitle": "Discover your dream home with ease",
@@ -342,10 +382,23 @@
   "bookingNotesHint": "Any special requests or questions for the agent...",
   "bookingSubmit": "Confirm Booking",
   "myBookingsTitle": "My Bookings",
+  "bookingHistorySummary": "Keep your property visits and requests in one place.",
+  "bookingHistoryCount": "{count, plural, =0{No visits} =1{1 visit} other{{count} visits}}",
+  "@bookingHistoryCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "myBookingsEmpty": "No bookings yet.",
   "myBookingsSubtitle": "Book a visit to any property to get started.",
   "bookingDetailsTitle": "Booking Details",
   "bookingStatusLabel": "Status",
+  "bookingStatusPending": "Pending",
+  "bookingStatusConfirmed": "Confirmed",
+  "bookingStatusCancelled": "Cancelled",
+  "bookingStatusCompleted": "Completed",
   "bookingPropertySnapshot": "Property",
   "bookingCancelTitle": "Cancel Booking?",
   "bookingCancelConfirm": "Are you sure you want to cancel this booking? This action cannot be undone.",
@@ -357,6 +410,21 @@
   "profileMyBookingsSubtitle": "View and manage your tour requests",
   "notificationsTitle": "Notifications",
   "notificationsMarkAllRead": "Mark all read",
+  "notificationsRecentActivity": "Recent activity",
+  "notificationsUnreadSummary": "{count} unread",
+  "@notificationsUnreadSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "notificationsEmpty": "No notifications yet.",
+  "notificationsEmptyDescription": "You're all caught up. New property updates will appear here.",
+  "notificationsJustNow": "Just now",
+  "notificationsMinutesAgo": "{count}m ago",
+  "notificationsHoursAgo": "{count}h ago",
+  "notificationsYesterday": "Yesterday",
+  "notificationsDaysAgo": "{count}d ago",
   "profileNotificationsSubtitle": "View your activity and updates"
 }

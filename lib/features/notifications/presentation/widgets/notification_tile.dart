@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../domain/entities/notification_entity.dart';
 import '../../domain/entities/notification_type.dart';
 
@@ -18,91 +20,118 @@ class NotificationTile extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final unread = !notification.isRead;
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
+    return Container(
+      margin: const EdgeInsetsDirectional.fromSTEB(20, 5, 20, 5),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
           color: unread
-              ? colors.primaryContainer.withValues(alpha: 0.35)
-              : colors.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: unread ? colors.primary.withValues(alpha: 0.25) : colors.outlineVariant,
-          ),
+              ? colors.primary.withValues(alpha: 0.3)
+              : colors.outlineVariant,
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _NotificationIcon(type: notification.type),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+        boxShadow: [
+          if (unread)
+            BoxShadow(
+              color: colors.shadow.withValues(alpha: 0.04),
+              blurRadius: 14,
+              offset: const Offset(0, 4),
+            ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(20),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (unread) ...[
+                  Container(
+                    width: 4,
+                    height: 54,
+                    decoration: BoxDecoration(
+                      color: colors.primary,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                ],
+                _NotificationIcon(type: notification.type),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Text(
-                          notification.title,
-                          style: Theme.of(context).textTheme.titleSmall
-                              ?.copyWith(
-                                fontWeight: unread
-                                    ? FontWeight.w700
-                                    : FontWeight.w500,
-                              ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                      Text(
+                        notification.title,
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: unread
+                              ? FontWeight.w700
+                              : FontWeight.w600,
+                          color: colors.onSurface,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        notification.body,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                          height: 1.4,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _formatTime(context, notification.createdAt),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: unread
+                              ? colors.primary
+                              : colors.onSurfaceVariant,
+                          fontWeight: unread ? FontWeight.w700 : null,
                         ),
                       ),
-                      if (unread)
-                        Container(
-                          width: 8,
-                          height: 8,
-                          margin: const EdgeInsetsDirectional.only(start: 8),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: colors.primary,
-                          ),
-                        ),
                     ],
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    notification.body,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colors.onSurface.withValues(alpha: 0.72),
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    _formatTime(notification.createdAt),
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: colors.onSurface.withValues(alpha: 0.5),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  String _formatTime(DateTime dt) {
-    final now = DateTime.now();
-    final diff = now.difference(dt);
-    if (diff.inMinutes < 1) return 'Just now';
-    if (diff.inHours < 1) return '${diff.inMinutes}m ago';
-    if (diff.inDays < 1) return '${diff.inHours}h ago';
-    if (diff.inDays == 1) return 'Yesterday';
-    if (diff.inDays < 7) return '${diff.inDays}d ago';
-    return '${dt.day}/${dt.month}/${dt.year}';
+  String _formatTime(BuildContext context, DateTime dateTime) {
+    final l10n = AppLocalizations.of(context);
+    final locale = Localizations.localeOf(context).toString();
+    final difference = DateTime.now().difference(dateTime);
+    if (difference.inMinutes < 1) {
+      return l10n?.notificationsJustNow ?? 'Just now';
+    }
+    if (difference.inHours < 1) {
+      return l10n?.notificationsMinutesAgo(difference.inMinutes) ??
+          '${difference.inMinutes}m ago';
+    }
+    if (difference.inDays < 1) {
+      return l10n?.notificationsHoursAgo(difference.inHours) ??
+          '${difference.inHours}h ago';
+    }
+    if (difference.inDays == 1) {
+      return '${l10n?.notificationsYesterday ?? 'Yesterday'} · ${DateFormat.jm(locale).format(dateTime)}';
+    }
+    if (difference.inDays < 7) {
+      return l10n?.notificationsDaysAgo(difference.inDays) ??
+          '${difference.inDays}d ago';
+    }
+    return DateFormat.yMMMd(locale).format(dateTime);
   }
 }
 
@@ -115,7 +144,7 @@ class _NotificationIcon extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final (icon, color) = switch (type) {
       NotificationType.accountCreated => (
-        Icons.person_add_rounded,
+        Icons.person_add_alt_1_rounded,
         colors.primary,
       ),
       NotificationType.chatMessage => (
@@ -123,32 +152,31 @@ class _NotificationIcon extends StatelessWidget {
         colors.secondary,
       ),
       NotificationType.bookingReceived => (
-        Icons.calendar_today_rounded,
+        Icons.calendar_month_rounded,
         colors.tertiary,
       ),
       NotificationType.bookingStatusChanged => (
-        Icons.update_rounded,
+        Icons.event_available_rounded,
         colors.primary,
       ),
       NotificationType.listingStatusChanged => (
-        Icons.home_rounded,
+        Icons.home_work_rounded,
         colors.secondary,
       ),
       NotificationType.newMatchingProperty => (
-        Icons.star_rounded,
+        Icons.auto_awesome_rounded,
         colors.tertiary,
       ),
     };
 
     return Container(
-      width: 40,
-      height: 40,
+      width: 48,
+      height: 48,
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        shape: BoxShape.circle,
+        color: color.withValues(alpha: 0.13),
+        borderRadius: BorderRadius.circular(16),
       ),
-      child: Icon(icon, size: 20, color: color),
+      child: Icon(icon, size: 22, color: color),
     );
   }
 }
-

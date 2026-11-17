@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -26,7 +26,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: BlocBuilder<HomeCubit, HomeState>(
           builder: (context, state) {
@@ -54,36 +54,34 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     // 1. Header
                     HomeHeader(locationName: state.currentLocationName),
-                    verticalSpace(18),
+                    verticalSpace(22),
 
                     // 2. Property search
                     HomeSearchBar(
                       onSearchTap: () => context.go(AppRoutes.search),
                     ),
-                    verticalSpace(24),
+                    verticalSpace(28),
 
                     // 3. Property Categories
                     SectionHeader(title: l10n?.homeCategories ?? 'Categories'),
                     verticalSpace(12),
                     if (state.categoriesError != null)
-                      Text(
+                      _sectionError(
+                        context,
                         state.categoriesError!,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
-                          fontSize: 13,
-                        ),
+                        onRetry: () => context.read<HomeCubit>().loadHome(),
                       )
                     else if (state.categories.isEmpty)
-                      Text(
-                        'No categories available right now.',
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          fontSize: 13,
-                        ),
+                      _sectionEmpty(
+                        context,
+                        icon: Icons.category_outlined,
+                        title:
+                            l10n?.homeNoFeatured ??
+                            'No categories available right now.',
                       )
                     else
                       SizedBox(
-                        height: 92,
+                        height: 100,
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           itemCount: state.categories.length,
@@ -117,25 +115,21 @@ class HomeScreen extends StatelessWidget {
                     ),
                     verticalSpace(12),
                     if (state.featuredError != null)
-                      Text(
+                      _sectionError(
+                        context,
                         state.featuredError!,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
-                          fontSize: 13,
-                        ),
+                        onRetry: () => context.read<HomeCubit>().loadHome(),
                       )
                     else if (state.featuredEstates.isEmpty)
-                      Text(
-                        l10n?.homeNoFeatured ??
+                      _sectionEmpty(
+                        context,
+                        icon: Icons.home_outlined,
+                        title:
+                            l10n?.homeNoFeatured ??
                             'No featured estates available right now.',
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          fontSize: 13,
-                        ),
                       )
                     else
                       SizedBox(
-                        // height: 255,
                         height: 275,
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
@@ -163,12 +157,10 @@ class HomeScreen extends StatelessWidget {
                     ),
                     verticalSpace(12),
                     if (state.topLocations.isEmpty)
-                      Text(
-                        'No location data available right now.',
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          fontSize: 13,
-                        ),
+                      _sectionEmpty(
+                        context,
+                        icon: Icons.location_city_outlined,
+                        title: 'No location data available right now.',
                       )
                     else
                       SizedBox(
@@ -201,21 +193,21 @@ class HomeScreen extends StatelessWidget {
                     ),
                     verticalSpace(12),
                     if (state.agentsError != null)
-                      Text(
+                      _sectionError(
+                        context,
                         state.agentsError!,
-                        style: TextStyle(color: colors.error, fontSize: 13),
+                        onRetry: () => context.read<HomeCubit>().loadHome(),
                       )
                     else if (state.topAgents.isEmpty)
-                      Text(
-                        l10n?.homeNoAgents ?? 'No agents available right now.',
-                        style: TextStyle(
-                          color: colors.onSurfaceVariant,
-                          fontSize: 13,
-                        ),
+                      _sectionEmpty(
+                        context,
+                        icon: Icons.person_outline_rounded,
+                        title:
+                            l10n?.homeNoAgents ??
+                            'No agents available right now.',
                       )
                     else
                       SizedBox(
-                        // height: 125,
                         height: 140,
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
@@ -237,7 +229,8 @@ class HomeScreen extends StatelessWidget {
 
                     // 7. Explore Nearby Estates Section
                     SectionHeader(
-                      title: l10n?.homeExploreNearby ?? 'Explore Nearby Estates',
+                      title:
+                          l10n?.homeExploreNearby ?? 'Explore Nearby Estates',
                       onSeeAll: () async {
                         final homeCubit = context.read<HomeCubit>();
                         await homeCubit.requestLocationPermission();
@@ -255,8 +248,7 @@ class HomeScreen extends StatelessWidget {
                           pathParameters: {'type': 'nearby'},
                           extra: ListingRequest(
                             type: ListingType.nearby,
-                            title:
-                                l10n?.homeExploreNearby ?? 'Nearby Estates',
+                            title: l10n?.homeExploreNearby ?? 'Nearby Estates',
                             estates: homeState.nearbyEstates,
                             distancesKm: homeState.estateDistancesKm,
                           ),
@@ -305,16 +297,13 @@ class HomeScreen extends StatelessWidget {
                         ),
                       )
                     else if (state.nearbyEstates.isEmpty)
-                      Text(
-                        'No estates found near your location.',
-                        style: TextStyle(
-                          color: colors.onSurfaceVariant,
-                          fontSize: 13,
-                        ),
+                      _sectionEmpty(
+                        context,
+                        icon: Icons.location_off_outlined,
+                        title: 'No estates found near your location.',
                       )
                     else
                       SizedBox(
-                        //height: 255,
                         height: 275,
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
@@ -343,6 +332,63 @@ class HomeScreen extends StatelessWidget {
             );
           },
         ),
+      ),
+    );
+  }
+
+  Widget _sectionEmpty(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+  }) {
+    final colors = Theme.of(context).colorScheme;
+    return SizedBox(
+      height: 110,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 40, color: colors.onSurfaceVariant),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 13, color: colors.onSurfaceVariant),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _sectionError(
+    BuildContext context,
+    String message, {
+    VoidCallback? onRetry,
+  }) {
+    final colors = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.errorContainer.withValues(alpha: 0.35),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colors.error.withValues(alpha: 0.35)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.error_outline, color: colors.error, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: TextStyle(
+                color: colors.error,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

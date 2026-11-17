@@ -64,65 +64,154 @@ class _FullscreenGalleryScreenState extends State<FullscreenGalleryScreen> {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
-        leading: IconButton(
-          tooltip: l10n?.commonClose ?? 'Close',
-          onPressed: _close,
-          icon: const Icon(Icons.close),
-        ),
-        title: Text(
-          widget.images.isEmpty
-              ? (l10n?.galleryViewAll ?? 'Photos')
-              : '${_currentIndex + 1} / ${widget.images.length}',
-          style: const TextStyle(color: Colors.white),
-        ),
-        centerTitle: true,
-      ),
-      body: widget.images.isEmpty
-          ? Center(
-              child: Text(
-                l10n?.detailsNoAmenities ?? 'No photos available.',
-                style: const TextStyle(color: Colors.white70),
-              ),
-            )
-          : PageView.builder(
-              controller: _pageController,
-              itemCount: widget.images.length,
-              onPageChanged: (index) => setState(() => _currentIndex = index),
-              itemBuilder: (context, index) => InteractiveViewer(
-                child: Center(
-                  child: Image.network(
-                    widget.images[index],
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => const Column(
-                      mainAxisSize: MainAxisSize.min,
+      body: SafeArea(
+        child: widget.images.isEmpty
+            ? Center(
+                child: Text(
+                  l10n?.galleryEmpty ?? 'No photos available',
+                  style: const TextStyle(color: Colors.white70),
+                ),
+              )
+            : Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(16, 8, 16, 8),
+                    child: Row(
                       children: [
-                        Icon(
-                          Icons.broken_image_outlined,
-                          color: AppColors.textMuted,
-                          size: 56,
+                        IconButton(
+                          tooltip: l10n?.commonClose ?? 'Close',
+                          onPressed: _close,
+                          style: IconButton.styleFrom(
+                            backgroundColor: Colors.white.withValues(
+                              alpha: 0.12,
+                            ),
+                            foregroundColor: Colors.white,
+                          ),
+                          icon: const Icon(Icons.close_rounded),
                         ),
-                        SizedBox(height: 12),
-                        Text(
-                          'This photo could not be loaded.',
-                          style: TextStyle(color: Colors.white70),
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.14),
+                            ),
+                          ),
+                          child: Text(
+                            '${_currentIndex + 1} / ${widget.images.length}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                    loadingBuilder: (context, child, progress) {
-                      if (progress == null) return child;
-                      return const Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.brandGreen,
-                        ),
-                      );
-                    },
                   ),
-                ),
+                  Expanded(
+                    child: PageView.builder(
+                      controller: _pageController,
+                      itemCount: widget.images.length,
+                      onPageChanged: (index) =>
+                          setState(() => _currentIndex = index),
+                      itemBuilder: (context, index) => InteractiveViewer(
+                        child: Center(
+                          child: Image.network(
+                            widget.images[index],
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) =>
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.broken_image_outlined,
+                                      color: Colors.white54,
+                                      size: 56,
+                                    ),
+                                    SizedBox(height: 12),
+                                    Text(
+                                      l10n?.galleryImageLoadError ??
+                                          'This photo could not be loaded.',
+                                      style: TextStyle(color: Colors.white70),
+                                    ),
+                                  ],
+                                ),
+                            loadingBuilder: (context, child, progress) {
+                              if (progress == null) return child;
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  color: AppColors.brandGreen,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (widget.images.length > 1)
+                    SizedBox(
+                      height: 88,
+                      child: ListView.separated(
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                          16,
+                          10,
+                          16,
+                          12,
+                        ),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: widget.images.length,
+                        separatorBuilder: (_, _) => const SizedBox(width: 10),
+                        itemBuilder: (context, index) {
+                          final selected = index == _currentIndex;
+                          return GestureDetector(
+                            onTap: () => _pageController.animateToPage(
+                              index,
+                              duration: const Duration(milliseconds: 260),
+                              curve: Curves.easeOutCubic,
+                            ),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 180),
+                              padding: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: selected
+                                      ? Colors.white
+                                      : Colors.white.withValues(alpha: 0.28),
+                                  width: selected ? 2 : 1,
+                                ),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: SizedBox(
+                                  width: 82,
+                                  child: Image.network(
+                                    widget.images[index],
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, _, _) => const ColoredBox(
+                                      color: Color(0xFF242424),
+                                      child: Icon(
+                                        Icons.broken_image_outlined,
+                                        color: Colors.white54,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                ],
               ),
-            ),
+      ),
     );
   }
 }

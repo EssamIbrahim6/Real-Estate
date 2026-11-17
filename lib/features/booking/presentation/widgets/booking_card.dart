@@ -20,46 +20,57 @@ class BookingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final title = booking.localizedEstateTitle(langCode);
-    final dateStr = DateFormat('EEE, MMM d, yyyy').format(booking.bookingDate);
+    final dateStr = DateFormat(
+      'EEE, MMM d',
+      langCode,
+    ).format(booking.bookingDate);
 
     return Card(
       elevation: 0,
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 18),
+      clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         side: BorderSide(color: colors.outlineVariant),
       ),
       color: colors.surface,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        borderRadius: BorderRadius.circular(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: 178,
+              child: Stack(
+                fit: StackFit.expand,
                 children: [
-                  // Cover image
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: SizedBox(
-                      width: 64,
-                      height: 64,
-                      child:
-                          booking.estateCoverImage.isNotEmpty
-                              ? Image.network(
-                                booking.estateCoverImage,
-                                fit: BoxFit.cover,
-                                errorBuilder:
-                                    (_, _, _) => _placeholder(colors),
-                              )
-                              : _placeholder(colors),
+                  booking.estateCoverImage.isNotEmpty
+                      ? Image.network(
+                          booking.estateCoverImage,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) => _placeholder(colors),
+                        )
+                      : _placeholder(colors),
+                  const DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Colors.transparent, Color(0xC9000000)],
+                        stops: [0.35, 1],
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
+                  PositionedDirectional(
+                    top: 14,
+                    end: 14,
+                    child: BookingStatusBadge(status: booking.status),
+                  ),
+                  PositionedDirectional(
+                    start: 17,
+                    end: 17,
+                    bottom: 16,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -68,52 +79,90 @@ class BookingCard extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 14,
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            height: 1.2,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          booking.estateAddress,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: colors.onSurfaceVariant,
+                        if (booking.estateAddress.isNotEmpty) ...[
+                          const SizedBox(height: 5),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.location_on_outlined,
+                                size: 15,
+                                color: Colors.white70,
+                              ),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  booking.estateAddress,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
+                        ],
                       ],
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  BookingStatusBadge(status: booking.status),
                 ],
               ),
-              const SizedBox(height: 12),
-              Divider(color: colors.outlineVariant, height: 1),
-              const SizedBox(height: 10),
-              Row(
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(15, 14, 15, 16),
+              child: Column(
                 children: [
-                  Icon(Icons.calendar_today_outlined, size: 14, color: colors.onSurfaceVariant),
-                  const SizedBox(width: 6),
-                  Text(
-                    dateStr,
-                    style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _BookingMeta(
+                          icon: Icons.calendar_month_rounded,
+                          label: dateStr,
+                        ),
+                      ),
+                      const SizedBox(width: 9),
+                      Expanded(
+                        child: _BookingMeta(
+                          icon: Icons.schedule_rounded,
+                          label: booking.timeSlot,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 16),
-                  Icon(Icons.access_time_rounded, size: 14, color: colors.onSurfaceVariant),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      booking.timeSlot,
-                      style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant),
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'EGP ${booking.estatePrice.toInt()}'
+                          '${booking.estatePricePeriod == null ? '' : ' / ${booking.estatePricePeriod}'}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: colors.tertiary,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        color: colors.primary,
+                        size: 20,
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -121,9 +170,49 @@ class BookingCard extends StatelessWidget {
 
   Widget _placeholder(ColorScheme colors) {
     return Container(
-      color: colors.surfaceContainerLow,
-      child: Icon(Icons.home_outlined, color: colors.onSurfaceVariant, size: 28),
+      color: colors.surfaceContainerHigh,
+      child: Icon(
+        Icons.home_work_outlined,
+        color: colors.onSurfaceVariant,
+        size: 42,
+      ),
     );
   }
 }
 
+class _BookingMeta extends StatelessWidget {
+  const _BookingMeta({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(13),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: colors.primary),
+          const SizedBox(width: 7),
+          Expanded(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: colors.onSurface,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

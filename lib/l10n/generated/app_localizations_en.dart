@@ -94,6 +94,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeCategories => 'Categories';
 
   @override
+  String get homeHeroTitle => 'Find a place to call home';
+
+  @override
+  String get homeHeroSubtitle =>
+      'A home that fits your life is just a search away.';
+
+  @override
   String get homeSearchHint => 'Search address, city, or property...';
 
   @override
@@ -138,6 +145,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchHint => 'Search estates...';
+
+  @override
+  String get searchAiTitle => 'AI-powered search';
+
+  @override
+  String get searchAiHint =>
+      'AI search understands everyday phrases. Try “2 bedrooms near Giza”.';
+
+  @override
+  String get searchVoiceSearch => 'Voice search';
 
   @override
   String get searchFilters => 'Filters';
@@ -207,6 +224,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get listingsEmpty => 'No properties found.';
 
   @override
+  String get listingsResultsTitle => 'Homes to explore';
+
+  @override
+  String listingsResultsCount(int count) {
+    return '$count properties selected for you';
+  }
+
+  @override
   String get listingsCategoryEmpty => 'No estates found for this category.';
 
   @override
@@ -227,6 +252,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get detailsOverview => 'Overview';
+
+  @override
+  String get detailsBedroomsLabel => 'Bedrooms';
+
+  @override
+  String get detailsBathroomsLabel => 'Bathrooms';
+
+  @override
+  String get detailsAreaLabel => 'Total area';
+
+  @override
+  String get detailsInteriorLabel => 'Interior';
 
   @override
   String detailsBedrooms(int count) {
@@ -728,6 +765,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editProfileTitle => 'Edit profile';
 
   @override
+  String get editProfileIntro =>
+      'Keep your details up to date so agents can reach you.';
+
+  @override
+  String get editProfileSection => 'Personal information';
+
+  @override
   String get editProfileFullName => 'Full name';
 
   @override
@@ -790,6 +834,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get agentDetailsPublishedEstates => 'Published estates';
 
   @override
+  String get agentReviewSummary => 'Client rating';
+
+  @override
+  String get agentVerifiedLabel => 'Verified agent';
+
+  @override
+  String agentReviewCount(int count) {
+    return '$count reviews';
+  }
+
+  @override
+  String agentExperienceYears(int count) {
+    return '$count years experience';
+  }
+
+  @override
   String get searchFilterPriceError =>
       'Minimum price must not exceed maximum price.';
 
@@ -813,6 +873,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get galleryViewAll => 'View all photos';
+
+  @override
+  String get galleryEmpty => 'No photos available';
+
+  @override
+  String get galleryImageLoadError => 'This photo could not be loaded.';
 
   @override
   String get onboarding1Title => 'Welcome to Real Estate App';
@@ -923,6 +989,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get myBookingsTitle => 'My Bookings';
 
   @override
+  String get bookingHistorySummary =>
+      'Keep your property visits and requests in one place.';
+
+  @override
+  String bookingHistoryCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count visits',
+      one: '1 visit',
+      zero: 'No visits',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get myBookingsEmpty => 'No bookings yet.';
 
   @override
@@ -934,6 +1016,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bookingStatusLabel => 'Status';
+
+  @override
+  String get bookingStatusPending => 'Pending';
+
+  @override
+  String get bookingStatusConfirmed => 'Confirmed';
+
+  @override
+  String get bookingStatusCancelled => 'Cancelled';
+
+  @override
+  String get bookingStatusCompleted => 'Completed';
 
   @override
   String get bookingPropertySnapshot => 'Property';
@@ -971,7 +1065,40 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationsMarkAllRead => 'Mark all read';
 
   @override
+  String get notificationsRecentActivity => 'Recent activity';
+
+  @override
+  String notificationsUnreadSummary(int count) {
+    return '$count unread';
+  }
+
+  @override
   String get notificationsEmpty => 'No notifications yet.';
+
+  @override
+  String get notificationsEmptyDescription =>
+      'You\'re all caught up. New property updates will appear here.';
+
+  @override
+  String get notificationsJustNow => 'Just now';
+
+  @override
+  String notificationsMinutesAgo(Object count) {
+    return '${count}m ago';
+  }
+
+  @override
+  String notificationsHoursAgo(Object count) {
+    return '${count}h ago';
+  }
+
+  @override
+  String get notificationsYesterday => 'Yesterday';
+
+  @override
+  String notificationsDaysAgo(Object count) {
+    return '${count}d ago';
+  }
 
   @override
   String get profileNotificationsSubtitle => 'View your activity and updates';

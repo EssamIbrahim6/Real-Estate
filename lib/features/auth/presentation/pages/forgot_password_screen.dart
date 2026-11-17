@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:real_estate_app/core/constants/app_assets.dart';
 import 'package:real_estate_app/l10n/generated/app_localizations.dart';
 
 import '../../../../core/constants/app_colors.dart';
@@ -48,6 +49,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
 
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
@@ -61,7 +63,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         final isLoading = state is AuthLoading;
 
         return Scaffold(
-          backgroundColor: AppColors.surface,
+          backgroundColor: colors.surface,
           body: SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -75,8 +77,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                     AuthHeader(
                       title: l10n?.authForgotPassword ?? 'Forgot Password',
-                      subtitle: l10n?.authForgotPasswordSubtitle ??
-                          'Enter your registered email address and we will send you a link to reset your password.',
+                      subtitle: l10n?.authForgotPasswordSubtitle ?? 'Enter your registered email address and we will send you a link to reset your password.',
+                      imageAsset: AppAssets.welcomeAuth4,
                     ),
                     verticalSpace(28),
 
@@ -84,26 +86,23 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppColors.success.withValues(alpha: 0.1),
+                          color: colors.tertiaryContainer.withValues(
+                            alpha: 0.35,
+                          ),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: AppColors.success.withValues(alpha: 0.3),
+                            color: colors.tertiary.withValues(alpha: 0.35),
                           ),
                         ),
                         child: Row(
                           children: [
-                            const Icon(
-                              Icons.check_circle_outline,
-                              color: AppColors.success,
-                              size: 24,
-                            ),
+                            const Icon(Icons.check_circle_outline, size: 24),
                             horizontalSpace(12),
                             Expanded(
                               child: Text(
-                                l10n?.authPasswordResetSent ??
-                                    'Password reset link sent! Check your inbox and spam folder.',
-                                style: const TextStyle(
-                                  color: AppColors.brandNavy,
+                                l10n?.authPasswordResetSent ?? 'Password reset link sent! Check your inbox and spam folder.',
+                                style: TextStyle(
+                                  color: colors.onSurface,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -132,6 +131,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         onPressed: isLoading ? null : _onSendResetPressed,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.brandGreen,
+                          foregroundColor: Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -150,7 +150,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 _emailSent
                                     ? (l10n?.authResendLink ?? 'Resend Link')
                                     : (l10n?.authSendResetLink ??
-                                        'Send Reset Link'),
+                                          'Send Reset Link'),
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,

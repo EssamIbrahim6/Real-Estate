@@ -94,6 +94,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get homeCategories => 'الفئات';
 
   @override
+  String get homeHeroTitle => 'اعثر على منزل تنتمي إليه';
+
+  @override
+  String get homeHeroSubtitle => 'المنزل المناسب لحياتك أقرب مما تتخيل.';
+
+  @override
   String get homeSearchHint => 'ابحث بالشارع، المدينة، أو العقار…';
 
   @override
@@ -138,6 +144,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get searchHint => 'ابحث عن عقارات…';
+
+  @override
+  String get searchAiTitle => 'بحث مدعوم بالذكاء الاصطناعي';
+
+  @override
+  String get searchAiHint =>
+      'يفهم البحث الذكي وصفك اليومي. جرّب: شقة بغرفتي نوم قرب الجيزة.';
+
+  @override
+  String get searchVoiceSearch => 'البحث الصوتي';
 
   @override
   String get searchFilters => 'التصفية';
@@ -206,6 +222,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get listingsEmpty => 'لم يتم العثور على أي عقارات.';
 
   @override
+  String get listingsResultsTitle => 'عقارات لاستكشافها';
+
+  @override
+  String listingsResultsCount(int count) {
+    return '$count عقارًا مختارًا لك';
+  }
+
+  @override
   String get listingsCategoryEmpty => 'لا توجد عقارات لهذه الفئة.';
 
   @override
@@ -226,6 +250,18 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get detailsOverview => 'نظرة عامة';
+
+  @override
+  String get detailsBedroomsLabel => 'غرف النوم';
+
+  @override
+  String get detailsBathroomsLabel => 'الحمامات';
+
+  @override
+  String get detailsAreaLabel => 'المساحة الإجمالية';
+
+  @override
+  String get detailsInteriorLabel => 'التأثيث';
 
   @override
   String detailsBedrooms(int count) {
@@ -723,6 +759,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get editProfileTitle => 'تعديل الملف الشخصي';
 
   @override
+  String get editProfileIntro => 'حدّث بياناتك ليتمكن الوسطاء من التواصل معك.';
+
+  @override
+  String get editProfileSection => 'المعلومات الشخصية';
+
+  @override
   String get editProfileFullName => 'الاسم بالكامل';
 
   @override
@@ -785,6 +827,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get agentDetailsPublishedEstates => 'العقارات المنشورة';
 
   @override
+  String get agentReviewSummary => 'تقييم العملاء';
+
+  @override
+  String get agentVerifiedLabel => 'وكيل موثّق';
+
+  @override
+  String agentReviewCount(int count) {
+    return '$count تقييم';
+  }
+
+  @override
+  String agentExperienceYears(int count) {
+    return 'خبرة $count سنوات';
+  }
+
+  @override
   String get searchFilterPriceError =>
       'يجب ألا يتجاوز الحد الأدنى للسعر الحد الأقصى.';
 
@@ -808,6 +866,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get galleryViewAll => 'عرض جميع الصور';
+
+  @override
+  String get galleryEmpty => 'لا توجد صور متاحة';
+
+  @override
+  String get galleryImageLoadError => 'تعذر تحميل هذه الصورة.';
 
   @override
   String get onboarding1Title => 'مرحباً بك في تطبيق العقارات';
@@ -917,6 +981,23 @@ class AppLocalizationsAr extends AppLocalizations {
   String get myBookingsTitle => 'حجوزاتي';
 
   @override
+  String get bookingHistorySummary =>
+      'تابع مواعيد زيارات العقارات وطلباتك في مكان واحد.';
+
+  @override
+  String bookingHistoryCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count زيارة',
+      two: 'زيارتان',
+      one: 'زيارة واحدة',
+      zero: 'لا توجد زيارات',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get myBookingsEmpty => 'لا توجد حجوزات حتى الآن.';
 
   @override
@@ -927,6 +1008,18 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get bookingStatusLabel => 'الحالة';
+
+  @override
+  String get bookingStatusPending => 'قيد الانتظار';
+
+  @override
+  String get bookingStatusConfirmed => 'مؤكد';
+
+  @override
+  String get bookingStatusCancelled => 'ملغي';
+
+  @override
+  String get bookingStatusCompleted => 'مكتمل';
 
   @override
   String get bookingPropertySnapshot => 'العقار';
@@ -963,7 +1056,40 @@ class AppLocalizationsAr extends AppLocalizations {
   String get notificationsMarkAllRead => 'تحديد الكل كمقروء';
 
   @override
+  String get notificationsRecentActivity => 'أحدث الإشعارات';
+
+  @override
+  String notificationsUnreadSummary(int count) {
+    return 'غير مقروء: $count';
+  }
+
+  @override
   String get notificationsEmpty => 'لا توجد إشعارات حتى الآن.';
+
+  @override
+  String get notificationsEmptyDescription =>
+      'أنت على اطلاع بكل جديد. ستظهر تحديثات العقارات هنا.';
+
+  @override
+  String get notificationsJustNow => 'الآن';
+
+  @override
+  String notificationsMinutesAgo(Object count) {
+    return 'منذ $count د';
+  }
+
+  @override
+  String notificationsHoursAgo(Object count) {
+    return 'منذ $count س';
+  }
+
+  @override
+  String get notificationsYesterday => 'أمس';
+
+  @override
+  String notificationsDaysAgo(Object count) {
+    return 'منذ $count يوم';
+  }
 
   @override
   String get profileNotificationsSubtitle => 'عرض نشاطك والتحديثات';

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:real_estate_app/l10n/generated/app_localizations.dart';
 
+import '../../../../core/constants/app_dimensions.dart';
+
 class SocialAuthButton extends StatelessWidget {
   final String label;
   final Widget icon;
@@ -18,14 +20,14 @@ class SocialAuthButton extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return Expanded(
       child: SizedBox(
-        height: 52,
+        height: AppDimensions.buttonHeightMd,
         child: OutlinedButton(
           onPressed: onTap,
           style: OutlinedButton.styleFrom(
-            backgroundColor: colors.surface,
+            backgroundColor: colors.surfaceContainerLowest,
             side: BorderSide(color: colors.outlineVariant, width: 1),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppDimensions.r16),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 12),
           ),
@@ -33,7 +35,7 @@ class SocialAuthButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               icon,
-              const SizedBox(width: 8),
+              const SizedBox(width: AppDimensions.p8),
               Flexible(
                 child: Text(
                   label,

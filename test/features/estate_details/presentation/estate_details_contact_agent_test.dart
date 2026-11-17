@@ -363,7 +363,7 @@ void main() {
                         ),
                       ),
                       Positioned(
-                        top: 90,
+                        bottom: 90,
                         right: 12,
                         child: TextButton(
                           onPressed: () => context.go('/property'),

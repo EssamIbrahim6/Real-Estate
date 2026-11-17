@@ -69,7 +69,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
         final localImagePath = state.data.localImagePath;
 
         return Scaffold(
-          backgroundColor: AppColors.surface,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           body: SafeArea(
             child: Column(
               children: [

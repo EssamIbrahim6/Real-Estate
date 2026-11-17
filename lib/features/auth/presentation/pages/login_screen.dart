@@ -80,8 +80,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     AuthHeader(
                       title: l10n?.authLoginTitle ?? "Let's Sign In",
-                      subtitle: l10n?.authLoginSubtitle ??
+                      subtitle:
+                          l10n?.authLoginSubtitle ??
                           "Welcome back! Sign in to continue.",
+                      imageAsset: AppAssets.welcomeAuth2,
                     ),
                     verticalSpace(28),
 

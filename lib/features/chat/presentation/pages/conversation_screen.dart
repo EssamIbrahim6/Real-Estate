@@ -1,9 +1,8 @@
-﻿import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/router/route_names.dart';
 import '../../../../core/widgets/app_error_view.dart';
@@ -153,19 +152,34 @@ class _ConversationScreenState extends State<ConversationScreen> {
       child: Scaffold(
         appBar: AppBar(
           leading: BackButton(onPressed: () => context.pop()),
-          title: Text(
-            widget.title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          title: Row(
+            children: [
+              CircleAvatar(
+                radius: 17,
+                backgroundColor: Theme.of(context).colorScheme.primary
+                    .withValues(alpha: 0.1),
+                child: Icon(
+                  Icons.support_agent_rounded,
+                  size: 20,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Text(
+                  widget.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
           ),
         ),
-            body: Column(
-              children: [
-                if (_estateLoading)
-                  const LinearProgressIndicator(),
-                if (_estate != null)
-                  _EstateMentionHeader(estate: _estate!),
-                Expanded(
+        body: Column(
+          children: [
+            if (_estateLoading) const LinearProgressIndicator(),
+            if (_estate != null) _EstateMentionHeader(estate: _estate!),
+            Expanded(
               child: BlocBuilder<ChatCubit, ChatState>(
                 builder: (context, state) {
                   switch (state.messagesStatus) {
@@ -180,19 +194,17 @@ class _ConversationScreenState extends State<ConversationScreen> {
                         ),
                       );
                     case ChatLoadStatus.empty:
-                      return Center(
-                        child: Text(
-                          l10n?.chatNoMessages ??
-                              'No messages yet. Start the conversation.',
-                        ),
+                      return _NoMessagesState(
+                        message:
+                            l10n?.chatNoMessages ??
+                            'No messages yet. Start the conversation.',
                       );
                     case ChatLoadStatus.success:
                       if (state.messages.isEmpty) {
-                        return Center(
-                          child: Text(
-                            l10n?.chatNoMessages ??
-                                'No messages yet. Start the conversation.',
-                          ),
+                        return _NoMessagesState(
+                          message:
+                              l10n?.chatNoMessages ??
+                              'No messages yet. Start the conversation.',
                         );
                       }
                       return ListView.builder(
@@ -222,6 +234,47 @@ class _ConversationScreenState extends State<ConversationScreen> {
   }
 }
 
+class _NoMessagesState extends StatelessWidget {
+  const _NoMessagesState({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 76,
+              height: 76,
+              decoration: BoxDecoration(
+                color: colors.primary.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.forum_outlined,
+                size: 34,
+                color: colors.primary,
+              ),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyLarge
+                  ?.copyWith(color: colors.onSurfaceVariant, height: 1.45),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _MessageBubble extends StatelessWidget {
   const _MessageBubble({required this.message, required this.isMine});
 
@@ -232,9 +285,9 @@ class _MessageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final bubbleColor = isMine
-        ? AppColors.primary
-        : colorScheme.surfaceContainerHighest;
-    final textColor = isMine ? Colors.white : colorScheme.onSurface;
+        ? colorScheme.primary
+        : colorScheme.surfaceContainerHigh;
+    final textColor = isMine ? colorScheme.onPrimary : colorScheme.onSurface;
 
     return Semantics(
       label: isMine ? 'sent message' : 'received message',
@@ -250,6 +303,14 @@ class _MessageBubble extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
               color: bubbleColor,
+              boxShadow: [
+                if (isMine)
+                  BoxShadow(
+                    color: colorScheme.shadow.withValues(alpha: 0.08),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+              ],
               borderRadius: BorderRadius.only(
                 topLeft: const Radius.circular(18),
                 topRight: const Radius.circular(18),
@@ -300,67 +361,75 @@ class _MessageComposer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
     return SafeArea(
       top: false,
-      child: Material(
-        color: Theme.of(context).colorScheme.surface,
-        elevation: 4,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(
-                child: TextField(
-                  key: const ValueKey<String>('message-composer'),
-                  controller: controller,
-                  enabled: enabled,
-                  minLines: 1,
-                  maxLines: 4,
-                  textCapitalization: TextCapitalization.sentences,
-                  textAlign: TextAlign.start,
-                  decoration: InputDecoration(
-                    hintText: enabled
-                        ? (l10n?.chatMessageHint ?? 'Write a message...')
-                        : (l10n?.chatSignInToSend ??
-                            'Sign in to send a message'),
-                    filled: true,
-                    fillColor: AppColors.inputBackground,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(24),
-                      borderSide: BorderSide.none,
-                    ),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+        decoration: BoxDecoration(
+          color: colors.surface,
+          border: Border(top: BorderSide(color: colors.outlineVariant)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Expanded(
+              child: TextField(
+                key: const ValueKey<String>('message-composer'),
+                controller: controller,
+                enabled: enabled,
+                minLines: 1,
+                maxLines: 4,
+                textCapitalization: TextCapitalization.sentences,
+                textAlign: TextAlign.start,
+                decoration: InputDecoration(
+                  hintText: enabled
+                      ? (l10n?.chatMessageHint ?? 'Write a message...')
+                      : (l10n?.chatSignInToSend ?? 'Sign in to send a message'),
+                  filled: true,
+                  fillColor: colors.surfaceContainerLow,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 14,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(26),
+                    borderSide: BorderSide(color: colors.outlineVariant),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(26),
+                    borderSide: BorderSide(color: colors.outlineVariant),
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
-              BlocBuilder<ChatCubit, ChatState>(
-                buildWhen: (previous, current) =>
-                    previous.isSending != current.isSending,
-                builder: (context, state) => IconButton.filled(
-                  key: const ValueKey<String>('send-message'),
-                  onPressed: enabled && !state.isSending
-                      ? () => onSend()
-                      : null,
-                  icon: state.isSending
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Icon(Icons.send),
-                  tooltip: l10n?.chatSendTooltip ?? 'Send message',
+            ),
+            const SizedBox(width: 9),
+            BlocBuilder<ChatCubit, ChatState>(
+              buildWhen: (previous, current) =>
+                  previous.isSending != current.isSending,
+              builder: (context, state) => IconButton.filled(
+                key: const ValueKey<String>('send-message'),
+                style: IconButton.styleFrom(
+                  backgroundColor: colors.primary,
+                  foregroundColor: colors.onPrimary,
+                  disabledBackgroundColor: colors.surfaceContainerHigh,
+                  disabledForegroundColor: colors.onSurfaceVariant,
                 ),
+                onPressed: enabled && !state.isSending ? () => onSend() : null,
+                icon: state.isSending
+                    ? SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: colors.onPrimary,
+                        ),
+                      )
+                    : const Icon(Icons.send_rounded),
+                tooltip: l10n?.chatSendTooltip ?? 'Send message',
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -384,25 +453,25 @@ class _EstateMentionHeader extends StatelessWidget {
         extra: estate,
       ),
       child: Container(
-        margin: const EdgeInsets.all(8),
-        padding: const EdgeInsets.all(12),
+        margin: const EdgeInsets.fromLTRB(16, 8, 16, 10),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: colors.surfaceContainerLow,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(color: colors.outlineVariant),
         ),
         child: Row(
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(13),
               child: Image.network(
                 estate.coverImage,
-                width: 56,
-                height: 56,
+                width: 66,
+                height: 66,
                 fit: BoxFit.cover,
                 errorBuilder: (_, _, _) => Container(
-                  width: 56,
-                  height: 56,
+                  width: 66,
+                  height: 66,
                   color: colors.surfaceContainerHighest,
                   child: const Icon(Icons.home_work_outlined),
                 ),
@@ -448,6 +517,7 @@ class _EstateMentionHeader extends StatelessWidget {
     );
   }
 }
+
 String _safeError(String? message) {
   if (message == null ||
       message.toLowerCase().contains('firebase') ||

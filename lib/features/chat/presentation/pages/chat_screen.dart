@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/router/route_names.dart';
+import '../../../../core/widgets/app_empty_state.dart';
 import '../../../../core/widgets/app_error_view.dart';
 import '../../../../core/widgets/app_skeleton.dart';
 import '../../../../l10n/generated/app_localizations.dart';
@@ -50,17 +50,28 @@ class _ChatScreenState extends State<ChatScreen> {
                     return const ChatListSkeleton();
                   case ChatLoadStatus.failure:
                     return AppErrorView(
-                      message: l10n?.commonError ??
+                      message:
+                          l10n?.commonError ??
                           'Could not load conversations. Please try again.',
                       onRetry: () => context
                           .read<ChatCubit>()
                           .watchConversations(_currentUserUid),
                     );
                   case ChatLoadStatus.empty:
-                    return const _EmptyConversations();
+                    return AppEmptyState(
+                      icon: Icons.chat_bubble_outline_rounded,
+                      title: l10n?.chatEmptyTitle ?? 'No conversations yet',
+                      description:
+                          l10n?.chatEmptyMessage ??
+                          'Start a conversation with an agent from a property.',
+                    );
                   case ChatLoadStatus.success:
                     if (state.conversations.isEmpty) {
-                      return const _EmptyConversations();
+                      return AppEmptyState(
+                        icon: Icons.chat_bubble_outline_rounded,
+                        title: l10n?.chatEmptyTitle ?? 'No conversations yet',
+                        description: l10n?.chatEmptyMessage ?? 'Start a conversation with an agent from a property.',
+                      );
                     }
                     return ListView.separated(
                       padding: const EdgeInsets.symmetric(
@@ -86,67 +97,13 @@ class _ChatScreenState extends State<ChatScreen> {
                                     conversation.lastMessageAt!.isAfter(
                                       readAt,
                                     )));
+                        final colors = Theme.of(context).colorScheme;
 
-                        return Card(
-                          margin: EdgeInsets.zero,
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 6,
-                            ),
-                            leading: CircleAvatar(
-                              backgroundColor: AppColors.primary.withAlpha(26),
-                              child: Icon(
-                                currentUserIsCustomer
-                                    ? Icons.support_agent
-                                    : Icons.person_outline,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            title: Text(
-                              participantName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontWeight: isUnread
-                                    ? FontWeight.w700
-                                    : FontWeight.w500,
-                              ),
-                            ),
-                            subtitle: Text(
-                              conversation.lastMessage ??
-                                  l10n?.chatInquiry ??
-                                  'Property inquiry',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: isUnread
-                                    ? Theme.of(context).colorScheme.onSurface
-                                    : Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
-                              ),
-                            ),
-                            trailing: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  _formatConversationTime(
-                                    conversation.lastMessageAt,
-                                    context,
-                                  ),
-                                  style: Theme.of(context).textTheme.labelSmall,
-                                ),
-                                if (isUnread) ...[
-                                  const SizedBox(height: 6),
-                                  const CircleAvatar(
-                                    radius: 5,
-                                    backgroundColor: AppColors.secondary,
-                                  ),
-                                ],
-                              ],
-                            ),
+                        return Material(
+                          color: colors.surface,
+                          borderRadius: BorderRadius.circular(22),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(22),
                             onTap: () => context.pushNamed(
                               AppRoutes.chatConversationName,
                               pathParameters: {
@@ -159,6 +116,136 @@ class _ChatScreenState extends State<ChatScreen> {
                                   'estateId': conversation.estateId,
                               },
                             ),
+                            child: Container(
+                              padding: const EdgeInsets.all(14),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(22),
+                                border: Border.all(
+                                  color: isUnread
+                                      ? colors.primary.withValues(alpha: 0.4)
+                                      : colors.outlineVariant,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 27,
+                                        backgroundColor: colors.primary
+                                            .withValues(alpha: 0.1),
+                                        child: Icon(
+                                          currentUserIsCustomer
+                                              ? Icons.support_agent_rounded
+                                              : Icons.person_outline_rounded,
+                                          color: colors.primary,
+                                          size: 25,
+                                        ),
+                                      ),
+                                      if (isUnread)
+                                        PositionedDirectional(
+                                          end: -1,
+                                          top: -1,
+                                          child: Container(
+                                            width: 13,
+                                            height: 13,
+                                            decoration: BoxDecoration(
+                                              color: colors.tertiary,
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                color: colors.surface,
+                                                width: 2,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  const SizedBox(width: 13),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                participantName,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .titleSmall
+                                                    ?.copyWith(
+                                                      fontWeight: isUnread
+                                                          ? FontWeight.w800
+                                                          : FontWeight.w600,
+                                                    ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              _formatConversationTime(
+                                                conversation.lastMessageAt,
+                                                context,
+                                              ),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .labelSmall
+                                                  ?.copyWith(
+                                                    color: isUnread
+                                                        ? colors.primary
+                                                        : colors
+                                                              .onSurfaceVariant,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Row(
+                                          children: [
+                                            if (conversation.estateId != null &&
+                                                conversation
+                                                    .estateId!
+                                                    .isNotEmpty) ...[
+                                              Icon(
+                                                Icons.home_work_outlined,
+                                                size: 15,
+                                                color: colors.onSurfaceVariant,
+                                              ),
+                                              const SizedBox(width: 6),
+                                            ],
+                                            Expanded(
+                                              child: Text(
+                                                conversation.lastMessage ??
+                                                    l10n?.chatInquiry ??
+                                                    'Property inquiry',
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.copyWith(
+                                                      color: isUnread
+                                                          ? colors.onSurface
+                                                          : colors
+                                                                .onSurfaceVariant,
+                                                      fontWeight: isUnread
+                                                          ? FontWeight.w600
+                                                          : FontWeight.w400,
+                                                    ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         );
                       },
@@ -166,44 +253,6 @@ class _ChatScreenState extends State<ChatScreen> {
                 }
               },
             ),
-    );
-  }
-}
-
-class _EmptyConversations extends StatelessWidget {
-  const _EmptyConversations();
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.chat_bubble_outline,
-              size: 48,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              l10n?.chatEmptyTitle ?? 'No conversations yet',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              l10n?.chatEmptyMessage ??
-                  'Start a conversation with an agent from a property.',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

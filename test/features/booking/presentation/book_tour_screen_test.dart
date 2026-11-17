@@ -151,6 +151,8 @@ void main() {
     expect(find.text('Palm Hills Villa'), findsOneWidget);
     expect(find.text('Sara Mostafa'), findsOneWidget);
     expect(find.text('sara@example.com'), findsOneWidget);
+    await tester.drag(find.byType(ListView), const Offset(0, -500));
+    await tester.pumpAndSettle();
     expect(find.text('+201098765432'), findsOneWidget);
     expect(find.text('Confirm Booking'), findsOneWidget);
   });

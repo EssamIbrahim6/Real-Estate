@@ -31,6 +31,8 @@
 
   "homeGreeting": "ابحث عن منزل أحلامك",
   "homeCategories": "الفئات",
+  "homeHeroTitle": "اعثر على منزل تنتمي إليه",
+  "homeHeroSubtitle": "المنزل المناسب لحياتك أقرب مما تتخيل.",
   "homeSearchHint": "ابحث بالشارع، المدينة، أو العقار…",
   "homeFeaturedEstates": "عقارات مميزة",
   "homeExploreNearby": "استكشف العقارات القريبة",
@@ -47,6 +49,9 @@
 
   "searchTitle": "البحث عن عقار",
   "searchHint": "ابحث عن عقارات…",
+  "searchAiTitle": "بحث مدعوم بالذكاء الاصطناعي",
+  "searchAiHint": "يفهم البحث الذكي وصفك اليومي. جرّب: شقة بغرفتي نوم قرب الجيزة.",
+  "searchVoiceSearch": "البحث الصوتي",
   "searchFilters": "التصفية",
   "searchApplyFilters": "تطبيق الفلاتر",
   "searchClearFilters": "مسح الفلاتر",
@@ -70,6 +75,15 @@
   "listingsCategoryTitle": "عقارات الفئة",
   "listingsNearbyTitle": "العقارات القريبة",
   "listingsEmpty": "لم يتم العثور على أي عقارات.",
+  "listingsResultsTitle": "عقارات لاستكشافها",
+  "listingsResultsCount": "{count} عقارًا مختارًا لك",
+  "@listingsResultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "listingsCategoryEmpty": "لا توجد عقارات لهذه الفئة.",
   "listingsLoading": "جاري تحميل العقارات…",
 
@@ -77,6 +91,10 @@
   "detailsPricePer": "{price} ج.م / {period}",
   "detailsPriceTotal": "{price} ج.م",
   "detailsOverview": "نظرة عامة",
+  "detailsBedroomsLabel": "غرف النوم",
+  "detailsBathroomsLabel": "الحمامات",
+  "detailsAreaLabel": "المساحة الإجمالية",
+  "detailsInteriorLabel": "التأثيث",
   "detailsBedrooms": "{count} غرف",
   "detailsBathrooms": "{count} حمامات",
   "detailsArea": "{count} م²",
@@ -243,6 +261,8 @@
   "authOtpResendIn": "إعادة إرسال الرمز خلال",
 
   "editProfileTitle": "تعديل الملف الشخصي",
+  "editProfileIntro": "حدّث بياناتك ليتمكن الوسطاء من التواصل معك.",
+  "editProfileSection": "المعلومات الشخصية",
   "editProfileFullName": "الاسم بالكامل",
   "editProfileEmail": "البريد الإلكتروني",
   "editProfileEmailHelper": "تغيير البريد الإلكتروني يتطلب التحقق من الحساب وغير متاح هنا.",
@@ -265,6 +285,24 @@
   "agentDetailsEmail": "البريد الإلكتروني",
   "agentDetailsBio": "نبذة",
   "agentDetailsPublishedEstates": "العقارات المنشورة",
+  "agentReviewSummary": "تقييم العملاء",
+  "agentVerifiedLabel": "وكيل موثّق",
+  "agentReviewCount": "{count} تقييم",
+  "@agentReviewCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "agentExperienceYears": "خبرة {count} سنوات",
+  "@agentExperienceYears": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
 
   "searchFilterPriceError": "يجب ألا يتجاوز الحد الأدنى للسعر الحد الأقصى.",
   "searchFilterInvalidPrice": "أدخل سعراً صحيحاً",
@@ -276,6 +314,8 @@
   "chatSendTooltip": "إرسال رسالة",
 
   "galleryViewAll": "عرض جميع الصور",
+  "galleryEmpty": "لا توجد صور متاحة",
+  "galleryImageLoadError": "تعذر تحميل هذه الصورة.",
 
   "onboarding1Title": "مرحباً بك في تطبيق العقارات",
   "onboarding1Subtitle": "اكتشف منزل أحلامك بكل سهولة",
@@ -316,10 +356,23 @@
   "bookingNotesHint": "أي طلبات خاصة أو أسئلة للوكيل...",
   "bookingSubmit": "تأكيد الحجز",
   "myBookingsTitle": "حجوزاتي",
+  "bookingHistorySummary": "تابع مواعيد زيارات العقارات وطلباتك في مكان واحد.",
+  "bookingHistoryCount": "{count, plural, =0{لا توجد زيارات} =1{زيارة واحدة} =2{زيارتان} other{{count} زيارة}}",
+  "@bookingHistoryCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "myBookingsEmpty": "لا توجد حجوزات حتى الآن.",
   "myBookingsSubtitle": "احجز موعداً لمعاينة أي عقار للبدء.",
   "bookingDetailsTitle": "تفاصيل الحجز",
   "bookingStatusLabel": "الحالة",
+  "bookingStatusPending": "قيد الانتظار",
+  "bookingStatusConfirmed": "مؤكد",
+  "bookingStatusCancelled": "ملغي",
+  "bookingStatusCompleted": "مكتمل",
   "bookingPropertySnapshot": "العقار",
   "bookingCancelTitle": "إلغاء الحجز؟",
   "bookingCancelConfirm": "هل أنت متأكد من رغبتك في إلغاء هذا الحجز؟ لا يمكن التراجع عن هذا الإجراء.",
@@ -331,6 +384,21 @@
   "profileMyBookingsSubtitle": "عرض وإدارة مواعيد معاينة العقارات",
   "notificationsTitle": "الإشعارات",
   "notificationsMarkAllRead": "تحديد الكل كمقروء",
+  "notificationsRecentActivity": "أحدث الإشعارات",
+  "notificationsUnreadSummary": "غير مقروء: {count}",
+  "@notificationsUnreadSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "notificationsEmpty": "لا توجد إشعارات حتى الآن.",
+  "notificationsEmptyDescription": "أنت على اطلاع بكل جديد. ستظهر تحديثات العقارات هنا.",
+  "notificationsJustNow": "الآن",
+  "notificationsMinutesAgo": "منذ {count} د",
+  "notificationsHoursAgo": "منذ {count} س",
+  "notificationsYesterday": "أمس",
+  "notificationsDaysAgo": "منذ {count} يوم",
   "profileNotificationsSubtitle": "عرض نشاطك والتحديثات"
 }

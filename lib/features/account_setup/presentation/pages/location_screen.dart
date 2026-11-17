@@ -173,7 +173,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                 right: 12,
                                 bottom: 12,
                                 child: FloatingActionButton.small(
-                                  backgroundColor: AppColors.surface,
+          backgroundColor: Theme.of(context).colorScheme.surface,
                                   onPressed: isLocating
                                       ? null
                                       : () => context

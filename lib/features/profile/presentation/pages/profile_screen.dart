@@ -1,9 +1,12 @@
 import '../../../notifications/presentation/widgets/notification_badge.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/route_names.dart';
+import '../../../../core/widgets/app_empty_state.dart';
+import '../../../../core/widgets/app_error_view.dart';
 import '../../../../core/widgets/app_feedback.dart';
 import '../../../../core/widgets/app_skeleton.dart';
 import '../../../../core/widgets/person_avatar.dart';
@@ -74,7 +77,8 @@ class ProfileScreen extends StatelessWidget {
             }
             if (state.status == ProfileStatus.error) {
               return _ProfileLoadError(
-                message: state.error ??
+                message:
+                    state.error ??
                     l10n?.profileLoadError ??
                     'Your profile could not be loaded.',
                 onRetry: context.read<ProfileCubit>().loadProfile,
@@ -112,7 +116,8 @@ class ProfileScreen extends StatelessWidget {
                       ProfileActionTile(
                         icon: Icons.person_outline_rounded,
                         title: l10n?.profileEditTitle ?? 'Edit profile',
-                        subtitle: l10n?.profileEditSubtitle ??
+                        subtitle:
+                            l10n?.profileEditSubtitle ??
                             'Update your name, phone, and photo',
                         onTap: () async {
                           final updated = await context.pushNamed<bool>(
@@ -126,41 +131,49 @@ class ProfileScreen extends StatelessWidget {
                       ProfileActionTile(
                         icon: Icons.favorite_border_rounded,
                         title: l10n?.favoritesTitle ?? 'Favorites',
-                        subtitle: l10n?.profileFavoritesSubtitle ??
+                        subtitle:
+                            l10n?.profileFavoritesSubtitle ??
                             'Properties you have saved',
                         onTap: () => context.push(AppRoutes.favorites),
                       ),
                       ProfileActionTile(
                         icon: Icons.chat_bubble_outline_rounded,
                         title: l10n?.navChat ?? 'Messages',
-                        subtitle: l10n?.profileMessagesSubtitle ??
+                        subtitle:
+                            l10n?.profileMessagesSubtitle ??
                             'Continue your conversations',
                         onTap: () => context.go(AppRoutes.chat),
                       ),
                       ProfileActionTile(
                         icon: Icons.calendar_month_outlined,
                         title: l10n?.myBookingsTitle ?? 'My Bookings',
-                        subtitle: l10n?.profileMyBookingsSubtitle ??
+                        subtitle:
+                            l10n?.profileMyBookingsSubtitle ??
                             'View and manage your tour requests',
                         onTap: () => context.push(AppRoutes.myBookings),
                       ),
                       ProfileActionTile(
                         icon: Icons.notifications_none_rounded,
                         title: l10n?.notificationsTitle ?? 'Notifications',
-                        subtitle: l10n?.profileNotificationsSubtitle ?? 'View your activity and updates',
-                        onTap: () => context.pushNamed(AppRoutes.notificationsName),
+                        subtitle:
+                            l10n?.profileNotificationsSubtitle ??
+                            'View your activity and updates',
+                        onTap: () =>
+                            context.pushNamed(AppRoutes.notificationsName),
                       ),
                     ],
                   ),
                   const SizedBox(height: 24),
                   ProfileSection(
-                    title: l10n?.profileSectionPreferences ??
+                    title:
+                        l10n?.profileSectionPreferences ??
                         'PREFERENCES & SUPPORT',
                     children: [
                       ProfileActionTile(
                         icon: Icons.settings_outlined,
                         title: l10n?.profileSettingsTitle ?? 'Settings',
-                        subtitle: l10n?.profileSettingsSubtitle ??
+                        subtitle:
+                            l10n?.profileSettingsSubtitle ??
                             'Account security and app preferences',
                         onTap: () =>
                             context.pushNamed('settings', extra: state.email),
@@ -168,7 +181,8 @@ class ProfileScreen extends StatelessWidget {
                       ProfileActionTile(
                         icon: Icons.help_outline_rounded,
                         title: l10n?.profileHelpTitle ?? 'Help & support',
-                        subtitle: l10n?.profileHelpSubtitle ??
+                        subtitle:
+                            l10n?.profileHelpSubtitle ??
                             'Browse frequently asked questions',
                         onTap: () => context.push(AppRoutes.faqSupport),
                       ),
@@ -181,7 +195,8 @@ class ProfileScreen extends StatelessWidget {
                       ProfileActionTile(
                         icon: Icons.logout_rounded,
                         title: l10n?.profileSignOutTitle ?? 'Sign out',
-                        subtitle: l10n?.profileSignOutSubtitle ??
+                        subtitle:
+                            l10n?.profileSignOutSubtitle ??
                             'Sign out of this account on this device',
                         destructive: true,
                         onTap: () => confirmSignOut(context),
@@ -220,9 +235,19 @@ class _ProfileHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: colors.outlineVariant),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [colors.primary, colors.primary.withValues(alpha: 0.84)],
+        ),
+        borderRadius: BorderRadius.circular(26),
+        boxShadow: [
+          BoxShadow(
+            color: colors.primary.withValues(alpha: 0.18),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -230,10 +255,10 @@ class _ProfileHeader extends StatelessWidget {
             children: [
               PersonAvatar(
                 photoUrl: photoUrl,
-                radius: 34,
+                radius: 36,
                 iconSize: 32,
-                backgroundColor: colors.primary.withValues(alpha: 0.08),
-                iconColor: colors.primary,
+                backgroundColor: colors.onPrimary.withValues(alpha: 0.16),
+                iconColor: colors.onPrimary,
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -247,8 +272,9 @@ class _ProfileHeader extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.3,
+                        color: colors.onPrimary,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.5,
                       ),
                     ),
                     if (email.isNotEmpty) ...[
@@ -258,7 +284,7 @@ class _ProfileHeader extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: colors.onSurface.withValues(alpha: 0.62),
+                          color: colors.onPrimary.withValues(alpha: 0.78),
                         ),
                       ),
                     ],
@@ -270,35 +296,56 @@ class _ProfileHeader extends StatelessWidget {
           const SizedBox(height: 18),
           Row(
             children: [
-              Icon(
-                isEmailVerified ? Icons.verified_rounded : Icons.info_outline,
-                size: 16,
-                color: isEmailVerified
-                    ? colors.primary
-                    : colors.onSurface.withValues(alpha: 0.55),
-              ),
-              const SizedBox(width: 7),
               Expanded(
-                child: Text(
-                  isEmailVerified
-                      ? (l10n?.profileEmailVerified ?? 'Email verified')
-                      : (l10n?.profileEmailNotVerified ?? 'Email not verified'),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colors.onSurface.withValues(alpha: 0.65),
-                    fontWeight: FontWeight.w500,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 9,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colors.onPrimary.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        isEmailVerified
+                            ? Icons.verified_rounded
+                            : Icons.info_outline_rounded,
+                        size: 16,
+                        color: colors.onPrimary,
+                      ),
+                      const SizedBox(width: 7),
+                      Expanded(
+                        child: Text(
+                          isEmailVerified
+                              ? (l10n?.profileEmailVerified ?? 'Email verified')
+                              : (l10n?.profileEmailNotVerified ??
+                                    'Email not verified'),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: colors.onPrimary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              OutlinedButton.icon(
+              const SizedBox(width: 10),
+              FilledButton.icon(
                 onPressed: onEdit,
                 icon: const Icon(Icons.edit_outlined, size: 16),
                 label: Text(l10n?.profileEditTitle ?? 'Edit profile'),
-                style: OutlinedButton.styleFrom(
+                style: FilledButton.styleFrom(
+                  backgroundColor: colors.onPrimary,
+                  foregroundColor: colors.primary,
                   minimumSize: const Size(0, 40),
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   visualDensity: VisualDensity.compact,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(14),
                   ),
                 ),
               ),
@@ -341,32 +388,14 @@ class _SignedOutView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.person_outline_rounded, size: 48),
-            const SizedBox(height: 16),
-            Text(
-              l10n?.profileSignInPrompt ?? 'Sign in to view your profile',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              l10n?.profileSignInSubtitle ??
-                  'Your saved properties and account details will be here.',
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
-            FilledButton(
-              onPressed: onSignIn,
-              child: Text(l10n?.authSignIn ?? 'Sign in'),
-            ),
-          ],
-        ),
-      ),
+    return AppEmptyState(
+      icon: Icons.person_outline_rounded,
+      title: l10n?.profileSignInPrompt ?? 'Sign in to view your profile',
+      description:
+          l10n?.profileSignInSubtitle ??
+          'Your saved properties and account details will be here.',
+      actionLabel: l10n?.authSignIn ?? 'Sign in',
+      onAction: onSignIn,
     );
   }
 }
@@ -379,23 +408,6 @@ class _ProfileLoadError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(message, textAlign: TextAlign.center),
-            const SizedBox(height: 16),
-            OutlinedButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh_rounded),
-              label: Text(l10n?.commonRetry ?? 'Try again'),
-            ),
-          ],
-        ),
-      ),
-    );
+    return AppErrorView(message: message, onRetry: onRetry);
   }
 }

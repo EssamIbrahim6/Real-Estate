@@ -45,7 +45,7 @@ class PaymentMethodScreen extends StatelessWidget {
         final selectedMethod = state.data.paymentMethod;
 
         return Scaffold(
-          backgroundColor: AppColors.surface,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           body: SafeArea(
             child: Column(
               children: [

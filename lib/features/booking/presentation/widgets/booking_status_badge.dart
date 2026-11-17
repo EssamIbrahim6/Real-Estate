@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../domain/entities/booking_status.dart';
 
 class BookingStatusBadge extends StatelessWidget {
@@ -22,23 +23,39 @@ class BookingStatusBadge extends StatelessWidget {
           fontSize: 11,
           fontWeight: FontWeight.w700,
           color: color,
-          letterSpacing: 0.3,
         ),
       ),
     );
   }
 
   (String, Color, Color) _resolve(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
     switch (status) {
       case BookingStatus.pending:
-        return ('Pending', const Color(0xFFB45309), const Color(0xFFFEF3C7));
+        return (
+          l10n?.bookingStatusPending ?? 'Pending',
+          colors.tertiary,
+          colors.tertiaryContainer,
+        );
       case BookingStatus.confirmed:
-        return ('Confirmed', const Color(0xFF065F46), const Color(0xFFD1FAE5));
+        return (
+          l10n?.bookingStatusConfirmed ?? 'Confirmed',
+          colors.primary,
+          colors.primaryContainer,
+        );
       case BookingStatus.cancelled:
-        return ('Cancelled', const Color(0xFF991B1B), const Color(0xFFFEE2E2));
+        return (
+          l10n?.bookingStatusCancelled ?? 'Cancelled',
+          colors.error,
+          colors.errorContainer,
+        );
       case BookingStatus.completed:
-        return ('Completed', const Color(0xFF1D4ED8), const Color(0xFFDBEAFE));
+        return (
+          l10n?.bookingStatusCompleted ?? 'Completed',
+          colors.secondary,
+          colors.secondaryContainer,
+        );
     }
   }
 }
-

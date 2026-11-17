@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/helpers/spacing.dart';
 import '../../../../core/router/route_names.dart';
 import '../../../../core/widgets/person_avatar.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../notifications/presentation/widgets/notification_badge.dart';
 
 class HomeHeader extends StatelessWidget {
@@ -19,32 +20,39 @@ class HomeHeader extends StatelessWidget {
         user?.displayName?.split(' ').first ??
         (user?.email != null ? user!.email!.split('@').first : 'Guest');
     final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
 
     return Row(
       children: [
         PersonAvatar(
           photoUrl: user?.photoURL,
-          radius: 22,
+          radius: 25,
           iconSize: 24,
-          backgroundColor: colors.surfaceContainer,
+          backgroundColor: colors.primary.withValues(alpha: 0.1),
           iconColor: colors.primary,
         ),
-        horizontalSpace(12),
+        horizontalSpace(13),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Hello, $displayName 👋',
+                'Hello, $displayName',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.titleMedium
-                    ?.copyWith(fontWeight: FontWeight.w800),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.4,
+                ),
               ),
-              verticalSpace(2),
+              verticalSpace(4),
               Row(
                 children: [
-                  Icon(Icons.location_on, size: 14, color: colors.tertiary),
+                  Icon(
+                    Icons.location_on_rounded,
+                    size: 14,
+                    color: colors.tertiary,
+                  ),
                   const SizedBox(width: 3),
                   Expanded(
                     child: Text(
@@ -61,10 +69,17 @@ class HomeHeader extends StatelessWidget {
           ),
         ),
         NotificationBadge(
-          child: IconButton(
-            tooltip: 'Notifications',
-            onPressed: () => context.pushNamed(AppRoutes.notificationsName),
-            icon: Icon(Icons.notifications_outlined, color: colors.onSurface),
+          child: Material(
+            color: colors.surfaceContainerLow,
+            shape: const CircleBorder(),
+            child: IconButton(
+              tooltip: l10n?.notificationsTitle ?? 'Notifications',
+              onPressed: () => context.pushNamed(AppRoutes.notificationsName),
+              icon: Icon(
+                Icons.notifications_none_rounded,
+                color: colors.onSurface,
+              ),
+            ),
           ),
         ),
       ],

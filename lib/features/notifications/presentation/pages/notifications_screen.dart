@@ -34,25 +34,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n?.notificationsTitle ?? 'Notifications'),
-        actions: [
-          BlocBuilder<NotificationsCubit, NotificationsState>(
-            builder: (context, state) {
-              if (!state.hasUnread) return const SizedBox.shrink();
-              return TextButton(
-                onPressed: () {
-                  final uid = FirebaseAuth.instance.currentUser?.uid;
-                  if (uid != null) {
-                    context.read<NotificationsCubit>().markAllAsRead(uid);
-                  }
-                },
-                child: Text(l10n?.notificationsMarkAllRead ?? 'Mark all read'),
-              );
-            },
-          ),
-        ],
-      ),
+      appBar: AppBar(title: Text(l10n?.notificationsTitle ?? 'Notifications')),
       body: BlocBuilder<NotificationsCubit, NotificationsState>(
         builder: (context, state) {
           if (state.status == NotificationsStatus.initial ||
@@ -77,8 +59,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             return AppEmptyState(
               icon: Icons.notifications_none_rounded,
               title: l10n?.notificationsEmpty ?? 'No notifications yet',
-              description:
-                  "You're all caught up! We'll let you know when something needs your attention.",
+              description: l10n?.notificationsEmptyDescription ?? "You're all caught up. New property updates will appear here.",
             );
           }
 
@@ -89,12 +70,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 context.read<NotificationsCubit>().watchNotifications(uid);
               }
             },
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: state.notifications.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 2),
+            child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.only(bottom: 12),
+              itemCount: state.notifications.length + 1,
               itemBuilder: (context, index) {
-                final notification = state.notifications[index];
+                if (index == 0) return _buildActivityHeader(context, state);
+                final notification = state.notifications[index - 1];
                 return NotificationTile(
                   notification: notification,
                   onTap: () => _onNotificationTap(context, notification),
@@ -103,6 +85,64 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildActivityHeader(BuildContext context, NotificationsState state) {
+    final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsetsDirectional.fromSTEB(20, 18, 20, 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n?.notificationsRecentActivity ?? 'Recent activity',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: colors.onSurface,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 11,
+                  vertical: 7,
+                ),
+                decoration: BoxDecoration(
+                  color: colors.primaryContainer.withValues(alpha: 0.55),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  l10n?.notificationsUnreadSummary(state.unreadCount) ??
+                      '${state.unreadCount} unread',
+                  style: TextStyle(
+                    color: colors.primary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              if (state.hasUnread)
+                TextButton.icon(
+                  onPressed: () {
+                    final uid = FirebaseAuth.instance.currentUser?.uid;
+                    if (uid != null) {
+                      context.read<NotificationsCubit>().markAllAsRead(uid);
+                    }
+                  },
+                  icon: const Icon(Icons.done_all_rounded, size: 18),
+                  label: Text(
+                    l10n?.notificationsMarkAllRead ?? 'Mark all read',
+                  ),
+                ),
+            ],
+          ),
+        ],
       ),
     );
   }

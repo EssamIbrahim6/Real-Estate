@@ -173,19 +173,22 @@ class _BookTourScreenState extends State<BookTourScreen> {
             children: [
               // Estate snapshot
               _EstateSnapshotCard(estate: estate, langCode: langCode),
-              const SizedBox(height: 24),
+              const SizedBox(height: 28),
 
               // Section: Your Details
-              _sectionTitle(context, l10n?.bookingCustomerSection ?? 'Your Details'),
+              _sectionTitle(
+                context,
+                l10n?.bookingCustomerSection ?? 'Your Details',
+                Icons.person_outline_rounded,
+              ),
               const SizedBox(height: 12),
               _field(
                 controller: _nameCtrl,
                 label: l10n?.bookingCustomerName ?? 'Full Name',
                 icon: Icons.person_outline_rounded,
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty)
-                        ? (l10n?.bookingFieldRequired ?? 'Required')
-                        : null,
+                validator: (v) => (v == null || v.trim().isEmpty)
+                    ? (l10n?.bookingFieldRequired ?? 'Required')
+                    : null,
               ),
               const SizedBox(height: 12),
               _field(
@@ -210,15 +213,19 @@ class _BookTourScreenState extends State<BookTourScreen> {
                 icon: Icons.phone_outlined,
                 keyboardType: TextInputType.phone,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                validator: (v) =>
-                    (v == null || v.trim().length < 7)
-                        ? (l10n?.bookingPhoneInvalid ?? 'Enter a valid phone number')
-                        : null,
+                validator: (v) => (v == null || v.trim().length < 7)
+                    ? (l10n?.bookingPhoneInvalid ??
+                          'Enter a valid phone number')
+                    : null,
               ),
               const SizedBox(height: 24),
 
               // Section: Visit Schedule
-              _sectionTitle(context, l10n?.bookingScheduleSection ?? 'Visit Schedule'),
+              _sectionTitle(
+                context,
+                l10n?.bookingScheduleSection ?? 'Visit Schedule',
+                Icons.event_available_rounded,
+              ),
               const SizedBox(height: 12),
 
               // Date picker
@@ -249,6 +256,22 @@ class _BookTourScreenState extends State<BookTourScreen> {
                     selected: isSelected,
                     onSelected: (_) => setState(() => _selectedSlot = slot),
                     selectedColor: colors.primary,
+                    showCheckmark: false,
+                    side: BorderSide(
+                      color: isSelected
+                          ? colors.primary
+                          : colors.outlineVariant,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    avatar: isSelected
+                        ? Icon(
+                            Icons.check_circle_rounded,
+                            color: colors.onPrimary,
+                            size: 16,
+                          )
+                        : null,
                     labelStyle: TextStyle(
                       color: isSelected ? colors.onPrimary : colors.onSurface,
                       fontSize: 12,
@@ -260,14 +283,19 @@ class _BookTourScreenState extends State<BookTourScreen> {
               const SizedBox(height: 24),
 
               // Notes
-              _sectionTitle(context, l10n?.bookingNotesLabel ?? 'Additional Notes (optional)'),
+              _sectionTitle(
+                context,
+                l10n?.bookingNotesLabel ?? 'Additional Notes (optional)',
+                Icons.sticky_note_2_outlined,
+              ),
               const SizedBox(height: 10),
               TextFormField(
                 controller: _notesCtrl,
                 maxLines: 3,
                 maxLength: 300,
                 decoration: InputDecoration(
-                  hintText: l10n?.bookingNotesHint ??
+                  hintText:
+                      l10n?.bookingNotesHint ??
                       'Any special requests or questions for the agent...',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
@@ -282,13 +310,37 @@ class _BookTourScreenState extends State<BookTourScreen> {
     );
   }
 
-  Widget _sectionTitle(BuildContext context, String title) {
-    return Text(
-      title,
-      style: TextStyle(
-        fontSize: 15,
-        fontWeight: FontWeight.w700,
-        color: Theme.of(context).colorScheme.onSurface,
+  Widget _sectionTitle(BuildContext context, String title, IconData icon) {
+    final colors = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: colors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Icon(icon, size: 18, color: colors.primary),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: colors.onSurface,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -325,66 +377,119 @@ class _EstateSnapshotCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: colors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colors.outlineVariant),
+    final address =
+        '${estate.location.localizedAddress(langCode)}, '
+        '${estate.location.localizedCity(langCode)}';
+    return Card(
+      elevation: 0,
+      margin: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(color: colors.outlineVariant),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: SizedBox(
-              width: 68,
-              height: 68,
-              child: estate.coverImage.isNotEmpty
-                  ? Image.network(
-                      estate.coverImage,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => Container(
-                        color: colors.surface,
-                        child: Icon(Icons.home_outlined, color: colors.onSurfaceVariant),
-                      ),
-                    )
-                  : Container(
-                      color: colors.surface,
-                      child: Icon(Icons.home_outlined, color: colors.onSurfaceVariant),
-                    ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          SizedBox(
+            height: 160,
+            child: Stack(
+              fit: StackFit.expand,
               children: [
-                Text(
-                  estate.localizedTitle(langCode),
-                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                estate.coverImage.isNotEmpty
+                    ? Image.network(
+                        estate.coverImage,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, _, _) => _imagePlaceholder(colors),
+                      )
+                    : _imagePlaceholder(colors),
+                const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Colors.transparent, Color(0xB8000000)],
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  '${estate.location.localizedAddress(langCode)}, ${estate.location.localizedCity(langCode)}',
-                  style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'EGP ${estate.price.toInt()}${estate.pricePeriod != null ? ' / ${estate.pricePeriod}' : ''}',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: colors.tertiary,
+                PositionedDirectional(
+                  end: 14,
+                  bottom: 14,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colors.surface.withValues(alpha: 0.94),
+                      borderRadius: BorderRadius.circular(13),
+                    ),
+                    child: Text(
+                      'EGP ${estate.price.toInt()}'
+                      '${estate.pricePeriod == null ? '' : ' / ${estate.pricePeriod}'}',
+                      style: TextStyle(
+                        color: colors.tertiary,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13,
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  estate.localizedTitle(langCode),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: colors.onSurface,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 7),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.location_on_outlined,
+                      size: 17,
+                      color: colors.primary,
+                    ),
+                    const SizedBox(width: 5),
+                    Expanded(
+                      child: Text(
+                        address,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: colors.onSurfaceVariant,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _imagePlaceholder(ColorScheme colors) {
+    return Container(
+      color: colors.surfaceContainerHigh,
+      child: Icon(
+        Icons.home_work_outlined,
+        color: colors.onSurfaceVariant,
+        size: 42,
       ),
     );
   }
@@ -418,18 +523,27 @@ class _DatePickerField extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(Icons.calendar_today_outlined, size: 20, color: colors.onSurfaceVariant),
+            Icon(
+              Icons.calendar_today_outlined,
+              size: 20,
+              color: colors.onSurfaceVariant,
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 dateStr ?? label,
                 style: TextStyle(
                   fontSize: 15,
-                  color: dateStr != null ? colors.onSurface : colors.onSurfaceVariant,
+                  color: dateStr != null
+                      ? colors.onSurface
+                      : colors.onSurfaceVariant,
                 ),
               ),
             ),
-            Icon(Icons.keyboard_arrow_down_rounded, color: colors.onSurfaceVariant),
+            Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: colors.onSurfaceVariant,
+            ),
           ],
         ),
       ),
@@ -449,27 +563,29 @@ class _BottomBar extends StatelessWidget {
     return BlocBuilder<BookingCubit, BookingState>(
       builder: (context, state) {
         final isLoading = state.submitStatus == BookingSubmitStatus.loading;
-        return Container(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
-          decoration: BoxDecoration(
-            color: colors.surface,
-            border: Border(top: BorderSide(color: colors.outlineVariant)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, -4),
-              ),
-            ],
-          ),
-          child: AppButton(
-            text: l10n?.bookingSubmit ?? 'Confirm Booking',
-            isLoading: isLoading,
-            onPressed: isLoading ? null : onSubmit,
+        return SafeArea(
+          top: false,
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+            decoration: BoxDecoration(
+              color: colors.surface,
+              border: Border(top: BorderSide(color: colors.outlineVariant)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, -4),
+                ),
+              ],
+            ),
+            child: AppButton(
+              text: l10n?.bookingSubmit ?? 'Confirm Booking',
+              isLoading: isLoading,
+              onPressed: isLoading ? null : onSubmit,
+            ),
           ),
         );
       },
     );
   }
 }
-
