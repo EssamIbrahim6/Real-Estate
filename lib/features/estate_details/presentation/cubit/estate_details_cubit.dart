@@ -1,9 +1,9 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../features/chat/domain/repositories/chat_repository.dart';
+import '../../../../features/chat/domain/entities/chat_launch_request.dart';
 import '../../../../features/agent/domain/repositories/agent_repository.dart';
 import '../../../../features/estate/domain/entities/estate_entity.dart';
 import '../../../../features/estate/domain/repositories/estate_repository.dart';
@@ -16,7 +16,6 @@ class EstateDetailsCubit extends Cubit<EstateDetailsState> {
   final AgentRepository _agentRepository;
   final EstateDetailsRepository _estateDetailsRepository;
   final FirebaseAuth _firebaseAuth;
-  final ChatRepository _chatRepository;
   StreamSubscription<List<String>>? _favoriteSubscription;
 
   EstateDetailsCubit({
@@ -24,7 +23,6 @@ class EstateDetailsCubit extends Cubit<EstateDetailsState> {
     required this._agentRepository,
     required this._estateDetailsRepository,
     required this._firebaseAuth,
-    required this._chatRepository,
   }) : super(const EstateDetailsState());
 
   bool get isAuthenticated => _firebaseAuth.currentUser != null;
@@ -146,7 +144,7 @@ class EstateDetailsCubit extends Cubit<EstateDetailsState> {
     return super.close();
   }
 
-  Future<String?> startConversationWithAgent() async {
+  Future<ChatLaunchRequest?> startConversationWithAgent() async {
     if (state.contactAgentStatus == ContactAgentStatus.loading) return null;
 
     emit(
@@ -185,55 +183,50 @@ class EstateDetailsCubit extends Cubit<EstateDetailsState> {
         );
       }
 
-       final agentResult = await _agentRepository.getAgentById(agentId);
-       final agent = agentResult.data;
-       if (agentResult.failure != null || agent == null) {
-         return _failContactAgent(
-           'We could not find the agent for this property.',
-         );
-       }
+      final agentResult = await _agentRepository.getAgentById(agentId);
+      final agent = agentResult.data;
+      if (agentResult.failure != null || agent == null) {
+        return _failContactAgent(
+          'We could not find the agent for this property.',
+        );
+      }
 
-       final agentUserUid = agent.userId.trim();
-       if (agentUserUid.isEmpty ||
-           agentUserUid.length > 128 ||
-           agentUserUid.contains(RegExp(r'\s'))) {
-         return _failContactAgent(
-           'This agent is not set up to receive messages yet.',
-         );
-       }
-       if (customerUid == agentUserUid) {
-         return _failContactAgent(
-           'You cannot start a conversation with your own agent account.',
-         );
-       }
+      final agentUserUid = agent.userId.trim();
+      if (agentUserUid.isEmpty ||
+          agentUserUid.length > 128 ||
+          agentUserUid.contains(RegExp(r'\s'))) {
+        return _failContactAgent(
+          'This agent is not set up to receive messages yet.',
+        );
+      }
+      if (customerUid == agentUserUid) {
+        return _failContactAgent(
+          'You cannot start a conversation with your own agent account.',
+        );
+      }
 
-       final result = await _chatRepository.getOrCreateConversation(
-         customerUid: customerUid,
-         agentUserUid: agentUserUid,
-         agentId: agentId,
-         estateId: estateId,
-       );
-       if (result.failure != null || result.data == null) {
-         return _failContactAgent(
-           'We could not open this conversation. Please try again.',
-         );
-       }
+      final launchRequest = ChatLaunchRequest(
+        customerUid: customerUid,
+        agentUserUid: agentUserUid,
+        agentId: agentId,
+        estateId: estateId,
+      );
 
-       emit(
-         state.copyWith(
-           contactAgentStatus: ContactAgentStatus.success,
-           conversationId: result.data!.id,
-         ),
-       );
-       return result.data!.id;
-     } catch (e) {
-       return _failContactAgent(
-         'We could not open this conversation. Please try again.',
-       );
-     }
+      emit(
+        state.copyWith(
+          contactAgentStatus: ContactAgentStatus.success,
+          conversationId: launchRequest.conversationId,
+        ),
+      );
+      return launchRequest;
+    } catch (e) {
+      return _failContactAgent(
+        'We could not open this conversation. Please try again.',
+      );
+    }
   }
 
-  String? _failContactAgent(String message) {
+  ChatLaunchRequest? _failContactAgent(String message) {
     emit(
       state.copyWith(
         contactAgentStatus: ContactAgentStatus.error,

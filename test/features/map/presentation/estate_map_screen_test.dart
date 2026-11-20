@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:real_estate_app/core/theme/app_theme.dart';
 import 'package:real_estate_app/core/utils/typedefs.dart';
 import 'package:real_estate_app/features/estate/domain/entities/estate_entity.dart';
 import 'package:real_estate_app/features/estate/domain/repositories/estate_repository.dart';
@@ -10,6 +11,7 @@ import 'package:real_estate_app/features/map/presentation/pages/estate_map_scree
 import 'package:real_estate_app/features/map/presentation/widgets/estate_map_marker.dart';
 import 'package:real_estate_app/features/map/presentation/widgets/estate_map_preview_card.dart';
 import 'package:real_estate_app/features/map/presentation/widgets/map_controls_bar.dart';
+import 'package:real_estate_app/l10n/generated/app_localizations.dart';
 
 void main() {
   late _FakeEstateRepository repository;
@@ -22,6 +24,110 @@ void main() {
 
   tearDown(() {
     cubit.close();
+  });
+
+  testWidgets('marker labels adapt to the active color scheme', (tester) async {
+    final estate = _createEstate(
+      id: 'marker',
+      lat: 30.0,
+      lng: 31.0,
+      price: 2500000,
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: Scaffold(
+          body: Center(
+            child: EstateMapMarker(
+              estate: estate,
+              isSelected: false,
+              onTap: () {},
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('EGP 2.5 M'), findsOneWidget);
+    final badgeFinder = find
+        .ancestor(of: find.text('EGP 2.5 M'), matching: find.byType(Container))
+        .first;
+    final badge = tester.widget<Container>(badgeFinder);
+    expect(
+      (badge.decoration! as BoxDecoration).color,
+      AppTheme.darkTheme.colorScheme.surface,
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.darkTheme,
+        home: Scaffold(
+          body: Center(
+            child: EstateMapMarker(
+              estate: estate,
+              isSelected: true,
+              onTap: () {},
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 200));
+
+    final selectedBadgeFinder = find
+        .ancestor(of: find.text('EGP 2.5 M'), matching: find.byType(Container))
+        .first;
+    final selectedBadge = tester.widget<Container>(selectedBadgeFinder);
+    expect(
+      (selectedBadge.decoration! as BoxDecoration).color,
+      AppTheme.darkTheme.colorScheme.primary,
+    );
+  });
+
+  testWidgets('map controls and preview labels localize in Arabic', (
+    tester,
+  ) async {
+    final estate = _createEstate(id: 'arabic-preview', lat: 30, lng: 31);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ar'),
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        home: Scaffold(
+          body: Stack(
+            children: [
+              Positioned(
+                right: 0,
+                top: 0,
+                child: MapControlsBar(
+                  onZoomIn: () {},
+                  onZoomOut: () {},
+                  onFitAll: () {},
+                  onMyLocation: () {},
+                ),
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: EstateMapPreviewCard(
+                  estate: estate,
+                  onTap: () {},
+                  onClose: () {},
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.bySemanticsLabel('تكبير'), findsOneWidget);
+    expect(find.bySemanticsLabel('إغلاق المعاينة'), findsOneWidget);
+    expect(find.text('ج.م 2500000'), findsOneWidget);
   });
 
   Widget buildTestWidget({MapScreenArgs? args}) {
@@ -92,6 +198,34 @@ void main() {
     },
   );
 
+  testWidgets('selected preview and controls fit a narrow screen', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final estate = _createEstate(
+      id: 'compact',
+      title: 'A property with a longer title',
+      price: 987654321,
+      lat: 30.0610,
+      lng: 31.2190,
+    );
+
+    await tester.pumpWidget(
+      buildTestWidget(args: MapScreenArgs(estates: [estate])),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(EstateMapMarker));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(EstateMapPreviewCard), findsOneWidget);
+    expect(find.bySemanticsLabel('Zoom in'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('renders empty view when all estates have invalid coordinates', (
     tester,
   ) async {
@@ -141,6 +275,16 @@ class _FakeEstateRepository implements EstateRepository {
   @override
   ResultFuture<String> createEstate(EstateEntity estate) async =>
       (failure: null, data: estate.id);
+
+  @override
+  ResultFuture<List<EstateEntity>> getEstatesByOwnerId(String ownerId) async =>
+      (failure: null, data: const <EstateEntity>[]);
+
+  @override
+  ResultVoid deleteEstate({
+    required String estateId,
+    required String currentUid,
+  }) async => (failure: null, isSuccess: true);
 }
 
 EstateEntity _createEstate({

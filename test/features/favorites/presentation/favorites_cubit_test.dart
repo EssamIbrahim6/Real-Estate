@@ -250,4 +250,14 @@ class _FakeEstateRepository implements EstateRepository {
   @override
   ResultFuture<String> createEstate(EstateEntity estate) async =>
       (failure: null, data: estate.id);
+
+  @override
+  ResultFuture<List<EstateEntity>> getEstatesByOwnerId(String ownerId) async =>
+      (failure: null, data: const <EstateEntity>[]);
+
+  @override
+  ResultVoid deleteEstate({
+    required String estateId,
+    required String currentUid,
+  }) async => (failure: null, isSuccess: true);
 }

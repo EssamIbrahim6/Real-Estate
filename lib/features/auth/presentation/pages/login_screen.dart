@@ -83,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       subtitle:
                           l10n?.authLoginSubtitle ??
                           "Welcome back! Sign in to continue.",
-                      imageAsset: AppAssets.welcomeAuth2,
+                      imageAsset: AppAssets.login,
                     ),
                     verticalSpace(28),
 

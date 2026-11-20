@@ -10,6 +10,8 @@ class ConversationModel extends ConversationEntity {
     required super.agentUserId,
     required super.agentId,
     super.estateId,
+    super.estateIds,
+    super.archivedBy,
     super.createdAt,
     super.lastMessage,
     super.lastMessageAt,
@@ -47,6 +49,16 @@ class ConversationModel extends ConversationEntity {
       agentUserId: map['agentUserId'] as String? ?? '',
       agentId: map['agentId'] as String? ?? '',
       estateId: map['estateId'] as String?,
+      estateIds:
+          (map['estateIds'] as List<dynamic>?)?.whereType<String>().toList(
+            growable: false,
+          ) ??
+          (map['estateId'] is String ? [map['estateId'] as String] : const []),
+      archivedBy:
+          (map['archivedBy'] as List<dynamic>?)?.whereType<String>().toList(
+            growable: false,
+          ) ??
+          const [],
       createdAt: _parseDateTime(map['createdAt']),
       lastMessage: map['lastMessage'] as String?,
       lastMessageAt: _parseDateTime(map['lastMessageAt']),
@@ -64,6 +76,8 @@ class ConversationModel extends ConversationEntity {
     'agentUserId': agentUserId,
     'agentId': agentId,
     'estateId': estateId,
+    'estateIds': estateIds.isEmpty && estateId != null ? [estateId] : estateIds,
+    'archivedBy': archivedBy,
     'createdAt':
         createdAtValue ??
         (createdAt == null

@@ -1,14 +1,5 @@
 abstract class AppAssets {
-  // // Base paths
-  // static const String _imagesPath = 'assets/images';
-  // static const String _iconsPath = 'assets/icons';
 
-  // // Images placeholders
-  // static const String logo = '$_imagesPath/logo.png';
-  // static const String placeholder = '$_imagesPath/placeholder.png';
-
-  // // Icons placeholders
-  // static const String appIcon = '$_iconsPath/app_icon.png';
   static const String googleIcon = "assets/icons/google.svg";
 
   static const String onboarding1 = "assets/images/onboarding/Rectangle_5.png";
@@ -19,4 +10,7 @@ abstract class AppAssets {
   static const String welcomeAuth2 = "assets/images/auth/Rectangle_9.png";
   static const String welcomeAuth3 = "assets/images/auth/Rectangle_10.png";
   static const String welcomeAuth4 = "assets/images/auth/Rectangle_11.png";
+
+  static const String login = "assets/images/auth/login1.jpg";
+  static const String signup = "assets/images/auth/singup1.jpg";
 }

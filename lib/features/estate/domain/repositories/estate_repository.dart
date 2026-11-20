@@ -24,4 +24,14 @@ abstract class EstateRepository {
 
   /// Creates or publishes an estate listing.
   ResultFuture<String> createEstate(EstateEntity estate);
+
+  /// Fetches estates published or owned by a specific user.
+  ResultFuture<List<EstateEntity>> getEstatesByOwnerId(String ownerId) async =>
+      (failure: null, data: <EstateEntity>[]);
+
+  /// Deletes an estate listing, verifying that [currentUid] is the owner.
+  ResultVoid deleteEstate({
+    required String estateId,
+    required String currentUid,
+  }) async => (failure: null, isSuccess: true);
 }

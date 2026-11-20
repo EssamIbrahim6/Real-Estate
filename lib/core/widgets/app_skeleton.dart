@@ -170,19 +170,7 @@ class HomeSkeleton extends StatelessWidget {
         const SizedBox(height: 28),
         const AppSkeleton(width: 150, height: 20),
         const SizedBox(height: 12),
-        SizedBox(
-          height: 92,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: 4,
-            separatorBuilder: (_, _) => const SizedBox(width: 12),
-            itemBuilder: (context, index) => const AppSkeleton(
-              width: 110,
-              height: 92,
-              borderRadius: BorderRadius.all(Radius.circular(16)),
-            ),
-          ),
-        ),
+        const CategoriesSkeleton(),
         const SizedBox(height: 28),
         const AppSkeleton(width: 180, height: 20),
         const SizedBox(height: 12),
@@ -409,5 +397,160 @@ class BookingHistorySkeleton extends StatelessWidget {
         ],
       ),
     ),
+  );
+}
+
+class CategoriesSkeleton extends StatelessWidget {
+  final int count;
+
+  const CategoriesSkeleton({super.key, this.count = 5});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 100,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: count,
+        separatorBuilder: (_, _) => const SizedBox(width: 10),
+        itemBuilder: (context, index) => SizedBox(
+          width: 84,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 62,
+                height: 62,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Center(
+                  child: AppSkeleton(
+                    width: 28,
+                    height: 28,
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              const AppSkeleton(width: 54, height: 11),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class PropertyManagementSkeleton extends StatelessWidget {
+  final int itemCount;
+
+  const PropertyManagementSkeleton({super.key, this.itemCount = 3});
+
+  @override
+  Widget build(BuildContext context) => ListView.separated(
+    padding: const EdgeInsets.all(16),
+    itemCount: itemCount,
+    separatorBuilder: (_, _) => const SizedBox(height: 14),
+    itemBuilder: (context, index) => Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+      ),
+      child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppSkeleton(
+            width: 84,
+            height: 84,
+            borderRadius: BorderRadius.all(Radius.circular(12)),
+          ),
+          SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    AppSkeleton(width: 120, height: 16),
+                    AppSkeleton(
+                      width: 64,
+                      height: 22,
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8),
+                AppSkeleton(width: 90, height: 12),
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    AppSkeleton(width: 80, height: 14),
+                    AppSkeleton(
+                      width: 32,
+                      height: 32,
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+class MessageListSkeleton extends StatelessWidget {
+  final int count;
+
+  const MessageListSkeleton({super.key, this.count = 6});
+
+  @override
+  Widget build(BuildContext context) => ListView.separated(
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+    itemCount: count,
+    separatorBuilder: (_, _) => const SizedBox(height: 12),
+    itemBuilder: (context, index) {
+      final isMe = index.isEven;
+      return Align(
+        alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+        child: Container(
+          width: 200 + (index % 3) * 30.0,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: isMe
+                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.12)
+                : Theme.of(context).colorScheme.surfaceContainerLow,
+            borderRadius: BorderRadius.only(
+              topLeft: const Radius.circular(16),
+              topRight: const Radius.circular(16),
+              bottomLeft: isMe ? const Radius.circular(16) : Radius.zero,
+              bottomRight: isMe ? Radius.zero : const Radius.circular(16),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AppSkeleton(
+                width: 170 + (index % 2) * 20.0,
+                height: 14,
+              ),
+              const SizedBox(height: 6),
+              const Align(
+                alignment: Alignment.bottomRight,
+                child: AppSkeleton(width: 40, height: 10),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
   );
 }

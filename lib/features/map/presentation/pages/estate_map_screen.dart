@@ -5,18 +5,15 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/router/route_names.dart';
-import '../../../../core/widgets/app_error_view.dart';
 import '../../../../core/widgets/app_feedback.dart';
-import '../../../../core/widgets/app_loading_indicator.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../domain/models/map_screen_args.dart';
 import '../cubit/map_cubit.dart';
 import '../cubit/map_state.dart';
-import '../widgets/estate_map_marker.dart';
-import '../widgets/estate_map_preview_card.dart';
-import '../widgets/map_controls_bar.dart';
+import '../widgets/estate_map_app_bar.dart';
+import '../widgets/estate_map_layer.dart';
+import '../widgets/map_status_view.dart';
 
 /// Fullscreen interactive map view displaying real-estate properties.
 class EstateMapScreen extends StatefulWidget {
@@ -32,7 +29,6 @@ class _EstateMapScreenState extends State<EstateMapScreen> {
   late final MapController _mapController;
   bool _isMapReady = false;
 
-  // Default Cairo coordinates as fallback
   static const LatLng _cairoFallback = LatLng(30.0444, 31.2357);
 
   @override
@@ -68,6 +64,7 @@ class _EstateMapScreenState extends State<EstateMapScreen> {
 
   Future<void> _handleMyLocation() async {
     final cubit = context.read<MapCubit>();
+    final l10n = AppLocalizations.of(context);
     cubit.setLocatingUser(true);
     try {
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -75,7 +72,8 @@ class _EstateMapScreenState extends State<EstateMapScreen> {
         if (mounted) {
           AppFeedback.info(
             context,
-            'Location services are disabled on this device.',
+            l10n?.mapServicesDisabled ??
+                'Location services are disabled on this device.',
           );
         }
         cubit.setLocatingUser(false);
@@ -92,22 +90,27 @@ class _EstateMapScreenState extends State<EstateMapScreen> {
         if (mounted) {
           AppFeedback.info(
             context,
-            'Location permission is required to center on your position.',
+            l10n?.mapPermissionRequired ??
+                'Location permission is required to center on your position.',
           );
         }
         cubit.setLocatingUser(false);
         return;
       }
 
-      final pos = await Geolocator.getCurrentPosition();
-      final userLatLng = LatLng(pos.latitude, pos.longitude);
-      cubit.setUserLocation(userLatLng);
+      final position = await Geolocator.getCurrentPosition();
+      final userLocation = LatLng(position.latitude, position.longitude);
+      cubit.setUserLocation(userLocation);
       if (_isMapReady) {
-        _mapController.move(userLatLng, 15.0);
+        _mapController.move(userLocation, 15.0);
       }
-    } catch (e) {
+    } catch (error) {
       if (mounted) {
-        AppFeedback.error(context, 'Could not determine location: $e');
+        AppFeedback.error(
+          context,
+          l10n?.mapLocationFailure(error.toString()) ??
+              'Could not determine location: $error',
+        );
       }
       cubit.setLocatingUser(false);
     }
@@ -133,21 +136,13 @@ class _EstateMapScreenState extends State<EstateMapScreen> {
         }
       },
       builder: (context, state) {
+        final colors = Theme.of(context).colorScheme;
         return Scaffold(
-          backgroundColor: AppColors.background,
-          appBar: AppBar(
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_rounded),
-              onPressed: () => context.pop(),
-            ),
-            title: Text(state.title),
-            actions: [
-              IconButton(
-                tooltip: 'Refresh',
-                icon: const Icon(Icons.refresh_rounded),
-                onPressed: () => context.read<MapCubit>().fetchEstates(),
-              ),
-            ],
+          backgroundColor: colors.surface,
+          appBar: EstateMapAppBar(
+            title: state.title,
+            onBack: () => context.pop(),
+            onRefresh: () => context.read<MapCubit>().fetchEstates(),
           ),
           body: _buildBody(context, state),
         );
@@ -157,12 +152,16 @@ class _EstateMapScreenState extends State<EstateMapScreen> {
 
   Widget _buildBody(BuildContext context, MapState state) {
     if (state.status == MapStatus.loading && state.validEstates.isEmpty) {
-      return const AppLoadingIndicator(message: 'Loading properties on map...');
+      return const MapStatusView.loading();
     }
 
     if (state.status == MapStatus.error && state.validEstates.isEmpty) {
-      return AppErrorView(
-        message: state.errorMessage ?? 'Failed to load properties on the map.',
+      final l10n = AppLocalizations.of(context);
+      return MapStatusView.error(
+        message:
+            state.errorMessage ??
+            l10n?.mapLoadError ??
+            'Failed to load properties on the map.',
         onRetry: () => context.read<MapCubit>().init(
           initialEstates: widget.args?.estates,
           targetEstate: widget.args?.targetEstate,
@@ -172,58 +171,16 @@ class _EstateMapScreenState extends State<EstateMapScreen> {
     }
 
     if (state.status == MapStatus.empty && state.validEstates.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(AppDimensions.p20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(
-                Icons.location_off_rounded,
-                size: 56,
-                color: AppColors.textMuted,
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'No properties with valid coordinates found.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.brandNavy,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'The selected properties do not have geographic coordinates available to pin on the map.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.brandNavy,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                onPressed: () => context.read<MapCubit>().fetchEstates(),
-                icon: const Icon(Icons.refresh_rounded, size: 18),
-                label: const Text('Load All Properties'),
-              ),
-            ],
-          ),
-        ),
+      return MapStatusView.empty(
+        onLoadAll: () => context.read<MapCubit>().fetchEstates(),
       );
     }
 
     final validPoints = state.validEstates
-        .map((e) => LatLng(e.location.latitude, e.location.longitude))
+        .map(
+          (estate) =>
+              LatLng(estate.location.latitude, estate.location.longitude),
+        )
         .toList();
 
     final LatLng initialCenter;
@@ -242,154 +199,79 @@ class _EstateMapScreenState extends State<EstateMapScreen> {
       initialCenter = _cairoFallback;
     }
 
-    final CameraFit? initialFit =
-        (state.targetEstate == null && validPoints.length > 1)
+    final initialFit = state.targetEstate == null && validPoints.length > 1
         ? CameraFit.coordinates(
             coordinates: validPoints,
             padding: const EdgeInsets.all(60.0),
           )
         : null;
 
-    final isPreviewOpen = state.selectedEstate != null;
-
-    return Stack(
-      children: [
-        // Map widget
-        FlutterMap(
-          mapController: _mapController,
-          options: MapOptions(
-            initialCenter: initialCenter,
-            initialZoom: state.targetEstate != null ? 15.0 : 13.0,
-            initialCameraFit: initialFit,
-            onMapReady: () {
-              _isMapReady = true;
-              if (state.targetEstate != null &&
-                  MapCubit.isValidCoordinate(
-                    state.targetEstate!.location.latitude,
-                    state.targetEstate!.location.longitude,
-                  )) {
-                _mapController.move(
-                  LatLng(
-                    state.targetEstate!.location.latitude,
-                    state.targetEstate!.location.longitude,
-                  ),
-                  15.0,
-                );
-              }
-            },
-            onTap: (tapPosition, point) =>
-                context.read<MapCubit>().clearSelection(),
-          ),
-          children: [
-            TileLayer(
-              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-              userAgentPackageName: 'com.example.real_estate_app',
+    return EstateMapLayer(
+      mapController: _mapController,
+      estates: state.validEstates,
+      selectedEstate: state.selectedEstate,
+      userLocation: state.userLocation,
+      isLocating: state.isLocatingUser,
+      initialCenter: initialCenter,
+      initialZoom: state.targetEstate != null ? 15.0 : 13.0,
+      initialCameraFit: initialFit,
+      onMapReady: () {
+        _isMapReady = true;
+        if (state.targetEstate != null &&
+            MapCubit.isValidCoordinate(
+              state.targetEstate!.location.latitude,
+              state.targetEstate!.location.longitude,
+            )) {
+          _mapController.move(
+            LatLng(
+              state.targetEstate!.location.latitude,
+              state.targetEstate!.location.longitude,
             ),
-            MarkerLayer(
-              markers: [
-                // Estate markers
-                ...state.validEstates.map((estate) {
-                  final isSelected = state.selectedEstate?.id == estate.id;
-                  final latLng = LatLng(
-                    estate.location.latitude,
-                    estate.location.longitude,
-                  );
-                  return Marker(
-                    point: latLng,
-                    width: isSelected ? 120 : 108,
-                    height: isSelected ? 56 : 50,
-                    alignment: Alignment.topCenter,
-                    child: EstateMapMarker(
-                      estate: estate,
-                      isSelected: isSelected,
-                      onTap: () {
-                        context.read<MapCubit>().selectEstate(estate);
-                        if (_isMapReady) {
-                          _mapController.move(
-                            latLng,
-                            _mapController.camera.zoom < 14.0
-                                ? 14.0
-                                : _mapController.camera.zoom,
-                          );
-                        }
-                      },
-                    ),
-                  );
-                }),
-
-                // User Location marker if available
-                if (state.userLocation != null)
-                  Marker(
-                    point: state.userLocation!,
-                    width: 24,
-                    height: 24,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.blueAccent,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 3),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.blueAccent.withValues(alpha: 0.4),
-                            blurRadius: 10,
-                            spreadRadius: 3,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ],
-        ),
-
-        // Controls Bar (Zoom, Fit, My Location)
-        Positioned(
-          right: 16,
-          bottom: isPreviewOpen ? 180 : 24,
-          child: MapControlsBar(
-            isLocating: state.isLocatingUser,
-            onZoomIn: () {
-              if (_isMapReady) {
-                _mapController.move(
-                  _mapController.camera.center,
-                  _mapController.camera.zoom + 1,
-                );
-              }
-            },
-            onZoomOut: () {
-              if (_isMapReady) {
-                _mapController.move(
-                  _mapController.camera.center,
-                  _mapController.camera.zoom - 1,
-                );
-              }
-            },
-            onFitAll: () => _fitAllEstates(validPoints),
-            onMyLocation: _handleMyLocation,
-          ),
-        ),
-
-        // Preview Card at bottom
-        if (state.selectedEstate != null)
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: SafeArea(
-              child: EstateMapPreviewCard(
-                estate: state.selectedEstate!,
-                onTap: () {
-                  context.push(
-                    '${AppRoutes.propertyDetails}/${state.selectedEstate!.id}',
-                    extra: state.selectedEstate,
-                  );
-                },
-                onClose: () => context.read<MapCubit>().clearSelection(),
-              ),
-            ),
-          ),
-      ],
+            15.0,
+          );
+        }
+      },
+      onMapTap: () => context.read<MapCubit>().clearSelection(),
+      onEstateTap: (estate) {
+        context.read<MapCubit>().selectEstate(estate);
+        final location = LatLng(
+          estate.location.latitude,
+          estate.location.longitude,
+        );
+        if (_isMapReady) {
+          _mapController.move(
+            location,
+            _mapController.camera.zoom < 14.0
+                ? 14.0
+                : _mapController.camera.zoom,
+          );
+        }
+      },
+      onZoomIn: () {
+        if (_isMapReady) {
+          _mapController.move(
+            _mapController.camera.center,
+            _mapController.camera.zoom + 1,
+          );
+        }
+      },
+      onZoomOut: () {
+        if (_isMapReady) {
+          _mapController.move(
+            _mapController.camera.center,
+            _mapController.camera.zoom - 1,
+          );
+        }
+      },
+      onFitAll: () => _fitAllEstates(validPoints),
+      onMyLocation: _handleMyLocation,
+      onOpenEstate: (estate) {
+        context.push(
+          '${AppRoutes.propertyDetails}/${estate.id}',
+          extra: estate,
+        );
+      },
+      onClosePreview: () => context.read<MapCubit>().clearSelection(),
     );
   }
 }

@@ -25,6 +25,18 @@ class SearchFilter extends Equatable {
     this.isAvailable = true,
   });
 
+  bool get hasSearchCriteria =>
+      (query?.trim().isNotEmpty ?? false) ||
+      (categoryId?.trim().isNotEmpty ?? false) ||
+      (city?.trim().isNotEmpty ?? false) ||
+      minPrice != null ||
+      maxPrice != null ||
+      bedrooms != null ||
+      bathrooms != null ||
+      isFurnished != null ||
+      (listingType?.trim().isNotEmpty ?? false) ||
+      isAvailable == false;
+
   SearchFilter clearFilters() => SearchFilter(query: query, isAvailable: true);
 
   @override

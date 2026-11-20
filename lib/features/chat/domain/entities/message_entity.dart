@@ -5,14 +5,16 @@ class MessageEntity extends Equatable {
   final String senderId;
   final String text;
   final DateTime? createdAt;
+  final List<String> hiddenFor;
 
   const MessageEntity({
     required this.id,
     required this.senderId,
     required this.text,
     this.createdAt,
+    this.hiddenFor = const [],
   });
 
   @override
-  List<Object?> get props => [id, senderId, text, createdAt];
+  List<Object?> get props => [id, senderId, text, createdAt, hiddenFor];
 }

@@ -1,8 +1,10 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/helpers/spacing.dart';
 import '../../../../core/widgets/app_button.dart';
+import '../../../../l10n/generated/app_localizations.dart';
+import 'review_comment_field.dart';
+import 'review_rating_selector.dart';
 
 class SubmitReviewBottomSheet extends StatefulWidget {
   final int initialRating;
@@ -41,91 +43,73 @@ class _SubmitReviewBottomSheetState extends State<SubmitReviewBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 20,
-        right: 20,
-        top: 24,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                widget.initialComment.isNotEmpty
-                    ? 'Edit Your Review'
-                    : 'How was your experience?',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.brandNavy,
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
-          ),
-          verticalSpace(14),
-          // Interactive 1-5 Star selector
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(5, (index) {
-              final starValue = index + 1;
-              return GestureDetector(
-                onTap: () => setState(() => _rating = starValue),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                  child: Icon(
-                    starValue <= _rating
-                        ? Icons.star_rounded
-                        : Icons.star_outline_rounded,
-                    color: Colors.amber,
-                    size: 38,
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
+    final isEditing = widget.initialComment.isNotEmpty;
+
+    return SafeArea(
+      top: false,
+      child: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(
+          20,
+          12,
+          20,
+          MediaQuery.viewInsetsOf(context).bottom + 24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    isEditing
+                        ? (l10n?.detailsEditReview ?? 'Edit Your Review')
+                        : (l10n?.detailsExperiencePrompt ??
+                              'How was your experience?'),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: colors.onSurface,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ),
-              );
-            }),
-          ),
-          verticalSpace(18),
-          TextField(
-            controller: _commentController,
-            maxLines: 4,
-            maxLength: 300,
-            decoration: InputDecoration(
-              hintText: 'Share your thoughts about this estate...',
-              filled: true,
-              fillColor: AppColors.inputBackground,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: AppColors.inputBorder),
-              ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  tooltip: l10n?.commonClose ?? 'Close',
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
             ),
-          ),
-          verticalSpace(16),
-          AppButton(
-            text: widget.initialComment.isNotEmpty
-                ? 'Update Review'
-                : 'Submit Review',
-            isLoading: _isLoading,
-            onPressed: () async {
-              final navigator = Navigator.of(context);
-              setState(() => _isLoading = true);
-              final success = await widget.onSubmit(
-                _rating,
-                _commentController.text,
-              );
-              if (!mounted) return;
-              setState(() => _isLoading = false);
-              if (success) navigator.pop();
-            },
-          ),
-        ],
+            verticalSpace(14),
+            ReviewRatingSelector(
+              rating: _rating,
+              onChanged: (rating) => setState(() => _rating = rating),
+            ),
+            verticalSpace(12),
+            ReviewCommentField(controller: _commentController),
+            verticalSpace(16),
+            AppButton(
+              text: isEditing
+                  ? (l10n?.detailsUpdateReview ?? 'Update Review')
+                  : (l10n?.detailsSubmitReview ?? 'Submit Review'),
+              isLoading: _isLoading,
+              onPressed: () async {
+                final navigator = Navigator.of(context);
+                setState(() => _isLoading = true);
+                final success = await widget.onSubmit(
+                  _rating,
+                  _commentController.text,
+                );
+                if (!mounted) return;
+                setState(() => _isLoading = false);
+                if (success) navigator.pop();
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

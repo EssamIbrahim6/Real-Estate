@@ -146,6 +146,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get searchHint => 'ابحث عن عقارات…';
 
   @override
+  String get searchInitialTitle => 'اعثر على منزلك القادم';
+
+  @override
+  String get searchInitialHint =>
+      'ابحث بكلمة أو استخدم عوامل التصفية لاستكشاف العقارات المتاحة.';
+
+  @override
   String get searchAiTitle => 'بحث مدعوم بالذكاء الاصطناعي';
 
   @override
@@ -318,6 +325,28 @@ class AppLocalizationsAr extends AppLocalizations {
   String get detailsWriteReview => 'اكتب تقييماً';
 
   @override
+  String get detailsExperiencePrompt => 'كيف كانت تجربتك؟';
+
+  @override
+  String get detailsEditReview => 'تعديل تقييمك';
+
+  @override
+  String get detailsSubmitReview => 'إرسال التقييم';
+
+  @override
+  String get detailsUpdateReview => 'تحديث التقييم';
+
+  @override
+  String detailsRatingSemantics(int rating) {
+    return 'التقييم: $rating من 5';
+  }
+
+  @override
+  String detailsStarRatingTooltip(int rating) {
+    return 'اختر تقييمًا بدرجة $rating من 5';
+  }
+
+  @override
   String get detailsYourRating => 'تقييمك';
 
   @override
@@ -337,6 +366,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get mapSearchTitle => 'خريطة البحث';
+
+  @override
+  String get mapLoading => 'جاري تحميل العقارات على الخريطة...';
 
   @override
   String get mapZoomIn => 'تكبير';
@@ -362,6 +394,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get mapLoadAllButton => 'تحميل جميع العقارات';
 
   @override
+  String get mapLoadError => 'تعذر تحميل العقارات على الخريطة.';
+
+  @override
+  String get mapClosePreview => 'إغلاق المعاينة';
+
+  @override
   String get mapServicesDisabled => 'خدمات الموقع غير مفعّلة على هذا الجهاز.';
 
   @override
@@ -370,6 +408,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get mapLocationError => 'تعذر تحديد الموقع الجغرافي.';
+
+  @override
+  String mapLocationFailure(String error) {
+    return 'تعذر تحديد الموقع الجغرافي: $error';
+  }
 
   @override
   String get mapViewDetails => 'عرض التفاصيل';
@@ -479,6 +522,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get chatInquiry => 'استفسار عن العقار';
+
+  @override
+  String get chatAgentLabel => 'الوكيل';
+
+  @override
+  String get chatCustomerLabel => 'العميل';
+
+  @override
+  String get chatLoadError => 'تعذر تحميل المحادثات. يُرجى المحاولة مرة أخرى.';
 
   @override
   String get settingsTitle => 'الإعدادات';
@@ -865,6 +917,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get chatSendTooltip => 'إرسال رسالة';
 
   @override
+  String get chatSentMessageSemantics => 'رسالة مرسلة';
+
+  @override
+  String get chatReceivedMessageSemantics => 'رسالة مستلمة';
+
+  @override
   String get galleryViewAll => 'عرض جميع الصور';
 
   @override
@@ -924,6 +982,19 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get offlineNotice =>
       'لا يوجد اتصال بالإنترنت. قد لا تتوفر بعض الميزات.';
+
+  @override
+  String get offlineTitle => 'لا يوجد اتصال بالإنترنت';
+
+  @override
+  String get offlineDescription => 'اتصل بالإنترنت لمواصلة استخدام التطبيق.';
+
+  @override
+  String get connectionChecking => 'جارٍ التحقق من الاتصال';
+
+  @override
+  String get connectionCheckingDescription =>
+      'يرجى الانتظار بينما نتحقق من اتصالك بالإنترنت.';
 
   @override
   String get bookingTitle => 'حجز موعد للمعاينة';
@@ -1093,4 +1164,217 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get profileNotificationsSubtitle => 'عرض نشاطك والتحديثات';
+
+  @override
+  String get profileYourProperties => 'عقاراتك';
+
+  @override
+  String get profileYourPropertiesSubtitle =>
+      'عرض وإدارة العقارات التي قمت بإدراجها';
+
+  @override
+  String get myPropertiesTitle => 'عقاراتك';
+
+  @override
+  String get myPropertiesEmpty => 'لم تقم بإدراج أي عقارات بعد.';
+
+  @override
+  String get myPropertiesEmptySubtitle =>
+      'انشر عقارك الأول لتصل إلى آلاف المشترين.';
+
+  @override
+  String get myPropertiesAddNew => 'إضافة عقار جديد';
+
+  @override
+  String get myPropertiesDeleteTitle => 'حذف العقار؟';
+
+  @override
+  String get myPropertiesDeleteMessage =>
+      'هل أنت متأكد من رغبتك في حذف هذا العقار نهائياً؟ لا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get myPropertiesDeleteButton => 'حذف';
+
+  @override
+  String get myPropertiesDeleteSuccess => 'تم حذف العقار بنجاح.';
+
+  @override
+  String get myPropertiesDeleteError =>
+      'فشل حذف العقار. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get myPropertiesStatusPending => 'قيد المراجعة';
+
+  @override
+  String get myPropertiesStatusApproved => 'تمت الموافقة';
+
+  @override
+  String get myPropertiesStatusActive => 'نشط';
+
+  @override
+  String get myPropertiesStatusRejected => 'مرفوض';
+
+  @override
+  String get myPropertiesPickImages => 'اختيار الصور';
+
+  @override
+  String get myPropertiesCoverImageTag => 'الغلاف';
+
+  @override
+  String get myPropertiesSetAsCover => 'تعيين كغلاف';
+
+  @override
+  String get myPropertiesRemoveImage => 'إزالة الصورة';
+
+  @override
+  String get myPropertiesUploadProgress => 'جاري رفع العقار...';
+
+  @override
+  String get myPropertiesMinImagesError =>
+      'يرجى اختيار صورة واحدة على الأقل للعقار.';
+
+  @override
+  String get myPropertiesSelectLocation => 'تحديد الموقع على الخريطة';
+
+  @override
+  String get myPropertiesLocationPicked => 'تم تحديد الإحداثيات';
+
+  @override
+  String get myPropertiesLocationRequired => 'موقع العقار مطلوب';
+
+  @override
+  String get propertyLocationPickerTitle => 'تحديد موقع العقار';
+
+  @override
+  String get propertyLocationPickerHint =>
+      'اضغط على الخريطة أو حرّكها وحدد مركزها.';
+
+  @override
+  String get propertyLocationSelectMapCenter => 'اختيار مركز الخريطة';
+
+  @override
+  String get propertyLocationSelectionReady =>
+      'تم تحديد الموقع. أكّد استخدامه لهذا العقار.';
+
+  @override
+  String get propertyLocationAddressUnavailable =>
+      'تعذّر العثور على العنوان، وسيتم حفظ الموقع المحدد على الخريطة.';
+
+  @override
+  String get propertyLocationConfirm => 'تأكيد الموقع';
+
+  @override
+  String get propertyMapLoadingError =>
+      'تعذّر تحميل الخريطة. تحقق من اتصالك أو أعد المحاولة.';
+
+  @override
+  String get propertyMapRetry => 'إعادة تحميل الخريطة';
+
+  @override
+  String get chatDeleteConversation => 'حذف المحادثة';
+
+  @override
+  String get chatDeleteConversationConfirm =>
+      'هل أنت متأكد من رغبتك في إزالة هذه المحادثة من قائمتك؟';
+
+  @override
+  String get chatDeleteConversationButton => 'حذف';
+
+  @override
+  String get chatConversationDeleted => 'تمت إزالة المحادثة';
+
+  @override
+  String get chatDeleteMessage => 'حذف الرسالة';
+
+  @override
+  String get chatDeleteMessageForMe => 'حذف لدي فقط';
+
+  @override
+  String get chatDeleteMessageForMeConfirm => 'إزالة هذه الرسالة من شاشتك؟';
+
+  @override
+  String get chatDeleteForEveryoneNotAllowed =>
+      'لا يمكن حذف الرسائل لدى الجميع لضمان أمان الحساب وتوثيق المحادثة.';
+
+  @override
+  String get chatMessageDeleted => 'تم حذف الرسالة';
+
+  @override
+  String get chatDeleteForMe => 'إخفاء لدي فقط';
+
+  @override
+  String get chatDeleteMessageConfirm => 'إخفاء هذه الرسالة من محادثتك فقط؟';
+
+  @override
+  String get chatMessageHiddenForMe => 'تم إخفاء الرسالة من محادثتك.';
+
+  @override
+  String get chatArchiveConversation => 'أرشفة';
+
+  @override
+  String get chatConversationArchived => 'تمت أرشفة المحادثة.';
+
+  @override
+  String get chatArchiveFailed => 'تعذّرت أرشفة المحادثة.';
+
+  @override
+  String get chatCopyMessage => 'نسخ النص';
+
+  @override
+  String get chatMessageCopied => 'تم نسخ النص إلى الحافظة';
+
+  @override
+  String get chatPropertyInquiryPrefix => 'استفسار بخصوص:';
+
+  @override
+  String get categoryApartment => 'شقة';
+
+  @override
+  String get categoryVilla => 'فيلا';
+
+  @override
+  String get categoryHouse => 'منزل';
+
+  @override
+  String get categoryOffice => 'مكتب';
+
+  @override
+  String get categoryStudio => 'استوديو';
+
+  @override
+  String get categoryCommercial => 'تجاري';
+
+  @override
+  String get categoryTownhouse => 'تاون هاوس';
+
+  @override
+  String get categoryPenthouse => 'بنتهاوس';
+
+  @override
+  String get categoryLand => 'أرض';
+
+  @override
+  String get categoryChalet => 'شاليه';
+
+  @override
+  String get supportWebsite => 'الموقع الإلكتروني';
+
+  @override
+  String get supportEmailUs => 'راسلنا بالبريد';
+
+  @override
+  String get supportTerms => 'الشروط والأحكام';
+
+  @override
+  String get supportBuyer => 'مشتري';
+
+  @override
+  String get supportEstateAgent => 'وكيل عقاري';
+
+  @override
+  String get supportSubtitle =>
+      'اعثر على إجابات للأسئلة الشائعة أو تواصل مباشرة مع فريق الدعم المخصص لدينا.';
+
+  @override
+  String get supportEmailCopied => 'تم نسخ عنوان البريد الإلكتروني للدعم';
 }

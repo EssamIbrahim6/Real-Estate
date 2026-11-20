@@ -20,6 +20,11 @@ abstract class EstateRemoteDataSource {
   });
   Future<List<EstateModel>> getEstatesByAgentId(String agentId);
   Future<String> createEstate(EstateModel estate);
+  Future<List<EstateModel>> getEstatesByOwnerId(String ownerId);
+  Future<void> deleteEstate({
+    required String estateId,
+    required String currentUid,
+  });
 }
 
 class EstateRemoteDataSourceImpl implements EstateRemoteDataSource {
@@ -167,6 +172,99 @@ class EstateRemoteDataSourceImpl implements EstateRemoteDataSource {
     } on FirebaseException catch (e) {
       throw ServerException(message: e.message ?? 'Failed to load estates');
     } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<List<EstateModel>> getEstatesByOwnerId(String ownerId) async {
+    final trimmed = ownerId.trim();
+    if (trimmed.isEmpty) return const [];
+    try {
+      final resultsMap = <String, EstateModel>{};
+
+      // Query by ownerId
+      final qOwner = await _firestore
+          .collection('estates')
+          .where('ownerId', isEqualTo: trimmed)
+          .get();
+      for (final doc in qOwner.docs) {
+        resultsMap[doc.id] = EstateModel.fromFirestore(doc);
+      }
+
+      // Query by createdBy
+      final qCreated = await _firestore
+          .collection('estates')
+          .where('createdBy', isEqualTo: trimmed)
+          .get();
+      for (final doc in qCreated.docs) {
+        resultsMap[doc.id] = EstateModel.fromFirestore(doc);
+      }
+
+      // Query by userId
+      final qUser = await _firestore
+          .collection('estates')
+          .where('userId', isEqualTo: trimmed)
+          .get();
+      for (final doc in qUser.docs) {
+        resultsMap[doc.id] = EstateModel.fromFirestore(doc);
+      }
+
+      // Query by agentId
+      final qAgent = await _firestore
+          .collection('estates')
+          .where('agentId', isEqualTo: trimmed)
+          .get();
+      for (final doc in qAgent.docs) {
+        resultsMap[doc.id] = EstateModel.fromFirestore(doc);
+      }
+
+      final list = resultsMap.values.toList();
+      list.sort((a, b) {
+        final aTime = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final bTime = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        return bTime.compareTo(aTime);
+      });
+      return list;
+    } on FirebaseException catch (e) {
+      throw ServerException(message: e.message ?? 'Failed to load your properties');
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<void> deleteEstate({
+    required String estateId,
+    required String currentUid,
+  }) async {
+    final trimmedId = estateId.trim();
+    if (trimmedId.isEmpty) {
+      throw ArgumentError('Estate ID is required.');
+    }
+    final trimmedUid = currentUid.trim();
+    if (trimmedUid.isEmpty) {
+      throw ArgumentError('User ID is required.');
+    }
+
+    try {
+      final docRef = _firestore.collection('estates').doc(trimmedId);
+      final doc = await docRef.get();
+      if (!doc.exists) return;
+
+      final estate = EstateModel.fromFirestore(doc);
+      final owner = estate.primaryOwnerUid;
+      if (owner != null && owner != trimmedUid && estate.agentId != trimmedUid) {
+        throw const ServerException(
+          message: 'You are not authorized to delete this property listing.',
+        );
+      }
+
+      await docRef.delete();
+    } on FirebaseException catch (e) {
+      throw ServerException(message: e.message ?? 'Failed to delete property');
+    } catch (e) {
+      if (e is ServerException) rethrow;
       throw ServerException(message: e.toString());
     }
   }

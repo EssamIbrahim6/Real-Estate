@@ -82,6 +82,23 @@ class EstateRepositoryImpl implements EstateRepository {
 
   @override
   ResultFuture<String> createEstate(EstateEntity estate) async {
+    final latitude = estate.location.latitude;
+    final longitude = estate.location.longitude;
+    if (!latitude.isFinite ||
+        !longitude.isFinite ||
+        latitude < -90 ||
+        latitude > 90 ||
+        longitude < -180 ||
+        longitude > 180 ||
+        (latitude == 0 && longitude == 0)) {
+      return (
+        failure: const ValidationFailure(
+          message: 'A valid property location is required.',
+        ),
+        data: null,
+      );
+    }
+
     try {
       final model = estate is EstateModel
           ? estate
@@ -138,6 +155,36 @@ class EstateRepositoryImpl implements EstateRepository {
       return (failure: ServerFailure(message: e.message), data: null);
     } catch (e) {
       return (failure: ServerFailure(message: e.toString()), data: null);
+    }
+  }
+
+  @override
+  ResultFuture<List<EstateEntity>> getEstatesByOwnerId(String ownerId) async {
+    try {
+      final estates = await _remoteDataSource.getEstatesByOwnerId(ownerId);
+      return (failure: null, data: estates);
+    } on ServerException catch (e) {
+      return (failure: ServerFailure(message: e.message), data: null);
+    } catch (e) {
+      return (failure: ServerFailure(message: e.toString()), data: null);
+    }
+  }
+
+  @override
+  ResultVoid deleteEstate({
+    required String estateId,
+    required String currentUid,
+  }) async {
+    try {
+      await _remoteDataSource.deleteEstate(
+        estateId: estateId,
+        currentUid: currentUid,
+      );
+      return (failure: null, isSuccess: true);
+    } on ServerException catch (e) {
+      return (failure: ServerFailure(message: e.message), isSuccess: false);
+    } catch (e) {
+      return (failure: ServerFailure(message: e.toString()), isSuccess: false);
     }
   }
 }

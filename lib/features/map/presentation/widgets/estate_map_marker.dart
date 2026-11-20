@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../estate/domain/entities/estate_entity.dart';
 
 /// Interactive price badge / pin displayed at an estate's location on the map.
@@ -36,6 +36,10 @@ class EstateMapMarker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final priceLabel = formatPrice(estate.price);
+    final colors = Theme.of(context).colorScheme;
+    final currency = AppLocalizations.of(context)?.commonEgp ?? 'EGP';
+    final backgroundColor = isSelected ? colors.primary : colors.surface;
+    final foregroundColor = isSelected ? colors.onPrimary : colors.primary;
 
     return GestureDetector(
       onTap: onTap,
@@ -48,19 +52,21 @@ class EstateMapMarker extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.brandNavy : AppColors.brandGreen,
-                borderRadius: BorderRadius.circular(20),
+                color: backgroundColor,
+                borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: isSelected ? AppColors.brandGreen : Colors.white,
-                  width: isSelected ? 2 : 1.5,
+                  color: isSelected ? colors.secondary : colors.surface,
+                  width: isSelected ? 2 : 1,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.25),
-                    blurRadius: isSelected ? 8 : 4,
-                    offset: const Offset(0, 2),
+                    color: colors.shadow.withValues(
+                      alpha: isSelected ? 0.3 : 0.2,
+                    ),
+                    blurRadius: isSelected ? 10 : 6,
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
@@ -69,21 +75,19 @@ class EstateMapMarker extends StatelessWidget {
                 children: [
                   Icon(
                     isSelected ? Icons.location_on : Icons.home_rounded,
-                    size: 13,
-                    color: isSelected
-                        ? AppColors.brandGreen
-                        : AppColors.brandNavy,
+                    size: 14,
+                    color: isSelected ? colors.secondary : colors.primary,
                   ),
                   const SizedBox(width: 3),
                   Flexible(
                     child: Text(
-                      'EGP $priceLabel',
+                      '$currency $priceLabel',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 12,
                         fontWeight: FontWeight.w800,
-                        color: isSelected ? Colors.white : AppColors.brandNavy,
+                        color: foregroundColor,
                         letterSpacing: -0.2,
                       ),
                     ),
@@ -93,10 +97,8 @@ class EstateMapMarker extends StatelessWidget {
             ),
             // Pin pointer notch
             CustomPaint(
-              size: const Size(10, 6),
-              painter: _TrianglePainter(
-                color: isSelected ? AppColors.brandNavy : AppColors.brandGreen,
-              ),
+              size: const Size(11, 6),
+              painter: _TrianglePainter(color: backgroundColor),
             ),
           ],
         ),

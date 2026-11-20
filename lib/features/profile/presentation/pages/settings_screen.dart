@@ -55,13 +55,6 @@ class SettingsScreen extends StatelessWidget {
                   onTap: () =>
                       context.pushNamed('forgot-password', extra: email),
                 ),
-                ProfileActionTile(
-                  icon: Icons.add_home_work_outlined,
-                  title: l10n?.settingsAddProperty ?? 'Add New Property',
-                  subtitle: l10n?.settingsAddPropertySubtitle ??
-                      'List a new estate in English and Arabic',
-                  onTap: () => context.push(AppRoutes.addProperty),
-                ),
               ],
             ),
             const SizedBox(height: 24),

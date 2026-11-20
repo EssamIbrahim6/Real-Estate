@@ -79,9 +79,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       subtitle:
                           l10n?.authRegisterSubtitle ??
                           'Join us to find your dream property.',
-                      imageAsset: AppAssets.welcomeAuth3,
+                      imageAsset: AppAssets.signup,
                     ),
-                    verticalSpace(28),
+                    verticalSpace(16),
 
                     AuthTextField(
                       controller: _nameController,

@@ -8,6 +8,7 @@ class MessageModel extends MessageEntity {
     required super.senderId,
     required super.text,
     super.createdAt,
+    super.hiddenFor,
   });
 
   factory MessageModel.fromFirestore(
@@ -25,12 +26,18 @@ class MessageModel extends MessageEntity {
       senderId: map['senderId'] as String? ?? '',
       text: map['text'] as String? ?? '',
       createdAt: _parseDateTime(map['createdAt']),
+      hiddenFor:
+          (map['hiddenFor'] as List<dynamic>?)?.whereType<String>().toList(
+            growable: false,
+          ) ??
+          const [],
     );
   }
 
   Map<String, dynamic> toFirestore({Object? createdAtValue}) => {
     'senderId': senderId,
     'text': text,
+    'hiddenFor': hiddenFor,
     'createdAt':
         createdAtValue ??
         (createdAt == null

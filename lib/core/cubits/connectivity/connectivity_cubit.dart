@@ -6,27 +6,22 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../services/connectivity_service.dart';
 
-// ---------------------------------------------------------------------------
-// State
-// ---------------------------------------------------------------------------
+
 
 class ConnectivityState extends Equatable {
-  final bool isConnected;
+  final ConnectivityStatus status;
 
-  const ConnectivityState({this.isConnected = true});
+  const ConnectivityState({this.status = ConnectivityStatus.checking});
+
+  bool get isConnected => status == ConnectivityStatus.connected;
 
   @override
-  List<Object?> get props => [isConnected];
+  List<Object?> get props => [status];
 }
 
-// ---------------------------------------------------------------------------
-// Cubit
-// ---------------------------------------------------------------------------
+enum ConnectivityStatus { checking, connected, disconnected }
 
-/// Listens to [ConnectivityService] and exposes online/offline state.
-///
-/// Usage: Provide high in the widget tree (e.g., in [app.dart]) and read
-/// with [BlocBuilder] or [BlocListener] to show a banner or disable actions.
+
 class ConnectivityCubit extends Cubit<ConnectivityState> {
   final ConnectivityService service;
   StreamSubscription<bool>? _subscription;
@@ -39,20 +34,33 @@ class ConnectivityCubit extends Cubit<ConnectivityState> {
 
   Future<void> _init() async {
     try {
-      final generation = _statusGeneration;
       _subscription = service.onStatusChange.listen(
         _onStatusChanged,
         onError: (Object error, StackTrace stackTrace) {
           _logConnectivityError('status stream', error, stackTrace);
         },
       );
+    } catch (error, stackTrace) {
+      _logConnectivityError('status stream subscription', error, stackTrace);
+    }
+    await retryConnectivity(source: 'initial check');
+  }
 
-      final connected = await service.checkConnectivity();
+  Future<void> retryConnectivity({String source = 'retry'}) async {
+    final generation = ++_statusGeneration;
+    emit(const ConnectivityState(status: ConnectivityStatus.checking));
+    try {
+      final connected = await service.checkConnectivity().timeout(
+        const Duration(seconds: 10),
+      );
       if (!isClosed && generation == _statusGeneration) {
         _updateStatus(connected);
       }
     } catch (error, stackTrace) {
-      _logConnectivityError('initial check', error, stackTrace);
+      _logConnectivityError(source, error, stackTrace);
+      if (!isClosed && generation == _statusGeneration) {
+        _updateStatus(false);
+      }
     }
   }
 
@@ -63,8 +71,11 @@ class ConnectivityCubit extends Cubit<ConnectivityState> {
   }
 
   void _updateStatus(bool connected) {
-    if (isClosed || state.isConnected == connected) return;
-    emit(ConnectivityState(isConnected: connected));
+    final status = connected
+        ? ConnectivityStatus.connected
+        : ConnectivityStatus.disconnected;
+    if (isClosed || state.status == status) return;
+    emit(ConnectivityState(status: status));
   }
 
   void _logConnectivityError(

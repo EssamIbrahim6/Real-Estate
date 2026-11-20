@@ -7,16 +7,13 @@ import 'package:speech_to_text/speech_to_text.dart';
 
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/router/route_names.dart';
-import '../../../../core/widgets/app_error_view.dart';
-import '../../../../core/widgets/app_empty_state.dart';
-import '../../../../core/widgets/app_skeleton.dart';
 import '../../../../l10n/generated/app_localizations.dart';
-import '../../../estate/domain/entities/estate_entity.dart';
-import '../../../home/presentation/widgets/estate_card.dart';
 import '../cubit/search_cubit.dart';
 import '../cubit/search_state.dart';
 import '../../domain/entities/search_filter.dart';
 import '../widgets/search_filter_sheet.dart';
+import '../widgets/search_input_controls.dart';
+import '../widgets/search_results_section.dart';
 import '../../../map/domain/models/map_screen_args.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -44,8 +41,6 @@ class _SearchScreenState extends State<SearchScreen> {
     super.initState();
     final cubit = context.read<SearchCubit>();
     cubit.loadCategories();
-    // Load initial results with the current (empty) filter.
-    cubit.search(cubit.state.filter);
     // Wire live search: every keystroke resets the debounce timer.
     _queryController.addListener(_onQueryChanged);
     _initSpeech();
@@ -76,18 +71,33 @@ class _SearchScreenState extends State<SearchScreen> {
     setState(() {});
     if (_suppressQuerySearch) return;
     _debounceTimer?.cancel();
-    _debounceTimer = Timer(_debounceDuration, _runSmartSearch);
+    _debounceTimer = Timer(_debounceDuration, _runSearch);
   }
 
-  Future<void> _runSmartSearch() async {
+  Future<void> _runSearch({bool useAiSearch = false}) async {
     _debounceTimer?.cancel();
     if (!mounted) return;
     final rawQuery = _queryController.text.trim();
-    if (rawQuery.isEmpty) {
-      await context.read<SearchCubit>().search(const SearchFilter());
+    final cubit = context.read<SearchCubit>();
+    if (useAiSearch && rawQuery.isNotEmpty) {
+      await cubit.smartSearch(rawQuery);
       return;
     }
-    await context.read<SearchCubit>().smartSearch(rawQuery);
+    final current = cubit.state.filter;
+    await cubit.search(
+      SearchFilter(
+        query: rawQuery.isEmpty ? null : rawQuery,
+        categoryId: current.categoryId,
+        city: current.city,
+        minPrice: current.minPrice,
+        maxPrice: current.maxPrice,
+        bedrooms: current.bedrooms,
+        bathrooms: current.bathrooms,
+        isFurnished: current.isFurnished,
+        listingType: current.listingType,
+        isAvailable: current.isAvailable,
+      ),
+    );
   }
 
   Future<void> _toggleListening() async {
@@ -105,7 +115,7 @@ class _SearchScreenState extends State<SearchScreen> {
         _queryController.text = result.recognizedWords;
         _suppressQuerySearch = false;
         if (result.finalResult) {
-          _runSmartSearch();
+          _runSearch();
         }
       },
       listenOptions: SpeechListenOptions(
@@ -151,7 +161,6 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -187,134 +196,36 @@ class _SearchScreenState extends State<SearchScreen> {
             child: Column(
               children: [
                 BlocBuilder<SearchCubit, SearchState>(
-                  builder: (context, state) => Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _queryController,
-                          textInputAction: TextInputAction.search,
-                          // onChanged is handled by the listener added in initState.
-                          // onSubmitted fires an immediate search (bypassing debounce).
-                          onSubmitted: (_) => _runSmartSearch(),
-                          decoration: InputDecoration(
-                            hintText: l10n?.searchHint ?? 'Search estates…',
-                            prefixIcon: const Icon(Icons.search_rounded),
-                            suffixIcon: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (_queryController.text.isNotEmpty)
-                                  IconButton(
-                                    tooltip:
-                                        l10n?.commonClear ?? 'Clear search',
-                                    onPressed: () {
-                                      _debounceTimer?.cancel();
-                                      _queryController.clear();
-                                      _runSmartSearch();
-                                    },
-                                    icon: const Icon(Icons.close_rounded),
-                                  ),
-                                IconButton(
-                                  tooltip: l10n?.commonSearch ?? 'Search',
-                                  onPressed: _runSmartSearch,
-                                  icon: const Icon(Icons.arrow_forward_rounded),
-                                ),
-                              ],
-                            ),
-                            filled: true,
-                            fillColor: colors.surface,
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 18,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide(
-                                color: colors.outlineVariant,
-                              ),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide(
-                                color: colors.outlineVariant,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 9),
-                      IconButton.filledTonal(
-                        tooltip: l10n?.searchFilters ?? 'Filters',
-                        onPressed: () => _openFilters(state),
-                        icon: const Icon(Icons.tune_rounded),
-                      ),
-                    ],
+                  builder: (context, state) => SearchInputControls(
+                    controller: _queryController,
+                    hintText: l10n?.searchHint ?? 'Search estates…',
+                    voiceTooltip: l10n?.searchVoiceSearch ?? 'Voice search',
+                    clearTooltip: l10n?.commonClear ?? 'Clear search',
+                    searchTooltip: l10n?.commonSearch ?? 'Search',
+                    filterTooltip: l10n?.searchFilters ?? 'Filters',
+                    speechAvailable: _speechAvailable,
+                    isListening: _isListening,
+                    onSubmitted: (_) => _runSearch(),
+                    onVoicePressed: _toggleListening,
+                    onClearPressed: () {
+                      _suppressQuerySearch = true;
+                      _queryController.clear();
+                      _suppressQuerySearch = false;
+                      _debounceTimer?.cancel();
+                      context.read<SearchCubit>().reset();
+                    },
+                    onSearchPressed: _runSearch,
+                    onFiltersPressed: () => _openFilters(state),
                   ),
                 ),
                 const SizedBox(height: 12),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsetsDirectional.fromSTEB(14, 12, 8, 12),
-                  decoration: BoxDecoration(
-                    color: colors.primaryContainer.withValues(alpha: 0.42),
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: colors.primary.withValues(alpha: 0.16),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: colors.surface.withValues(alpha: 0.8),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Icon(
-                          Icons.auto_awesome_rounded,
-                          color: colors.primary,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 11),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              l10n?.searchAiTitle ?? 'AI-powered search',
-                              style: Theme.of(context).textTheme.labelLarge
-                                  ?.copyWith(
-                                    color: colors.onSurface,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                            ),
-                            const SizedBox(height: 3),
-                            Text(
-                              l10n?.searchAiHint ??
-                                  'Describe the home you are looking for.',
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(
-                                    color: colors.onSurfaceVariant,
-                                    height: 1.3,
-                                  ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      IconButton(
-                        visualDensity: VisualDensity.compact,
-                        tooltip: l10n?.searchVoiceSearch ?? 'Voice search',
-                        onPressed: _speechAvailable ? _toggleListening : null,
-                        icon: Icon(
-                          _isListening ? Icons.mic_rounded : Icons.mic_none,
-                          color: _isListening
-                              ? colors.primary
-                              : colors.onSurfaceVariant,
-                          size: 21,
-                        ),
-                      ),
-                    ],
-                  ),
+                SearchAiPromptCard(
+                  title: l10n?.searchAiTitle ?? 'AI-powered search',
+                  hint:
+                      l10n?.searchAiHint ??
+                      'Describe the home you are looking for.',
+                  hasQuery: _queryController.text.trim().isNotEmpty,
+                  onPressed: () => _runSearch(useAiSearch: true),
                 ),
               ],
             ),
@@ -322,40 +233,26 @@ class _SearchScreenState extends State<SearchScreen> {
           Expanded(
             child: BlocBuilder<SearchCubit, SearchState>(
               builder: (context, state) {
-                switch (state.status) {
-                  case SearchStatus.initial:
-                  case SearchStatus.loading:
-                    if (state.estates.isEmpty) {
-                      return const EstateListSkeleton(itemCount: 4);
-                    }
-                    return Stack(
-                      children: [
-                        _SearchResults(estates: state.estates),
-                        const Align(
-                          alignment: Alignment.topCenter,
-                          child: LinearProgressIndicator(),
-                        ),
-                      ],
-                    );
-                  case SearchStatus.failure:
-                    return AppErrorView(
-                      message:
-                          state.failure?.message ??
-                          l10n?.homeLoadError ??
-                          'Search could not be completed.',
-                      onRetry: () => context.read<SearchCubit>().retry(),
-                    );
-                  case SearchStatus.empty:
-                    return AppEmptyState(
-                      icon: Icons.search_off_rounded,
-                      title: l10n?.searchNoResults ?? 'No estates found',
-                      description:
-                          l10n?.searchNoResultsHint ??
-                          'Try changing your search or filters.',
-                    );
-                  case SearchStatus.success:
-                    return _SearchResults(estates: state.estates);
-                }
+                return SearchResultsSection(
+                  status: state.status,
+                  estates: state.estates,
+                  initialTitle:
+                      l10n?.searchInitialTitle ?? 'Find your next home',
+                  initialHint: l10n?.searchInitialHint ?? 'Search by keyword or use filters to explore available properties.',
+                  emptyTitle: l10n?.searchNoResults ?? 'No estates found',
+                  emptyHint:
+                      l10n?.searchNoResultsHint ??
+                      'Try changing your search or filters.',
+                  errorMessage:
+                      state.failure?.message ??
+                      l10n?.homeLoadError ??
+                      'Search could not be completed.',
+                  onRetry: () => context.read<SearchCubit>().retry(),
+                  onEstateTap: (estate) => context.push(
+                    '${AppRoutes.propertyDetails}/${estate.id}',
+                    extra: estate,
+                  ),
+                );
               },
             ),
           ),
@@ -363,28 +260,4 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
     );
   }
-}
-
-class _SearchResults extends StatelessWidget {
-  final List<EstateEntity> estates;
-
-  const _SearchResults({required this.estates});
-
-  @override
-  Widget build(BuildContext context) => ListView.separated(
-    padding: const EdgeInsets.all(AppDimensions.p20),
-    itemCount: estates.length,
-    separatorBuilder: (_, _) => const SizedBox(height: 16),
-    itemBuilder: (context, index) {
-      final estate = estates[index];
-      return EstateCard(
-        estate: estate,
-        width: double.infinity,
-        onTap: () => context.push(
-          '${AppRoutes.propertyDetails}/${estate.id}',
-          extra: estate,
-        ),
-      );
-    },
-  );
 }

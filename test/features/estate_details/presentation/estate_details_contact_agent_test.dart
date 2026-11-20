@@ -13,6 +13,7 @@ import 'package:real_estate_app/core/utils/typedefs.dart';
 import 'package:real_estate_app/features/agent/domain/entities/agent_entity.dart';
 import 'package:real_estate_app/features/agent/domain/repositories/agent_repository.dart';
 import 'package:real_estate_app/features/chat/domain/entities/conversation_entity.dart';
+import 'package:real_estate_app/features/chat/domain/entities/chat_launch_request.dart';
 import 'package:real_estate_app/features/chat/domain/entities/message_entity.dart';
 import 'package:real_estate_app/features/chat/domain/repositories/chat_repository.dart';
 import 'package:real_estate_app/features/chat/presentation/cubit/chat_cubit.dart';
@@ -33,7 +34,6 @@ void main() {
       final cubit = _createCubit(
         auth: _FakeFirebaseAuth(_FakeUser('customer-auth-uid')),
         agentRepository: _FakeAgentRepository(),
-        chatRepository: _FakeChatRepository(),
         estateDetailsRepository: repository,
       );
 
@@ -62,7 +62,6 @@ void main() {
       final cubit = _createCubit(
         auth: _FakeFirebaseAuth(_FakeUser('customer-auth-uid')),
         agentRepository: _FakeAgentRepository(),
-        chatRepository: _FakeChatRepository(),
         estateDetailsRepository: repository,
       );
 
@@ -85,7 +84,6 @@ void main() {
       final cubit = _createCubit(
         auth: _FakeFirebaseAuth(null),
         agentRepository: _FakeAgentRepository(),
-        chatRepository: _FakeChatRepository(),
         estateDetailsRepository: repository,
       );
 
@@ -106,7 +104,6 @@ void main() {
         final cubit = _createCubit(
           auth: _FakeFirebaseAuth(_FakeUser('customer-auth-uid')),
           agentRepository: _FakeAgentRepository(),
-          chatRepository: _FakeChatRepository(),
           estateDetailsRepository: repository,
         );
 
@@ -133,7 +130,6 @@ void main() {
         final cubit = _createCubit(
           auth: _FakeFirebaseAuth(_FakeUser('customer-auth-uid')),
           agentRepository: _FakeAgentRepository(),
-          chatRepository: _FakeChatRepository(),
           estateDetailsRepository: repository,
         );
 
@@ -150,35 +146,31 @@ void main() {
   group('EstateDetailsCubit.startConversationWithAgent', () {
     test('resolves estate agent document to its Auth UID', () async {
       final agentRepository = _FakeAgentRepository(agent: _agent());
-      final chatRepository = _FakeChatRepository();
       final cubit = _createCubit(
         auth: _FakeFirebaseAuth(_FakeUser('customer-auth-uid')),
         agentRepository: agentRepository,
-        chatRepository: chatRepository,
       );
       await cubit.loadEstateDetails(
         'estate-document-id',
         initialEstate: _estate(),
       );
 
-      final conversationId = await cubit.startConversationWithAgent();
+      final launchRequest = await cubit.startConversationWithAgent();
 
-      expect(conversationId, 'resolved-conversation-id');
+      expect(launchRequest?.conversationId, isNotEmpty);
+      expect(launchRequest?.customerUid, 'customer-auth-uid');
+      expect(launchRequest?.agentUserUid, 'agent-auth-uid');
+      expect(launchRequest?.agentId, 'agent-document-id');
+      expect(launchRequest?.estateId, 'estate-document-id');
       expect(agentRepository.requestedAgentId, 'agent-document-id');
-      expect(chatRepository.customerUid, 'customer-auth-uid');
-      expect(chatRepository.agentUserUid, 'agent-auth-uid');
-      expect(chatRepository.agentId, 'agent-document-id');
-      expect(chatRepository.estateId, 'estate-document-id');
       expect(cubit.state.contactAgentStatus, ContactAgentStatus.success);
       await cubit.close();
     });
 
     test('fails when the estate has no agent document', () async {
-      final chatRepository = _FakeChatRepository();
       final cubit = _createCubit(
         auth: _FakeFirebaseAuth(_FakeUser('customer-auth-uid')),
         agentRepository: _FakeAgentRepository(),
-        chatRepository: chatRepository,
       );
       await _loadEstate(cubit, estate: _estate());
 
@@ -187,20 +179,17 @@ void main() {
         cubit.state.contactAgentError,
         contains('could not find the agent'),
       );
-      expect(chatRepository.callCount, 0);
       await cubit.close();
     });
 
     test(
       'reports agent repository failures without exposing backend details',
       () async {
-        final chatRepository = _FakeChatRepository();
         final cubit = _createCubit(
           auth: _FakeFirebaseAuth(_FakeUser('customer-auth-uid')),
           agentRepository: _FakeAgentRepository(
             failure: const ServerFailure(message: 'permission-denied'),
           ),
-          chatRepository: chatRepository,
         );
         await _loadEstate(cubit, estate: _estate());
 
@@ -213,97 +202,56 @@ void main() {
           cubit.state.contactAgentError,
           isNot(contains('permission-denied')),
         );
-        expect(chatRepository.callCount, 0);
         await cubit.close();
       },
     );
 
     test('fails when the Agent userId is empty', () async {
-      final chatRepository = _FakeChatRepository();
       final cubit = _createCubit(
         auth: _FakeFirebaseAuth(_FakeUser('customer-auth-uid')),
         agentRepository: _FakeAgentRepository(agent: _agent(userId: '  ')),
-        chatRepository: chatRepository,
       );
       await _loadEstate(cubit, estate: _estate());
 
       expect(await cubit.startConversationWithAgent(), isNull);
       expect(cubit.state.contactAgentError, contains('not set up'));
-      expect(chatRepository.callCount, 0);
       await cubit.close();
     });
 
     test('requires an authenticated customer', () async {
-      final chatRepository = _FakeChatRepository();
       final cubit = _createCubit(
         auth: _FakeFirebaseAuth(null),
         agentRepository: _FakeAgentRepository(agent: _agent()),
-        chatRepository: chatRepository,
       );
       await _loadEstate(cubit, estate: _estate());
 
       expect(await cubit.startConversationWithAgent(), isNull);
       expect(cubit.state.contactAgentError, contains('Sign in'));
-      expect(chatRepository.callCount, 0);
       await cubit.close();
     });
 
     test('prevents contacting the current user as the agent', () async {
-      final chatRepository = _FakeChatRepository();
       final cubit = _createCubit(
         auth: _FakeFirebaseAuth(_FakeUser('agent-auth-uid')),
         agentRepository: _FakeAgentRepository(agent: _agent()),
-        chatRepository: chatRepository,
       );
       await _loadEstate(cubit, estate: _estate());
 
       expect(await cubit.startConversationWithAgent(), isNull);
       expect(cubit.state.contactAgentError, contains('own agent'));
-      expect(chatRepository.callCount, 0);
       await cubit.close();
     });
 
-    test(
-      'reports conversation creation failure without exposing details',
-      () async {
-        final chatRepository = _FakeChatRepository(
-          conversationFailure: const ServerFailure(
-            message: 'permission-denied raw backend detail',
-          ),
-        );
-        final cubit = _createCubit(
-          auth: _FakeFirebaseAuth(_FakeUser('customer-auth-uid')),
-          agentRepository: _FakeAgentRepository(agent: _agent()),
-          chatRepository: chatRepository,
-        );
-        await _loadEstate(cubit, estate: _estate());
-
-        expect(await cubit.startConversationWithAgent(), isNull);
-        expect(
-          cubit.state.contactAgentError,
-          'We could not open this conversation. Please try again.',
-        );
-        expect(
-          cubit.state.contactAgentError,
-          isNot(contains('permission-denied')),
-        );
-        await cubit.close();
-      },
-    );
-
     test('fails before lookup when estate agentId is missing', () async {
       final agentRepository = _FakeAgentRepository(agent: _agent());
-      final chatRepository = _FakeChatRepository();
       final cubit = _createCubit(
         auth: _FakeFirebaseAuth(_FakeUser('customer-auth-uid')),
         agentRepository: agentRepository,
-        chatRepository: chatRepository,
       );
       await _loadEstate(cubit, estate: _estate(agentId: ' '));
 
       expect(await cubit.startConversationWithAgent(), isNull);
       expect(agentRepository.requestedAgentId, isNull);
-      expect(chatRepository.callCount, 0);
       await cubit.close();
     });
   });
@@ -316,7 +264,6 @@ void main() {
     final cubit = _createCubit(
       auth: _FakeFirebaseAuth(_FakeUser('customer-auth-uid')),
       agentRepository: _FakeAgentRepository(agent: _agent()),
-      chatRepository: chatRepository,
     );
     await _loadEstate(cubit, estate: _estate());
     final rootKey = GlobalKey<NavigatorState>(debugLabel: 'testRootNav');
@@ -452,7 +399,7 @@ void main() {
       find.text('No messages yet. Start the conversation.'),
       findsOneWidget,
     );
-    expect(chatRepository.agentUserUid, 'agent-auth-uid');
+    expect(chatRepository.callCount, 0);
     expect(find.byKey(rootKey), findsOneWidget);
 
     await tester.tap(find.byType(BackButton));
@@ -472,7 +419,6 @@ void main() {
 EstateDetailsCubit _createCubit({
   required FirebaseAuth auth,
   required _FakeAgentRepository agentRepository,
-  required _FakeChatRepository chatRepository,
   _FakeEstateDetailsRepository? estateDetailsRepository,
 }) => EstateDetailsCubit(
   estateRepository: _FakeEstateRepository(),
@@ -480,7 +426,6 @@ EstateDetailsCubit _createCubit({
   estateDetailsRepository:
       estateDetailsRepository ?? _FakeEstateDetailsRepository(),
   firebaseAuth: auth,
-  chatRepository: chatRepository,
 );
 
 Future<void> _loadEstate(
@@ -577,9 +522,6 @@ class _FakeAgentRepository implements AgentRepository {
 }
 
 class _FakeChatRepository implements ChatRepository {
-  _FakeChatRepository({this.conversationFailure});
-
-  final Failure? conversationFailure;
   int callCount = 0;
   String? customerUid;
   String? agentUserUid;
@@ -599,19 +541,31 @@ class _FakeChatRepository implements ChatRepository {
     this.agentId = agentId;
     this.estateId = estateId;
     return (
-      failure: conversationFailure,
-      data: conversationFailure == null
-          ? const ConversationEntity(
-              id: 'resolved-conversation-id',
-              participants: ['customer-auth-uid', 'agent-auth-uid'],
-              customerId: 'customer-auth-uid',
-              agentUserId: 'agent-auth-uid',
-              agentId: 'agent-document-id',
-              estateId: 'estate-document-id',
-            )
-          : null,
+      failure: null,
+      data: const ConversationEntity(
+        id: 'resolved-conversation-id',
+        participants: ['customer-auth-uid', 'agent-auth-uid'],
+        customerId: 'customer-auth-uid',
+        agentUserId: 'agent-auth-uid',
+        agentId: 'agent-document-id',
+        estateId: 'estate-document-id',
+      ),
     );
   }
+
+  @override
+  ResultFuture<ConversationEntity?> getConversation(
+    String conversationId,
+  ) async => (
+    failure: null,
+    data: const ConversationEntity(
+      id: 'resolved-conversation-id',
+      participants: ['customer-auth-uid', 'agent-auth-uid'],
+      customerId: 'customer-auth-uid',
+      agentUserId: 'agent-auth-uid',
+      agentId: 'agent-document-id',
+    ),
+  );
 
   @override
   Stream<List<ConversationEntity>> watchConversations(String currentUserUid) =>
@@ -626,6 +580,20 @@ class _FakeChatRepository implements ChatRepository {
     required String conversationId,
     required String senderId,
     required String text,
+    ChatLaunchRequest? launchRequest,
+  }) async => (failure: null, isSuccess: true);
+
+  @override
+  ResultVoid archiveConversation({
+    required String conversationId,
+    required String participantUid,
+  }) async => (failure: null, isSuccess: true);
+
+  @override
+  ResultVoid deleteMessageForMe({
+    required String conversationId,
+    required String messageId,
+    required String participantUid,
   }) async => (failure: null, isSuccess: true);
 
   @override
@@ -665,6 +633,16 @@ class _FakeEstateRepository implements EstateRepository {
   @override
   ResultFuture<String> createEstate(EstateEntity estate) async =>
       (failure: null, data: estate.id);
+
+  @override
+  ResultFuture<List<EstateEntity>> getEstatesByOwnerId(String ownerId) async =>
+      (failure: null, data: const <EstateEntity>[]);
+
+  @override
+  ResultVoid deleteEstate({
+    required String estateId,
+    required String currentUid,
+  }) async => (failure: null, isSuccess: true);
 }
 
 class _FakeEstateDetailsRepository implements EstateDetailsRepository {

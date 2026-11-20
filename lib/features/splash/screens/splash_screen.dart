@@ -1,13 +1,15 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/cubits/connectivity/connectivity_cubit.dart';
 import '../../../core/router/route_names.dart';
-import '../../../core/theme/app_text_styles.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -17,37 +19,56 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  Timer? _startupTimer;
+  bool _nativeSplashRemoved = false;
 
   @override
   void initState() {
     super.initState();
-    _startupTimer = Timer(const Duration(seconds: 2), _determineNextScreen);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) unawaited(_determineNextScreen());
+    });
   }
 
-  @override
-  void dispose() {
-    _startupTimer?.cancel();
-    super.dispose();
+  void _removeNativeSplash() {
+    if (_nativeSplashRemoved) return;
+    _nativeSplashRemoved = true;
+    FlutterNativeSplash.remove();
   }
 
   Future<void> _determineNextScreen() async {
     if (!mounted) return;
 
+    final ConnectivityCubit connectivityCubit;
     try {
+      connectivityCubit = context.read<ConnectivityCubit>();
+    } catch (_) {
+      return;
+    }
+
+    try {
+      var connectivityStatus = connectivityCubit.state.status;
+      if (connectivityStatus == ConnectivityStatus.checking) {
+        connectivityStatus = (await connectivityCubit.stream.first).status;
+      }
+      if (connectivityStatus == ConnectivityStatus.disconnected) {
+        _removeNativeSplash();
+        await connectivityCubit.stream.firstWhere((state) => state.isConnected);
+        if (!mounted) return;
+      }
+
       final prefs = await SharedPreferences.getInstance();
       if (!mounted) return;
       final hasCompletedOnboarding =
           prefs.getBool('has_completed_onboarding') ?? false;
 
       if (!hasCompletedOnboarding) {
-        context.go(AppRoutes.onBoarding);
+        _navigateTo(AppRoutes.onBoarding);
         return;
       }
 
       final currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser == null) {
-        context.go(AppRoutes.welcome);
+        _navigateTo(AppRoutes.welcome);
         return;
       }
 
@@ -58,44 +79,20 @@ class _SplashScreenState extends State<SplashScreen> {
       if (!mounted) return;
 
       final isSetupCompleted = userDoc.data()?['accountSetupCompleted'] == true;
-      context.go(
+      _navigateTo(
         isSetupCompleted ? AppRoutes.home : AppRoutes.accountSetupLocation,
       );
     } catch (_) {
-      if (mounted) context.go(AppRoutes.welcome);
+      if (mounted) _navigateTo(AppRoutes.welcome);
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.sizeOf(context).height;
-    return Scaffold(
-      body: Stack(
-        children: [
-          SizedBox.expand(
-            child: Image.asset(
-              'assets/images/Splash_Screen.jpg',
-              fit: BoxFit.cover,
-            ),
-          ),
-          Positioned.fill(
-            child: Center(child: Image.asset('assets/images/Mask group.png')),
-          ),
-          Positioned(
-            bottom: screenHeight * 0.28,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Text(
-                'Apexie',
-                style: AppTextStyles.headlineLarge.copyWith(
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+  void _navigateTo(String location) {
+    if (!mounted) return;
+    context.go(location);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _removeNativeSplash());
   }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.expand();
 }

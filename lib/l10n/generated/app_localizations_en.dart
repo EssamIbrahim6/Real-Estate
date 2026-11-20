@@ -147,6 +147,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchHint => 'Search estates...';
 
   @override
+  String get searchInitialTitle => 'Find your next home';
+
+  @override
+  String get searchInitialHint =>
+      'Search by keyword or use filters to explore available properties.';
+
+  @override
   String get searchAiTitle => 'AI-powered search';
 
   @override
@@ -320,6 +327,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get detailsWriteReview => 'Write a Review';
 
   @override
+  String get detailsExperiencePrompt => 'How was your experience?';
+
+  @override
+  String get detailsEditReview => 'Edit Your Review';
+
+  @override
+  String get detailsSubmitReview => 'Submit Review';
+
+  @override
+  String get detailsUpdateReview => 'Update Review';
+
+  @override
+  String detailsRatingSemantics(int rating) {
+    return 'Rating: $rating out of 5';
+  }
+
+  @override
+  String detailsStarRatingTooltip(int rating) {
+    return 'Select a $rating-star rating';
+  }
+
+  @override
   String get detailsYourRating => 'Your Rating';
 
   @override
@@ -340,6 +369,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mapSearchTitle => 'Search Map';
+
+  @override
+  String get mapLoading => 'Loading properties on map...';
 
   @override
   String get mapZoomIn => 'Zoom in';
@@ -365,6 +397,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapLoadAllButton => 'Load All Properties';
 
   @override
+  String get mapLoadError => 'Failed to load properties on the map.';
+
+  @override
+  String get mapClosePreview => 'Close preview';
+
+  @override
   String get mapServicesDisabled =>
       'Location services are disabled on this device.';
 
@@ -374,6 +412,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mapLocationError => 'Could not determine location.';
+
+  @override
+  String mapLocationFailure(String error) {
+    return 'Could not determine location: $error';
+  }
 
   @override
   String get mapViewDetails => 'View details';
@@ -486,6 +529,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chatInquiry => 'Property inquiry';
+
+  @override
+  String get chatAgentLabel => 'Agent';
+
+  @override
+  String get chatCustomerLabel => 'Customer';
+
+  @override
+  String get chatLoadError => 'Could not load conversations. Please try again.';
 
   @override
   String get settingsTitle => 'Settings';
@@ -872,6 +924,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatSendTooltip => 'Send message';
 
   @override
+  String get chatSentMessageSemantics => 'Sent message';
+
+  @override
+  String get chatReceivedMessageSemantics => 'Received message';
+
+  @override
   String get galleryViewAll => 'View all photos';
 
   @override
@@ -931,6 +989,20 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get offlineNotice =>
       'No internet connection. Some features may be unavailable.';
+
+  @override
+  String get offlineTitle => 'You are offline';
+
+  @override
+  String get offlineDescription =>
+      'Connect to the internet to continue using the app.';
+
+  @override
+  String get connectionChecking => 'Checking connection';
+
+  @override
+  String get connectionCheckingDescription =>
+      'Please wait while we check your internet connection.';
 
   @override
   String get bookingTitle => 'Book a Visit';
@@ -1102,4 +1174,219 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileNotificationsSubtitle => 'View your activity and updates';
+
+  @override
+  String get profileYourProperties => 'Your Properties';
+
+  @override
+  String get profileYourPropertiesSubtitle =>
+      'View and manage your listed properties';
+
+  @override
+  String get myPropertiesTitle => 'Your Properties';
+
+  @override
+  String get myPropertiesEmpty => 'No properties listed yet.';
+
+  @override
+  String get myPropertiesEmptySubtitle =>
+      'Publish your first property to reach thousands of buyers.';
+
+  @override
+  String get myPropertiesAddNew => 'Add New Property';
+
+  @override
+  String get myPropertiesDeleteTitle => 'Delete Property?';
+
+  @override
+  String get myPropertiesDeleteMessage =>
+      'Are you sure you want to permanently delete this property listing? This action cannot be undone.';
+
+  @override
+  String get myPropertiesDeleteButton => 'Delete';
+
+  @override
+  String get myPropertiesDeleteSuccess => 'Property deleted successfully.';
+
+  @override
+  String get myPropertiesDeleteError =>
+      'Failed to delete property. Please try again.';
+
+  @override
+  String get myPropertiesStatusPending => 'Pending Review';
+
+  @override
+  String get myPropertiesStatusApproved => 'Approved';
+
+  @override
+  String get myPropertiesStatusActive => 'Active';
+
+  @override
+  String get myPropertiesStatusRejected => 'Rejected';
+
+  @override
+  String get myPropertiesPickImages => 'Select Images';
+
+  @override
+  String get myPropertiesCoverImageTag => 'Cover';
+
+  @override
+  String get myPropertiesSetAsCover => 'Set as cover';
+
+  @override
+  String get myPropertiesRemoveImage => 'Remove image';
+
+  @override
+  String get myPropertiesUploadProgress => 'Uploading property...';
+
+  @override
+  String get myPropertiesMinImagesError =>
+      'Please select at least one property image.';
+
+  @override
+  String get myPropertiesSelectLocation => 'Pick location on map';
+
+  @override
+  String get myPropertiesLocationPicked => 'Coordinates selected';
+
+  @override
+  String get myPropertiesLocationRequired => 'Property location is required';
+
+  @override
+  String get propertyLocationPickerTitle => 'Select property location';
+
+  @override
+  String get propertyLocationPickerHint =>
+      'Tap the map or move it and select its center.';
+
+  @override
+  String get propertyLocationSelectMapCenter => 'Select map center';
+
+  @override
+  String get propertyLocationSelectionReady =>
+      'Location selected. Confirm to use it for this property.';
+
+  @override
+  String get propertyLocationAddressUnavailable =>
+      'Address lookup is unavailable; the selected map location will still be saved.';
+
+  @override
+  String get propertyLocationConfirm => 'Confirm location';
+
+  @override
+  String get propertyMapLoadingError =>
+      'Map tiles are unavailable. Check your connection or retry.';
+
+  @override
+  String get propertyMapRetry => 'Retry map';
+
+  @override
+  String get chatDeleteConversation => 'Delete conversation';
+
+  @override
+  String get chatDeleteConversationConfirm =>
+      'Are you sure you want to remove this conversation from your chat list?';
+
+  @override
+  String get chatDeleteConversationButton => 'Delete';
+
+  @override
+  String get chatConversationDeleted => 'Conversation removed';
+
+  @override
+  String get chatDeleteMessage => 'Delete message';
+
+  @override
+  String get chatDeleteMessageForMe => 'Delete for me';
+
+  @override
+  String get chatDeleteMessageForMeConfirm =>
+      'Remove this message from your view?';
+
+  @override
+  String get chatDeleteForEveryoneNotAllowed =>
+      'Messages cannot be deleted for everyone to ensure account security and record keeping.';
+
+  @override
+  String get chatMessageDeleted => 'Message deleted';
+
+  @override
+  String get chatDeleteForMe => 'Delete for me';
+
+  @override
+  String get chatDeleteMessageConfirm =>
+      'Hide this message from your chat only?';
+
+  @override
+  String get chatMessageHiddenForMe => 'Message hidden from your chat.';
+
+  @override
+  String get chatArchiveConversation => 'Archive';
+
+  @override
+  String get chatConversationArchived => 'Conversation archived.';
+
+  @override
+  String get chatArchiveFailed => 'Conversation could not be archived.';
+
+  @override
+  String get chatCopyMessage => 'Copy text';
+
+  @override
+  String get chatMessageCopied => 'Text copied to clipboard';
+
+  @override
+  String get chatPropertyInquiryPrefix => 'Inquiry regarding:';
+
+  @override
+  String get categoryApartment => 'Apartment';
+
+  @override
+  String get categoryVilla => 'Villa';
+
+  @override
+  String get categoryHouse => 'House';
+
+  @override
+  String get categoryOffice => 'Office';
+
+  @override
+  String get categoryStudio => 'Studio';
+
+  @override
+  String get categoryCommercial => 'Commercial';
+
+  @override
+  String get categoryTownhouse => 'Townhouse';
+
+  @override
+  String get categoryPenthouse => 'Penthouse';
+
+  @override
+  String get categoryLand => 'Land';
+
+  @override
+  String get categoryChalet => 'Chalet';
+
+  @override
+  String get supportWebsite => 'Website';
+
+  @override
+  String get supportEmailUs => 'Email Us';
+
+  @override
+  String get supportTerms => 'Terms';
+
+  @override
+  String get supportBuyer => 'Buyer';
+
+  @override
+  String get supportEstateAgent => 'Estate Agent';
+
+  @override
+  String get supportSubtitle =>
+      'Find answers to common questions or reach out directly to our dedicated support team.';
+
+  @override
+  String get supportEmailCopied => 'Support email address copied';
 }

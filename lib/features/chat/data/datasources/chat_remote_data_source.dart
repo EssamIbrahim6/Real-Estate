@@ -1,9 +1,8 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../../../core/services/notification_service.dart';
+import '../../domain/entities/chat_launch_request.dart';
 import '../models/conversation_model.dart';
 import '../models/message_model.dart';
 
@@ -15,6 +14,8 @@ abstract class ChatRemoteDataSource {
     required String estateId,
   });
 
+  Future<ConversationModel?> getConversation(String conversationId);
+
   Stream<List<ConversationModel>> watchConversations(String currentUserUid);
 
   Stream<List<MessageModel>> watchMessages(String conversationId);
@@ -23,6 +24,18 @@ abstract class ChatRemoteDataSource {
     required String conversationId,
     required String senderId,
     required String text,
+    ChatLaunchRequest? launchRequest,
+  });
+
+  Future<void> archiveConversation({
+    required String conversationId,
+    required String participantUid,
+  });
+
+  Future<void> deleteMessageForMe({
+    required String conversationId,
+    required String messageId,
+    required String participantUid,
   });
 
   Future<void> markConversationAsRead({
@@ -68,50 +81,52 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     final conversationId = _conversationIdFor(
       customerUid: normalizedCustomerUid,
       agentUserUid: normalizedAgentUid,
-      estateId: normalizedEstateId,
     );
     final reference = _conversations.doc(conversationId);
+    final snapshot = await reference.get();
+    if (snapshot.exists) return ConversationModel.fromFirestore(snapshot);
 
-    return _firestore.runTransaction((transaction) async {
-      final snapshot = await transaction.get(reference);
-      if (snapshot.exists) {
-        return ConversationModel.fromFirestore(snapshot);
-      }
+    return ConversationModel(
+      id: conversationId,
+      participants: [normalizedCustomerUid, normalizedAgentUid],
+      customerId: normalizedCustomerUid,
+      agentUserId: normalizedAgentUid,
+      agentId: normalizedAgentId,
+      estateId: normalizedEstateId,
+      estateIds: [normalizedEstateId],
+    );
+  }
 
-      final model = ConversationModel(
-        id: conversationId,
-        participants: [normalizedCustomerUid, normalizedAgentUid],
-        customerId: normalizedCustomerUid,
-        agentUserId: normalizedAgentUid,
-        agentId: normalizedAgentId,
-        estateId: normalizedEstateId,
-      );
-      transaction.set(reference, model.toFirestore());
-      return model;
-    });
+  @override
+  Future<ConversationModel?> getConversation(String conversationId) async {
+    final normalizedId = conversationId.trim();
+    if (normalizedId.isEmpty) {
+      throw ArgumentError('A conversation ID is required.');
+    }
+
+    final snapshot = await _conversations.doc(normalizedId).get();
+    if (!snapshot.exists) {
+      return null;
+    }
+    return ConversationModel.fromFirestore(snapshot);
   }
 
   @visibleForTesting
   static String conversationIdFor({
     required String customerUid,
     required String agentUserUid,
-    required String estateId,
-  }) => _conversationIdFor(
-    customerUid: customerUid,
-    agentUserUid: agentUserUid,
-    estateId: estateId,
-  );
+  }) =>
+      _conversationIdFor(customerUid: customerUid, agentUserUid: agentUserUid);
 
   static String _conversationIdFor({
     required String customerUid,
     required String agentUserUid,
-    required String estateId,
-  }) {
-    final encodedTuple = base64Url
-        .encode(utf8.encode(jsonEncode([customerUid, agentUserUid, estateId])))
-        .replaceAll('=', '');
-    return 'conversation_$encodedTuple';
-  }
+  }) => ChatLaunchRequest(
+    customerUid: customerUid,
+    agentUserUid: agentUserUid,
+    agentId: '',
+    estateId: '',
+  ).conversationId;
 
   @override
   Stream<List<ConversationModel>> watchConversations(String currentUserUid) {
@@ -122,6 +137,10 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
         .map(
           (snapshot) => snapshot.docs
               .map(ConversationModel.fromFirestore)
+              .where(
+                (conversation) =>
+                    !conversation.archivedBy.contains(currentUserUid),
+              )
               .toList(growable: false),
         );
   }
@@ -145,6 +164,7 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     required String conversationId,
     required String senderId,
     required String text,
+    ChatLaunchRequest? launchRequest,
   }) async {
     final normalizedText = text.trim();
     if (normalizedText.isEmpty) {
@@ -153,6 +173,27 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
 
     final conversationReference = _conversations.doc(conversationId);
     final messageReference = conversationReference.collection('messages').doc();
+    if (launchRequest != null) {
+      if (launchRequest.conversationId != conversationId ||
+          launchRequest.customerUid != senderId) {
+        throw ArgumentError('The conversation request does not match sender.');
+      }
+      await _sendFirstMessage(
+        conversationReference: conversationReference,
+        messageReference: messageReference,
+        launchRequest: launchRequest,
+        text: normalizedText,
+      );
+      await _notifyRecipient(
+        conversationReference: conversationReference,
+        messageReference: messageReference,
+        senderId: senderId,
+        text: normalizedText,
+        conversationId: conversationId,
+      );
+      return;
+    }
+
     final batch = _firestore.batch();
     batch.set(
       messageReference,
@@ -169,6 +210,73 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     });
     await batch.commit();
 
+    await _notifyRecipient(
+      conversationReference: conversationReference,
+      messageReference: messageReference,
+      senderId: senderId,
+      text: normalizedText,
+      conversationId: conversationId,
+    );
+  }
+
+  Future<void> _sendFirstMessage({
+    required DocumentReference<Map<String, dynamic>> conversationReference,
+    required DocumentReference<Map<String, dynamic>> messageReference,
+    required ChatLaunchRequest launchRequest,
+    required String text,
+  }) async {
+    final message = MessageModel(
+      id: messageReference.id,
+      senderId: launchRequest.customerUid,
+      text: text,
+    ).toFirestore();
+    await _firestore.runTransaction((transaction) async {
+      final snapshot = await transaction.get(conversationReference);
+      if (snapshot.exists) {
+        final existing = ConversationModel.fromFirestore(snapshot);
+        final estateIds = <String>{
+          ...existing.estateIds,
+          launchRequest.estateId,
+        }.toList(growable: false);
+        transaction.update(conversationReference, {
+          'estateIds': estateIds,
+          'contextEstateId': launchRequest.estateId,
+          'lastMessage': text,
+          'lastMessageAt': FieldValue.serverTimestamp(),
+          'lastSenderId': launchRequest.customerUid,
+        });
+      } else {
+        transaction.set(conversationReference, {
+          'participants': [
+            launchRequest.customerUid,
+            launchRequest.agentUserUid,
+          ],
+          'customerId': launchRequest.customerUid,
+          'agentUserId': launchRequest.agentUserUid,
+          'agentId': launchRequest.agentId,
+          'estateId': launchRequest.estateId,
+          'estateIds': [launchRequest.estateId],
+          'contextEstateId': launchRequest.estateId,
+          'createdAt': FieldValue.serverTimestamp(),
+          'lastMessage': text,
+          'lastMessageAt': FieldValue.serverTimestamp(),
+          'lastSenderId': launchRequest.customerUid,
+          'lastReadAtByParticipant': <String, dynamic>{},
+          'archivedBy': <String>[],
+          'firstMessageId': messageReference.id,
+        });
+      }
+      transaction.set(messageReference, message);
+    });
+  }
+
+  Future<void> _notifyRecipient({
+    required DocumentReference<Map<String, dynamic>> conversationReference,
+    required DocumentReference<Map<String, dynamic>> messageReference,
+    required String senderId,
+    required String text,
+    required String conversationId,
+  }) async {
     try {
       final convDoc = await conversationReference.get();
       final participants =
@@ -180,18 +288,40 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
         orElse: () => '',
       );
       if (recipientId.isNotEmpty) {
-        _notificationService?.notifyChatMessage(
+        await _notificationService?.notifyChatMessage(
           messageId: messageReference.id,
           recipientId: recipientId,
           senderName: 'Chat',
           conversationId: conversationId,
-          messagePreview: normalizedText,
+          messagePreview: text,
         );
       }
-    } catch (_) {
-      // Fire-and-forget notification
+    } catch (error, stackTrace) {
+      debugPrint('Chat message notification failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
     }
   }
+
+  @override
+  Future<void> archiveConversation({
+    required String conversationId,
+    required String participantUid,
+  }) => _conversations.doc(conversationId).update({
+    'archivedBy': FieldValue.arrayUnion([participantUid]),
+  });
+
+  @override
+  Future<void> deleteMessageForMe({
+    required String conversationId,
+    required String messageId,
+    required String participantUid,
+  }) => _conversations
+      .doc(conversationId)
+      .collection('messages')
+      .doc(messageId)
+      .update({
+        'hiddenFor': FieldValue.arrayUnion([participantUid]),
+      });
 
   @override
   Future<void> markConversationAsRead({

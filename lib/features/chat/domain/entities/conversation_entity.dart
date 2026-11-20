@@ -7,6 +7,8 @@ class ConversationEntity extends Equatable {
   final String agentUserId;
   final String agentId;
   final String? estateId;
+  final List<String> estateIds;
+  final List<String> archivedBy;
   final DateTime? createdAt;
   final String? lastMessage;
   final DateTime? lastMessageAt;
@@ -20,6 +22,8 @@ class ConversationEntity extends Equatable {
     required this.agentUserId,
     required this.agentId,
     this.estateId,
+    this.estateIds = const [],
+    this.archivedBy = const [],
     this.createdAt,
     this.lastMessage,
     this.lastMessageAt,
@@ -35,6 +39,8 @@ class ConversationEntity extends Equatable {
     agentUserId,
     agentId,
     estateId,
+    estateIds,
+    archivedBy,
     createdAt,
     lastMessage,
     lastMessageAt,

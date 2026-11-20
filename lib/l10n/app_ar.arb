@@ -49,6 +49,8 @@
 
   "searchTitle": "البحث عن عقار",
   "searchHint": "ابحث عن عقارات…",
+  "searchInitialTitle": "اعثر على منزلك القادم",
+  "searchInitialHint": "ابحث بكلمة أو استخدم عوامل التصفية لاستكشاف العقارات المتاحة.",
   "searchAiTitle": "بحث مدعوم بالذكاء الاصطناعي",
   "searchAiHint": "يفهم البحث الذكي وصفك اليومي. جرّب: شقة بغرفتي نوم قرب الجيزة.",
   "searchVoiceSearch": "البحث الصوتي",
@@ -111,6 +113,26 @@
   "detailsContactAgent": "تواصل مع الوكيل",
   "detailsReviews": "التقييمات",
   "detailsWriteReview": "اكتب تقييماً",
+  "detailsExperiencePrompt": "كيف كانت تجربتك؟",
+  "detailsEditReview": "تعديل تقييمك",
+  "detailsSubmitReview": "إرسال التقييم",
+  "detailsUpdateReview": "تحديث التقييم",
+  "detailsRatingSemantics": "التقييم: {rating} من 5",
+  "@detailsRatingSemantics": {
+    "placeholders": {
+      "rating": {
+        "type": "int"
+      }
+    }
+  },
+  "detailsStarRatingTooltip": "اختر تقييمًا بدرجة {rating} من 5",
+  "@detailsStarRatingTooltip": {
+    "placeholders": {
+      "rating": {
+        "type": "int"
+      }
+    }
+  },
   "detailsYourRating": "تقييمك",
   "detailsReviewCommentHint": "شارك رأيك حول هذا العقار…",
   "detailsNoReviews": "لا توجد تقييمات بعد. كن أول من يكتب تقييماً!",
@@ -119,6 +141,7 @@
 
   "mapExploreTitle": "استكشف على الخريطة",
   "mapSearchTitle": "خريطة البحث",
+  "mapLoading": "جاري تحميل العقارات على الخريطة...",
   "mapZoomIn": "تكبير",
   "mapZoomOut": "تصغير",
   "mapFitAll": "إظهار جميع العقارات",
@@ -126,9 +149,19 @@
   "mapNoValidCoordsTitle": "لم يتم العثور على عقارات بإحداثيات صالحة.",
   "mapNoValidCoordsMessage": "العقارات المحددة لا تحتوي على إحداثيات جغرافية لعرضها على الخريطة.",
   "mapLoadAllButton": "تحميل جميع العقارات",
+  "mapLoadError": "تعذر تحميل العقارات على الخريطة.",
+  "mapClosePreview": "إغلاق المعاينة",
   "mapServicesDisabled": "خدمات الموقع غير مفعّلة على هذا الجهاز.",
   "mapPermissionRequired": "إذن تحديد الموقع مطلوب للتمركز على موقعك.",
   "mapLocationError": "تعذر تحديد الموقع الجغرافي.",
+  "mapLocationFailure": "تعذر تحديد الموقع الجغرافي: {error}",
+  "@mapLocationFailure": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "mapViewDetails": "عرض التفاصيل",
 
   "favoritesTitle": "المفضلة",
@@ -167,6 +200,9 @@
   "chatEmptyMessage": "ابدأ محادثة مع وكيل من أي عقار.",
   "chatAuthRequired": "سجّل الدخول لعرض محادثاتك.",
   "chatInquiry": "استفسار عن العقار",
+  "chatAgentLabel": "الوكيل",
+  "chatCustomerLabel": "العميل",
+  "chatLoadError": "تعذر تحميل المحادثات. يُرجى المحاولة مرة أخرى.",
 
   "settingsTitle": "الإعدادات",
   "settingsAccountSection": "الحساب والأمان",
@@ -312,6 +348,8 @@
   "chatMessageHint": "اكتب رسالة...",
   "chatSignInToSend": "سجّل الدخول لإرسال رسالة",
   "chatSendTooltip": "إرسال رسالة",
+  "chatSentMessageSemantics": "رسالة مرسلة",
+  "chatReceivedMessageSemantics": "رسالة مستلمة",
 
   "galleryViewAll": "عرض جميع الصور",
   "galleryEmpty": "لا توجد صور متاحة",
@@ -337,6 +375,10 @@
   "commonTermsAndPrivacy": "شروط الخدمة وسياسة الخصوصية",
 
   "offlineNotice": "لا يوجد اتصال بالإنترنت. قد لا تتوفر بعض الميزات.",
+  "offlineTitle": "لا يوجد اتصال بالإنترنت",
+  "offlineDescription": "اتصل بالإنترنت لمواصلة استخدام التطبيق.",
+  "connectionChecking": "جارٍ التحقق من الاتصال",
+  "connectionCheckingDescription": "يرجى الانتظار بينما نتحقق من اتصالك بالإنترنت.",
 
   "bookingTitle": "حجز موعد للمعاينة",
   "bookingSuccess": "تم حجز موعد المعاينة بنجاح!",
@@ -400,5 +442,76 @@
   "notificationsHoursAgo": "منذ {count} س",
   "notificationsYesterday": "أمس",
   "notificationsDaysAgo": "منذ {count} يوم",
-  "profileNotificationsSubtitle": "عرض نشاطك والتحديثات"
+  "profileNotificationsSubtitle": "عرض نشاطك والتحديثات",
+
+  "profileYourProperties": "عقاراتك",
+  "profileYourPropertiesSubtitle": "عرض وإدارة العقارات التي قمت بإدراجها",
+  "myPropertiesTitle": "عقاراتك",
+  "myPropertiesEmpty": "لم تقم بإدراج أي عقارات بعد.",
+  "myPropertiesEmptySubtitle": "انشر عقارك الأول لتصل إلى آلاف المشترين.",
+  "myPropertiesAddNew": "إضافة عقار جديد",
+  "myPropertiesDeleteTitle": "حذف العقار؟",
+  "myPropertiesDeleteMessage": "هل أنت متأكد من رغبتك في حذف هذا العقار نهائياً؟ لا يمكن التراجع عن هذا الإجراء.",
+  "myPropertiesDeleteButton": "حذف",
+  "myPropertiesDeleteSuccess": "تم حذف العقار بنجاح.",
+  "myPropertiesDeleteError": "فشل حذف العقار. يرجى المحاولة مرة أخرى.",
+  "myPropertiesStatusPending": "قيد المراجعة",
+  "myPropertiesStatusApproved": "تمت الموافقة",
+  "myPropertiesStatusActive": "نشط",
+  "myPropertiesStatusRejected": "مرفوض",
+  "myPropertiesPickImages": "اختيار الصور",
+  "myPropertiesCoverImageTag": "الغلاف",
+  "myPropertiesSetAsCover": "تعيين كغلاف",
+  "myPropertiesRemoveImage": "إزالة الصورة",
+  "myPropertiesUploadProgress": "جاري رفع العقار...",
+  "myPropertiesMinImagesError": "يرجى اختيار صورة واحدة على الأقل للعقار.",
+  "myPropertiesSelectLocation": "تحديد الموقع على الخريطة",
+  "myPropertiesLocationPicked": "تم تحديد الإحداثيات",
+  "myPropertiesLocationRequired": "موقع العقار مطلوب",
+  "propertyLocationPickerTitle": "تحديد موقع العقار",
+  "propertyLocationPickerHint": "اضغط على الخريطة أو حرّكها وحدد مركزها.",
+  "propertyLocationSelectMapCenter": "اختيار مركز الخريطة",
+  "propertyLocationSelectionReady": "تم تحديد الموقع. أكّد استخدامه لهذا العقار.",
+  "propertyLocationAddressUnavailable": "تعذّر العثور على العنوان، وسيتم حفظ الموقع المحدد على الخريطة.",
+  "propertyLocationConfirm": "تأكيد الموقع",
+  "propertyMapLoadingError": "تعذّر تحميل الخريطة. تحقق من اتصالك أو أعد المحاولة.",
+  "propertyMapRetry": "إعادة تحميل الخريطة",
+
+  "chatDeleteConversation": "حذف المحادثة",
+  "chatDeleteConversationConfirm": "هل أنت متأكد من رغبتك في إزالة هذه المحادثة من قائمتك؟",
+  "chatDeleteConversationButton": "حذف",
+  "chatConversationDeleted": "تمت إزالة المحادثة",
+  "chatDeleteMessage": "حذف الرسالة",
+  "chatDeleteMessageForMe": "حذف لدي فقط",
+  "chatDeleteMessageForMeConfirm": "إزالة هذه الرسالة من شاشتك؟",
+  "chatDeleteForEveryoneNotAllowed": "لا يمكن حذف الرسائل لدى الجميع لضمان أمان الحساب وتوثيق المحادثة.",
+  "chatMessageDeleted": "تم حذف الرسالة",
+  "chatDeleteForMe": "إخفاء لدي فقط",
+  "chatDeleteMessageConfirm": "إخفاء هذه الرسالة من محادثتك فقط؟",
+  "chatMessageHiddenForMe": "تم إخفاء الرسالة من محادثتك.",
+  "chatArchiveConversation": "أرشفة",
+  "chatConversationArchived": "تمت أرشفة المحادثة.",
+  "chatArchiveFailed": "تعذّرت أرشفة المحادثة.",
+  "chatCopyMessage": "نسخ النص",
+  "chatMessageCopied": "تم نسخ النص إلى الحافظة",
+  "chatPropertyInquiryPrefix": "استفسار بخصوص:",
+
+  "categoryApartment": "شقة",
+  "categoryVilla": "فيلا",
+  "categoryHouse": "منزل",
+  "categoryOffice": "مكتب",
+  "categoryStudio": "استوديو",
+  "categoryCommercial": "تجاري",
+  "categoryTownhouse": "تاون هاوس",
+  "categoryPenthouse": "بنتهاوس",
+  "categoryLand": "أرض",
+  "categoryChalet": "شاليه",
+
+  "supportWebsite": "الموقع الإلكتروني",
+  "supportEmailUs": "راسلنا بالبريد",
+  "supportTerms": "الشروط والأحكام",
+  "supportBuyer": "مشتري",
+  "supportEstateAgent": "وكيل عقاري",
+  "supportSubtitle": "اعثر على إجابات للأسئلة الشائعة أو تواصل مباشرة مع فريق الدعم المخصص لدينا.",
+  "supportEmailCopied": "تم نسخ عنوان البريد الإلكتروني للدعم"
 }

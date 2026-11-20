@@ -3,6 +3,8 @@ import 'package:equatable/equatable.dart';
 import '../../../../core/errors/failures.dart';
 import '../../domain/entities/conversation_entity.dart';
 import '../../domain/entities/message_entity.dart';
+import '../../domain/entities/chat_participant.dart';
+import '../../../estate/domain/entities/estate_entity.dart';
 
 enum ChatLoadStatus { initial, loading, success, empty, failure }
 
@@ -10,6 +12,8 @@ class ChatState extends Equatable {
   final ChatLoadStatus conversationsStatus;
   final List<ConversationEntity> conversations;
   final Failure? conversationsFailure;
+  final Map<String, EstateEntity> estatePreviews;
+  final Map<String, ChatParticipant> participantPreviews;
   final ChatLoadStatus messagesStatus;
   final String? activeConversationId;
   final List<MessageEntity> messages;
@@ -22,6 +26,8 @@ class ChatState extends Equatable {
     this.conversationsStatus = ChatLoadStatus.initial,
     this.conversations = const [],
     this.conversationsFailure,
+    this.estatePreviews = const {},
+    this.participantPreviews = const {},
     this.messagesStatus = ChatLoadStatus.initial,
     this.activeConversationId,
     this.messages = const [],
@@ -35,6 +41,8 @@ class ChatState extends Equatable {
     ChatLoadStatus? conversationsStatus,
     List<ConversationEntity>? conversations,
     Failure? conversationsFailure,
+    Map<String, EstateEntity>? estatePreviews,
+    Map<String, ChatParticipant>? participantPreviews,
     ChatLoadStatus? messagesStatus,
     String? activeConversationId,
     List<MessageEntity>? messages,
@@ -54,6 +62,8 @@ class ChatState extends Equatable {
       conversationsFailure: clearConversationsFailure
           ? null
           : conversationsFailure ?? this.conversationsFailure,
+      estatePreviews: estatePreviews ?? this.estatePreviews,
+      participantPreviews: participantPreviews ?? this.participantPreviews,
       messagesStatus: messagesStatus ?? this.messagesStatus,
       activeConversationId: clearActiveConversationId
           ? null
@@ -77,6 +87,8 @@ class ChatState extends Equatable {
     conversationsStatus,
     conversations,
     conversationsFailure,
+    estatePreviews,
+    participantPreviews,
     messagesStatus,
     activeConversationId,
     messages,

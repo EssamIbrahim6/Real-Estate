@@ -137,6 +137,15 @@ class ProfileScreen extends StatelessWidget {
                         onTap: () => context.push(AppRoutes.favorites),
                       ),
                       ProfileActionTile(
+                        icon: Icons.holiday_village_outlined,
+                        title: l10n?.profileYourProperties ?? 'Your Properties',
+                        subtitle:
+                            l10n?.profileYourPropertiesSubtitle ??
+                            'View and manage your listed properties',
+                        onTap: () =>
+                            context.pushNamed(AppRoutes.myPropertiesName),
+                      ),
+                      ProfileActionTile(
                         icon: Icons.chat_bubble_outline_rounded,
                         title: l10n?.navChat ?? 'Messages',
                         subtitle:

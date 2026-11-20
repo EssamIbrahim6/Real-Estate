@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_colors.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 
 /// Floating controls bar for the map: Zoom in, Zoom out, Fit all markers, and My Location.
 class MapControlsBar extends StatelessWidget {
@@ -19,23 +19,25 @@ class MapControlsBar extends StatelessWidget {
     this.isLocating = false,
   });
 
-  Widget _buildButton({
+  Widget _buildButton(
+    BuildContext context, {
     required Widget icon,
     required VoidCallback onTap,
     required String tooltip,
   }) {
+    final colors = Theme.of(context).colorScheme;
     return Semantics(
       label: tooltip,
       button: true,
       child: Material(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        elevation: 3,
-        shadowColor: Colors.black.withValues(alpha: 0.15),
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(14),
+        elevation: 2,
+        shadowColor: colors.shadow.withValues(alpha: 0.24),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: SizedBox(width: 44, height: 44, child: Center(child: icon)),
+          borderRadius: BorderRadius.circular(14),
+          child: SizedBox(width: 48, height: 48, child: Center(child: icon)),
         ),
       ),
     );
@@ -43,48 +45,51 @@ class MapControlsBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final iconColor = theme.colorScheme.primary;
+    final l10n = AppLocalizations.of(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildButton(
-          icon: const Icon(Icons.add, size: 20, color: AppColors.brandNavy),
+          context,
+          icon: Icon(Icons.add, size: 20, color: iconColor),
           onTap: onZoomIn,
-          tooltip: 'Zoom in',
+          tooltip: l10n?.mapZoomIn ?? 'Zoom in',
         ),
         const SizedBox(height: 8),
         _buildButton(
-          icon: const Icon(Icons.remove, size: 20, color: AppColors.brandNavy),
+          context,
+          icon: Icon(Icons.remove, size: 20, color: iconColor),
           onTap: onZoomOut,
-          tooltip: 'Zoom out',
+          tooltip: l10n?.mapZoomOut ?? 'Zoom out',
         ),
         const SizedBox(height: 8),
         _buildButton(
-          icon: const Icon(
+          context,
+          icon: Icon(
             Icons.filter_center_focus_rounded,
             size: 20,
-            color: AppColors.brandNavy,
+            color: iconColor,
           ),
           onTap: onFitAll,
-          tooltip: 'Fit all properties',
+          tooltip: l10n?.mapFitAll ?? 'Fit all properties',
         ),
         const SizedBox(height: 8),
         _buildButton(
+          context,
           icon: isLocating
-              ? const SizedBox(
+              ? SizedBox(
                   width: 18,
                   height: 18,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: AppColors.brandNavy,
+                    color: iconColor,
                   ),
                 )
-              : const Icon(
-                  Icons.my_location_rounded,
-                  size: 20,
-                  color: AppColors.brandNavy,
-                ),
+              : Icon(Icons.my_location_rounded, size: 20, color: iconColor),
           onTap: onMyLocation,
-          tooltip: 'My location',
+          tooltip: l10n?.mapMyLocation ?? 'My location',
         ),
       ],
     );

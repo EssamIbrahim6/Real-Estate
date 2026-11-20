@@ -16,6 +16,8 @@ void main() {
         'agentUserId': 'agent-user-uid',
         'agentId': 'agent-document-id',
         'estateId': 'estate-document-id',
+        'estateIds': ['estate-document-id', 'another-estate'],
+        'archivedBy': ['agent-user-uid'],
         'createdAt': Timestamp.fromDate(createdAt),
         'lastMessage': 'Interested in this property',
         'lastMessageAt': Timestamp.fromDate(lastMessageAt),
@@ -29,6 +31,8 @@ void main() {
       expect(conversation.agentUserId, 'agent-user-uid');
       expect(conversation.agentId, 'agent-document-id');
       expect(conversation.estateId, 'estate-document-id');
+      expect(conversation.estateIds, ['estate-document-id', 'another-estate']);
+      expect(conversation.archivedBy, ['agent-user-uid']);
       expect(conversation.createdAt!.isAtSameMomentAs(createdAt), isTrue);
       expect(conversation.lastMessage, 'Interested in this property');
       expect(
@@ -51,6 +55,8 @@ void main() {
         'agentUserId': 'agent',
         'agentId': 'agent-doc',
         'estateId': 'estate',
+        'estateIds': ['estate'],
+        'archivedBy': const <String>[],
         'lastMessageAt': null,
         'lastReadAtByParticipant': null,
       }, 'conversation-id');
@@ -83,6 +89,8 @@ void main() {
         'agentUserId',
         'agentId',
         'estateId',
+        'estateIds',
+        'archivedBy',
         'createdAt',
         'lastMessage',
         'lastMessageAt',
@@ -109,11 +117,13 @@ void main() {
         'senderId': 'sender-uid',
         'text': 'Hello',
         'createdAt': Timestamp.fromDate(createdAt),
+        'hiddenFor': ['sender-uid'],
       }, 'message-id');
 
       expect(message.id, 'message-id');
       expect(message.senderId, 'sender-uid');
       expect(message.text, 'Hello');
+      expect(message.hiddenFor, ['sender-uid']);
       expect(message.createdAt!.isAtSameMomentAs(createdAt), isTrue);
 
       final map = MessageModel(
@@ -122,7 +132,7 @@ void main() {
         text: message.text,
         createdAt: createdAt,
       ).toFirestore();
-      expect(map.keys.toSet(), {'senderId', 'text', 'createdAt'});
+      expect(map.keys.toSet(), {'senderId', 'text', 'createdAt', 'hiddenFor'});
       expect(
         (map['createdAt'] as Timestamp).toDate().isAtSameMomentAs(createdAt),
         isTrue,

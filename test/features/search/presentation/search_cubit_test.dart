@@ -12,6 +12,32 @@ import 'package:real_estate_app/features/search/presentation/cubit/search_cubit.
 import 'package:real_estate_app/features/search/presentation/cubit/search_state.dart';
 
 void main() {
+  test(
+    'skips empty filters and resets completed searches to initial',
+    () async {
+      final repository = _RecordingSearchRepository();
+      final cubit = SearchCubit(
+        searchRepository: repository,
+        categoryRepository: _FakeCategoryRepository(),
+      );
+      addTearDown(cubit.close);
+
+      await cubit.search(const SearchFilter());
+      expect(repository.filters, isEmpty);
+      expect(cubit.state.status, SearchStatus.initial);
+
+      await cubit.search(const SearchFilter(city: 'Cairo'));
+      expect(repository.filters, hasLength(1));
+      expect(repository.filters.single.city, 'Cairo');
+      expect(cubit.state.status, SearchStatus.empty);
+
+      cubit.reset();
+      expect(cubit.state.status, SearchStatus.initial);
+      expect(cubit.state.filter, const SearchFilter());
+      expect(cubit.state.estates, isEmpty);
+    },
+  );
+
   test('ignores results from an older search that finishes last', () async {
     final repository = _ControlledSearchRepository();
     final cubit = SearchCubit(
@@ -32,6 +58,16 @@ void main() {
     expect(cubit.state.filter.query, 'newer');
     expect(cubit.state.estates.single.id, 'newer');
   });
+}
+
+class _RecordingSearchRepository implements SearchRepository {
+  final List<SearchFilter> filters = [];
+
+  @override
+  ResultFuture<List<EstateEntity>> search(SearchFilter filter) async {
+    filters.add(filter);
+    return (failure: null, data: const <EstateEntity>[]);
+  }
 }
 
 class _ControlledSearchRepository implements SearchRepository {

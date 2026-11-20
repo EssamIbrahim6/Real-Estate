@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/helpers/spacing.dart';
+import '../../../../core/widgets/app_feedback.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../auth/presentation/widgets/app_back_button.dart';
 import '../../domain/entities/faq_item.dart';
@@ -27,8 +28,11 @@ class _FaqSupportView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -40,19 +44,20 @@ class _FaqSupportView extends StatelessWidget {
 
               Text(
                 l10n?.faqTitle ?? 'FAQ & Support',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.brandNavy,
+                  color: colors.onSurface,
                   letterSpacing: -0.5,
                 ),
               ),
               verticalSpace(8),
-              const Text(
-                'Find answers to common questions or reach out directly to our dedicated support team.',
+              Text(
+                l10n?.supportSubtitle ??
+                    'Find answers to common questions or reach out directly to our dedicated support team.',
                 style: TextStyle(
                   fontSize: 13,
-                  color: AppColors.textSecondary,
+                  color: colors.onSurfaceVariant,
                   height: 1.5,
                 ),
               ),
@@ -61,21 +66,41 @@ class _FaqSupportView extends StatelessWidget {
               Row(
                 children: [
                   _buildContactCard(
+                    context: context,
                     icon: Icons.language_rounded,
-                    label: 'Website',
-                    onTap: () {},
+                    label: l10n?.supportWebsite ?? 'Website',
+                    onTap: () {
+                      AppFeedback.info(context, 'https://apexie-realestate.web.app');
+                    },
                   ),
                   horizontalSpace(12),
                   _buildContactCard(
+                    context: context,
                     icon: Icons.mail_outline_rounded,
-                    label: 'Email Us',
-                    onTap: () {},
+                    label: l10n?.supportEmailUs ?? 'Email Us',
+                    onTap: () async {
+                      await Clipboard.setData(
+                        const ClipboardData(text: 'support@apexie.com'),
+                      );
+                      if (context.mounted) {
+                        AppFeedback.success(
+                          context,
+                          l10n?.supportEmailCopied ?? 'Support email copied',
+                        );
+                      }
+                    },
                   ),
                   horizontalSpace(12),
                   _buildContactCard(
+                    context: context,
                     icon: Icons.description_outlined,
-                    label: 'Terms',
-                    onTap: () {},
+                    label: l10n?.supportTerms ?? 'Terms',
+                    onTap: () {
+                      AppFeedback.info(
+                        context,
+                        l10n?.commonTermsAndPrivacy ?? 'Terms of Service & Privacy Policy',
+                      );
+                    },
                   ),
                 ],
               ),
@@ -83,26 +108,42 @@ class _FaqSupportView extends StatelessWidget {
 
               TextField(
                 onChanged: (q) => context.read<SupportCubit>().search(q),
+                style: TextStyle(color: colors.onSurface, fontSize: 14),
                 decoration: InputDecoration(
                   hintText: l10n?.faqSearchHint ?? 'Search questions...',
-                  hintStyle: const TextStyle(
+                  hintStyle: TextStyle(
                     fontSize: 14,
-                    color: AppColors.textMuted,
+                    color: colors.onSurfaceVariant,
                   ),
-                  prefixIcon: const Icon(
+                  prefixIcon: Icon(
                     Icons.search,
-                    color: AppColors.textMuted,
+                    color: colors.onSurfaceVariant,
                     size: 20,
                   ),
                   filled: true,
-                  fillColor: AppColors.inputBackground,
+                  fillColor: colors.surfaceContainerLow,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 14,
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
+                    borderSide: BorderSide(
+                      color: colors.outlineVariant.withValues(alpha: 0.4),
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(
+                      color: colors.outlineVariant.withValues(alpha: 0.4),
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(
+                      color: colors.primary,
+                      width: 1.5,
+                    ),
                   ),
                 ),
               ),
@@ -113,13 +154,17 @@ class _FaqSupportView extends StatelessWidget {
                   return Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: AppColors.inputBackground,
+                      color: colors.surfaceContainerLow,
                       borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: colors.outlineVariant.withValues(alpha: 0.3),
+                      ),
                     ),
                     child: Row(
                       children: [
                         _buildSegmentTab(
-                          label: 'Buyer',
+                          context: context,
+                          label: l10n?.supportBuyer ?? 'Buyer',
                           isSelected:
                               state.selectedCategory == FaqCategory.buyer,
                           onTap: () => context
@@ -127,7 +172,8 @@ class _FaqSupportView extends StatelessWidget {
                               .selectCategory(FaqCategory.buyer),
                         ),
                         _buildSegmentTab(
-                          label: 'Estate Agent',
+                          context: context,
+                          label: l10n?.supportEstateAgent ?? 'Estate Agent',
                           isSelected:
                               state.selectedCategory == FaqCategory.estateAgent,
                           onTap: () => context
@@ -149,11 +195,10 @@ class _FaqSupportView extends StatelessWidget {
                       child: Center(
                         child: Text(
                           state.searchQuery.isEmpty
-                              ? (l10n?.faqNoResults ??
-                                  'No questions found.')
+                              ? (l10n?.faqNoResults ?? 'No questions found.')
                               : 'No questions found matching "${state.searchQuery}".',
-                          style: const TextStyle(
-                            color: AppColors.textSecondary,
+                          style: TextStyle(
+                            color: colors.onSurfaceVariant,
                             fontSize: 13,
                           ),
                         ),
@@ -181,33 +226,41 @@ class _FaqSupportView extends StatelessWidget {
   }
 
   Widget _buildContactCard({
+    required BuildContext context,
     required IconData icon,
     required String label,
     required VoidCallback onTap,
   }) {
+    final colors = Theme.of(context).colorScheme;
     return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          decoration: BoxDecoration(
-            color: AppColors.inputBackground,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Column(
-            children: [
-              Icon(icon, color: AppColors.brandNavy, size: 22),
-              const SizedBox(height: 6),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.brandNavy,
-                ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(14),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            decoration: BoxDecoration(
+              color: colors.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: colors.outlineVariant.withValues(alpha: 0.4),
               ),
-            ],
+            ),
+            child: Column(
+              children: [
+                Icon(icon, color: colors.primary, size: 22),
+                const SizedBox(height: 6),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: colors.onSurface,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -215,22 +268,29 @@ class _FaqSupportView extends StatelessWidget {
   }
 
   Widget _buildSegmentTab({
+    required BuildContext context,
     required String label,
     required bool isSelected,
     required VoidCallback onTap,
   }) {
+    final colors = Theme.of(context).colorScheme;
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.surface : Colors.transparent,
+            color: isSelected ? colors.surface : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
+            border: isSelected
+                ? Border.all(
+                    color: colors.outlineVariant.withValues(alpha: 0.5),
+                  )
+                : null,
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
+                      color: colors.shadow.withValues(alpha: 0.05),
                       blurRadius: 4,
                       offset: const Offset(0, 1),
                     ),
@@ -243,9 +303,7 @@ class _FaqSupportView extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected
-                    ? AppColors.brandNavy
-                    : AppColors.textSecondary,
+                color: isSelected ? colors.onSurface : colors.onSurfaceVariant,
               ),
             ),
           ),
@@ -268,10 +326,15 @@ class _FaqTileState extends State<_FaqTile> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.inputBackground,
+        color: colors.surfaceContainerLow,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: colors.outlineVariant.withValues(alpha: 0.4),
+        ),
       ),
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
@@ -280,16 +343,16 @@ class _FaqTileState extends State<_FaqTile> {
           tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           title: Text(
             widget.item.question,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: AppColors.brandNavy,
+              color: colors.onSurface,
             ),
           ),
           trailing: AnimatedRotation(
             turns: _isExpanded ? 0.125 : 0,
             duration: const Duration(milliseconds: 200),
-            child: const Icon(Icons.add, color: AppColors.brandNavy, size: 22),
+            child: Icon(Icons.add, color: colors.primary, size: 22),
           ),
           children: [
             Padding(
@@ -298,9 +361,9 @@ class _FaqTileState extends State<_FaqTile> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   widget.item.answer,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
-                    color: AppColors.textSecondary,
+                    color: colors.onSurfaceVariant,
                     height: 1.5,
                   ),
                 ),

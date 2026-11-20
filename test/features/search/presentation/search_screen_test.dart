@@ -13,54 +13,58 @@ import 'package:real_estate_app/features/search/presentation/pages/search_screen
 import 'package:real_estate_app/l10n/generated/app_localizations.dart';
 
 void main() {
-  testWidgets(
-    'live search debounces input and accepts English and Arabic text',
-    (tester) async {
-      final searchRepository = _FakeSearchRepository();
-      final cubit = SearchCubit(
-        searchRepository: searchRepository,
-        categoryRepository: _FakeCategoryRepository(),
-      );
-      addTearDown(cubit.close);
+  testWidgets('empty search stays initial and text search is debounced', (
+    tester,
+  ) async {
+    final searchRepository = _FakeSearchRepository();
+    final cubit = SearchCubit(
+      searchRepository: searchRepository,
+      categoryRepository: _FakeCategoryRepository(),
+    );
+    addTearDown(cubit.close);
 
-      await tester.pumpWidget(
-        BlocProvider.value(
-          value: cubit,
-          child: const MaterialApp(home: SearchScreen()),
-        ),
-      );
-      await tester.pumpAndSettle();
+    await tester.pumpWidget(
+      BlocProvider.value(
+        value: cubit,
+        child: const MaterialApp(home: SearchScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
 
-      expect(searchRepository.filters, hasLength(1));
-      final searchField = find.byType(TextField);
+    expect(searchRepository.filters, isEmpty);
+    expect(find.text('Find your next home'), findsOneWidget);
+    final searchField = find.byType(TextField);
 
-      await tester.enterText(searchField, 'cairo');
-      await tester.pump();
-      expect(searchRepository.filters, hasLength(1));
-      expect(find.text('Arabic or English?'), findsNothing);
+    await tester.tap(searchField);
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pumpAndSettle();
+    expect(searchRepository.filters, isEmpty);
 
-      await tester.testTextInput.receiveAction(TextInputAction.search);
-      await tester.pumpAndSettle();
-      expect(searchRepository.filters.last.city, 'Cairo');
+    await tester.enterText(searchField, 'cairo');
+    await tester.pump();
+    expect(searchRepository.filters, isEmpty);
 
-      await tester.enterText(searchField, 'القاهرة');
-      await tester.pump();
-      expect(searchRepository.filters, hasLength(2));
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pumpAndSettle();
+    expect(searchRepository.filters, hasLength(1));
+    expect(searchRepository.filters.last.query, 'cairo');
+    expect(searchRepository.filters.last.city, isNull);
 
-      await tester.pump(const Duration(milliseconds: 349));
-      expect(searchRepository.filters, hasLength(2));
-      await tester.pump(const Duration(milliseconds: 1));
-      expect(searchRepository.filters.last.city, 'Cairo');
+    await tester.enterText(searchField, 'القاهرة');
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 349));
+    expect(searchRepository.filters, hasLength(1));
+    await tester.pump(const Duration(milliseconds: 1));
+    expect(searchRepository.filters, hasLength(2));
+    expect(searchRepository.filters.last.query, 'القاهرة');
+    expect(find.text('No estates found'), findsOneWidget);
+    expect(find.text('Find your next home'), findsNothing);
 
-      await tester.enterText(searchField, '');
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 349));
-      expect(searchRepository.filters, hasLength(3));
-      await tester.pump(const Duration(milliseconds: 1));
-      expect(searchRepository.filters, hasLength(4));
-      expect(searchRepository.filters.last.query, isNull);
-    },
-  );
+    await tester.tap(find.byTooltip('Clear search'));
+    await tester.pumpAndSettle();
+    expect(searchRepository.filters, hasLength(2));
+    expect(find.text('Find your next home'), findsOneWidget);
+  });
 
   testWidgets('AI search helper fits a compact Arabic dark layout', (
     tester,

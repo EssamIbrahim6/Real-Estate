@@ -24,7 +24,7 @@ class AuthHeader extends StatelessWidget {
         ClipRRect(
           borderRadius: BorderRadius.circular(26),
           child: SizedBox(
-            height: 164,
+            height: 180,
             width: double.infinity,
             child: Stack(
               fit: StackFit.expand,

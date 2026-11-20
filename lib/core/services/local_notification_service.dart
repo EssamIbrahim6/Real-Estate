@@ -1,15 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
-/// Free, local-only notification service using `flutter_local_notifications`.
-///
-/// Handles displaying native foreground heads-up banners when the app is
-/// active in foreground.
-///
-/// **IMPORTANT ARCHITECTURAL LIMITATION**:
-/// Local notifications run strictly within the Flutter client process.
-/// They CANNOT listen to Firestore or trigger alerts when the app is
-/// completely closed or terminated by the operating system.
 class LocalNotificationService {
   static final LocalNotificationService instance =
       LocalNotificationService._internal();

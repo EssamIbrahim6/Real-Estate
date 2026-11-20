@@ -28,6 +28,8 @@ abstract class AppRoutes {
   static const String listingsName = 'listings';
   static const String fullscreenGalleryName = 'fullscreen-gallery';
   static const String addProperty = '/add-property';
+  static const String myProperties = '/my-properties';
+  static const String myPropertiesName = 'my-properties';
   static const String map = '/map';
   static const String accountSetupLocation = '/account-setup/location';
   static const String accountSetupPreferences = '/account-setup/preferences';

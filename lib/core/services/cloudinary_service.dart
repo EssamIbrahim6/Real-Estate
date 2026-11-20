@@ -12,7 +12,7 @@ abstract class CloudinaryService {
 class CloudinaryServiceImpl implements CloudinaryService {
   final String cloudName;
   final String uploadPreset;
-  // xo5cninj
+ 
   const CloudinaryServiceImpl({
     this.cloudName = 'xo5cninj',
     this.uploadPreset = 'RealEstate',
@@ -35,7 +35,6 @@ class CloudinaryServiceImpl implements CloudinaryService {
         final data = json.decode(responseBody) as Map<String, dynamic>;
         return data['secure_url'] as String;
       } else {
-        // Fallback: If no preset configured, return local path indicator or throw user-friendly error
         throw ServerException(
           message:
               'Failed to upload image to Cloudinary: ${response.statusCode}',

@@ -5,21 +5,18 @@ import 'package:real_estate_app/features/chat/data/datasources/chat_remote_data_
 import 'package:real_estate_app/features/chat/data/models/conversation_model.dart';
 import 'package:real_estate_app/features/chat/data/models/message_model.dart';
 import 'package:real_estate_app/features/chat/data/repositories/chat_repository_impl.dart';
+import 'package:real_estate_app/features/chat/domain/entities/chat_launch_request.dart';
 
 void main() {
   test('conversation ID is deterministic and tuple collision-safe', () {
-    String id(String customer, String agent, String estate) =>
+    String id(String customer, String agent) =>
         ChatRemoteDataSourceImpl.conversationIdFor(
           customerUid: customer,
           agentUserUid: agent,
-          estateId: estate,
         );
 
-    expect(
-      id('customer', 'agent', 'estate'),
-      id('customer', 'agent', 'estate'),
-    );
-    expect(id('a', 'bc', 'estate'), isNot(id('ab', 'c', 'estate')));
+    expect(id('customer', 'agent'), id('customer', 'agent'));
+    expect(id('a', 'bc'), isNot(id('ab', 'c')));
   });
 
   test('empty messages are rejected before reaching the data source', () async {
@@ -80,6 +77,17 @@ class _FakeChatRemoteDataSource implements ChatRemoteDataSource {
   }
 
   @override
+  Future<ConversationModel?> getConversation(String conversationId) async =>
+      ConversationModel(
+        id: conversationId,
+        participants: const ['customer', 'agent'],
+        customerId: 'customer',
+        agentUserId: 'agent',
+        agentId: 'agent-id',
+        estateId: 'estate-id',
+      );
+
+  @override
   Stream<List<ConversationModel>> watchConversations(String currentUserUid) =>
       const Stream.empty();
 
@@ -92,9 +100,23 @@ class _FakeChatRemoteDataSource implements ChatRemoteDataSource {
     required String conversationId,
     required String senderId,
     required String text,
+    ChatLaunchRequest? launchRequest,
   }) async {
     sendMessageCalled = true;
   }
+
+  @override
+  Future<void> archiveConversation({
+    required String conversationId,
+    required String participantUid,
+  }) async {}
+
+  @override
+  Future<void> deleteMessageForMe({
+    required String conversationId,
+    required String messageId,
+    required String participantUid,
+  }) async {}
 
   @override
   Future<void> markConversationAsRead({

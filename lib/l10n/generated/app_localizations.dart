@@ -368,6 +368,18 @@ abstract class AppLocalizations {
   /// **'Search estates...'**
   String get searchHint;
 
+  /// No description provided for @searchInitialTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Find your next home'**
+  String get searchInitialTitle;
+
+  /// No description provided for @searchInitialHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by keyword or use filters to explore available properties.'**
+  String get searchInitialHint;
+
   /// No description provided for @searchAiTitle.
   ///
   /// In en, this message translates to:
@@ -686,6 +698,42 @@ abstract class AppLocalizations {
   /// **'Write a Review'**
   String get detailsWriteReview;
 
+  /// No description provided for @detailsExperiencePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'How was your experience?'**
+  String get detailsExperiencePrompt;
+
+  /// No description provided for @detailsEditReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Your Review'**
+  String get detailsEditReview;
+
+  /// No description provided for @detailsSubmitReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Review'**
+  String get detailsSubmitReview;
+
+  /// No description provided for @detailsUpdateReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Review'**
+  String get detailsUpdateReview;
+
+  /// No description provided for @detailsRatingSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating: {rating} out of 5'**
+  String detailsRatingSemantics(int rating);
+
+  /// No description provided for @detailsStarRatingTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a {rating}-star rating'**
+  String detailsStarRatingTooltip(int rating);
+
   /// No description provided for @detailsYourRating.
   ///
   /// In en, this message translates to:
@@ -727,6 +775,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search Map'**
   String get mapSearchTitle;
+
+  /// No description provided for @mapLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading properties on map...'**
+  String get mapLoading;
 
   /// No description provided for @mapZoomIn.
   ///
@@ -770,6 +824,18 @@ abstract class AppLocalizations {
   /// **'Load All Properties'**
   String get mapLoadAllButton;
 
+  /// No description provided for @mapLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load properties on the map.'**
+  String get mapLoadError;
+
+  /// No description provided for @mapClosePreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Close preview'**
+  String get mapClosePreview;
+
   /// No description provided for @mapServicesDisabled.
   ///
   /// In en, this message translates to:
@@ -787,6 +853,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not determine location.'**
   String get mapLocationError;
+
+  /// No description provided for @mapLocationFailure.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not determine location: {error}'**
+  String mapLocationFailure(String error);
 
   /// No description provided for @mapViewDetails.
   ///
@@ -997,6 +1069,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Property inquiry'**
   String get chatInquiry;
+
+  /// No description provided for @chatAgentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Agent'**
+  String get chatAgentLabel;
+
+  /// No description provided for @chatCustomerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer'**
+  String get chatCustomerLabel;
+
+  /// No description provided for @chatLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load conversations. Please try again.'**
+  String get chatLoadError;
 
   /// No description provided for @settingsTitle.
   ///
@@ -1730,6 +1820,18 @@ abstract class AppLocalizations {
   /// **'Send message'**
   String get chatSendTooltip;
 
+  /// No description provided for @chatSentMessageSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent message'**
+  String get chatSentMessageSemantics;
+
+  /// No description provided for @chatReceivedMessageSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Received message'**
+  String get chatReceivedMessageSemantics;
+
   /// No description provided for @galleryViewAll.
   ///
   /// In en, this message translates to:
@@ -1849,6 +1951,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No internet connection. Some features may be unavailable.'**
   String get offlineNotice;
+
+  /// No description provided for @offlineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You are offline'**
+  String get offlineTitle;
+
+  /// No description provided for @offlineDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect to the internet to continue using the app.'**
+  String get offlineDescription;
+
+  /// No description provided for @connectionChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking connection'**
+  String get connectionChecking;
+
+  /// No description provided for @connectionCheckingDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Please wait while we check your internet connection.'**
+  String get connectionCheckingDescription;
 
   /// No description provided for @bookingTitle.
   ///
@@ -2143,6 +2269,408 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View your activity and updates'**
   String get profileNotificationsSubtitle;
+
+  /// No description provided for @profileYourProperties.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Properties'**
+  String get profileYourProperties;
+
+  /// No description provided for @profileYourPropertiesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'View and manage your listed properties'**
+  String get profileYourPropertiesSubtitle;
+
+  /// No description provided for @myPropertiesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Properties'**
+  String get myPropertiesTitle;
+
+  /// No description provided for @myPropertiesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No properties listed yet.'**
+  String get myPropertiesEmpty;
+
+  /// No description provided for @myPropertiesEmptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Publish your first property to reach thousands of buyers.'**
+  String get myPropertiesEmptySubtitle;
+
+  /// No description provided for @myPropertiesAddNew.
+  ///
+  /// In en, this message translates to:
+  /// **'Add New Property'**
+  String get myPropertiesAddNew;
+
+  /// No description provided for @myPropertiesDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Property?'**
+  String get myPropertiesDeleteTitle;
+
+  /// No description provided for @myPropertiesDeleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to permanently delete this property listing? This action cannot be undone.'**
+  String get myPropertiesDeleteMessage;
+
+  /// No description provided for @myPropertiesDeleteButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get myPropertiesDeleteButton;
+
+  /// No description provided for @myPropertiesDeleteSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Property deleted successfully.'**
+  String get myPropertiesDeleteSuccess;
+
+  /// No description provided for @myPropertiesDeleteError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete property. Please try again.'**
+  String get myPropertiesDeleteError;
+
+  /// No description provided for @myPropertiesStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending Review'**
+  String get myPropertiesStatusPending;
+
+  /// No description provided for @myPropertiesStatusApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get myPropertiesStatusApproved;
+
+  /// No description provided for @myPropertiesStatusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get myPropertiesStatusActive;
+
+  /// No description provided for @myPropertiesStatusRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get myPropertiesStatusRejected;
+
+  /// No description provided for @myPropertiesPickImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Images'**
+  String get myPropertiesPickImages;
+
+  /// No description provided for @myPropertiesCoverImageTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Cover'**
+  String get myPropertiesCoverImageTag;
+
+  /// No description provided for @myPropertiesSetAsCover.
+  ///
+  /// In en, this message translates to:
+  /// **'Set as cover'**
+  String get myPropertiesSetAsCover;
+
+  /// No description provided for @myPropertiesRemoveImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove image'**
+  String get myPropertiesRemoveImage;
+
+  /// No description provided for @myPropertiesUploadProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading property...'**
+  String get myPropertiesUploadProgress;
+
+  /// No description provided for @myPropertiesMinImagesError.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select at least one property image.'**
+  String get myPropertiesMinImagesError;
+
+  /// No description provided for @myPropertiesSelectLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick location on map'**
+  String get myPropertiesSelectLocation;
+
+  /// No description provided for @myPropertiesLocationPicked.
+  ///
+  /// In en, this message translates to:
+  /// **'Coordinates selected'**
+  String get myPropertiesLocationPicked;
+
+  /// No description provided for @myPropertiesLocationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Property location is required'**
+  String get myPropertiesLocationRequired;
+
+  /// No description provided for @propertyLocationPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select property location'**
+  String get propertyLocationPickerTitle;
+
+  /// No description provided for @propertyLocationPickerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the map or move it and select its center.'**
+  String get propertyLocationPickerHint;
+
+  /// No description provided for @propertyLocationSelectMapCenter.
+  ///
+  /// In en, this message translates to:
+  /// **'Select map center'**
+  String get propertyLocationSelectMapCenter;
+
+  /// No description provided for @propertyLocationSelectionReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Location selected. Confirm to use it for this property.'**
+  String get propertyLocationSelectionReady;
+
+  /// No description provided for @propertyLocationAddressUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Address lookup is unavailable; the selected map location will still be saved.'**
+  String get propertyLocationAddressUnavailable;
+
+  /// No description provided for @propertyLocationConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm location'**
+  String get propertyLocationConfirm;
+
+  /// No description provided for @propertyMapLoadingError.
+  ///
+  /// In en, this message translates to:
+  /// **'Map tiles are unavailable. Check your connection or retry.'**
+  String get propertyMapLoadingError;
+
+  /// No description provided for @propertyMapRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry map'**
+  String get propertyMapRetry;
+
+  /// No description provided for @chatDeleteConversation.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete conversation'**
+  String get chatDeleteConversation;
+
+  /// No description provided for @chatDeleteConversationConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to remove this conversation from your chat list?'**
+  String get chatDeleteConversationConfirm;
+
+  /// No description provided for @chatDeleteConversationButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get chatDeleteConversationButton;
+
+  /// No description provided for @chatConversationDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversation removed'**
+  String get chatConversationDeleted;
+
+  /// No description provided for @chatDeleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete message'**
+  String get chatDeleteMessage;
+
+  /// No description provided for @chatDeleteMessageForMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete for me'**
+  String get chatDeleteMessageForMe;
+
+  /// No description provided for @chatDeleteMessageForMeConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this message from your view?'**
+  String get chatDeleteMessageForMeConfirm;
+
+  /// No description provided for @chatDeleteForEveryoneNotAllowed.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages cannot be deleted for everyone to ensure account security and record keeping.'**
+  String get chatDeleteForEveryoneNotAllowed;
+
+  /// No description provided for @chatMessageDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Message deleted'**
+  String get chatMessageDeleted;
+
+  /// No description provided for @chatDeleteForMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete for me'**
+  String get chatDeleteForMe;
+
+  /// No description provided for @chatDeleteMessageConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide this message from your chat only?'**
+  String get chatDeleteMessageConfirm;
+
+  /// No description provided for @chatMessageHiddenForMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Message hidden from your chat.'**
+  String get chatMessageHiddenForMe;
+
+  /// No description provided for @chatArchiveConversation.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get chatArchiveConversation;
+
+  /// No description provided for @chatConversationArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversation archived.'**
+  String get chatConversationArchived;
+
+  /// No description provided for @chatArchiveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversation could not be archived.'**
+  String get chatArchiveFailed;
+
+  /// No description provided for @chatCopyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy text'**
+  String get chatCopyMessage;
+
+  /// No description provided for @chatMessageCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Text copied to clipboard'**
+  String get chatMessageCopied;
+
+  /// No description provided for @chatPropertyInquiryPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Inquiry regarding:'**
+  String get chatPropertyInquiryPrefix;
+
+  /// No description provided for @categoryApartment.
+  ///
+  /// In en, this message translates to:
+  /// **'Apartment'**
+  String get categoryApartment;
+
+  /// No description provided for @categoryVilla.
+  ///
+  /// In en, this message translates to:
+  /// **'Villa'**
+  String get categoryVilla;
+
+  /// No description provided for @categoryHouse.
+  ///
+  /// In en, this message translates to:
+  /// **'House'**
+  String get categoryHouse;
+
+  /// No description provided for @categoryOffice.
+  ///
+  /// In en, this message translates to:
+  /// **'Office'**
+  String get categoryOffice;
+
+  /// No description provided for @categoryStudio.
+  ///
+  /// In en, this message translates to:
+  /// **'Studio'**
+  String get categoryStudio;
+
+  /// No description provided for @categoryCommercial.
+  ///
+  /// In en, this message translates to:
+  /// **'Commercial'**
+  String get categoryCommercial;
+
+  /// No description provided for @categoryTownhouse.
+  ///
+  /// In en, this message translates to:
+  /// **'Townhouse'**
+  String get categoryTownhouse;
+
+  /// No description provided for @categoryPenthouse.
+  ///
+  /// In en, this message translates to:
+  /// **'Penthouse'**
+  String get categoryPenthouse;
+
+  /// No description provided for @categoryLand.
+  ///
+  /// In en, this message translates to:
+  /// **'Land'**
+  String get categoryLand;
+
+  /// No description provided for @categoryChalet.
+  ///
+  /// In en, this message translates to:
+  /// **'Chalet'**
+  String get categoryChalet;
+
+  /// No description provided for @supportWebsite.
+  ///
+  /// In en, this message translates to:
+  /// **'Website'**
+  String get supportWebsite;
+
+  /// No description provided for @supportEmailUs.
+  ///
+  /// In en, this message translates to:
+  /// **'Email Us'**
+  String get supportEmailUs;
+
+  /// No description provided for @supportTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms'**
+  String get supportTerms;
+
+  /// No description provided for @supportBuyer.
+  ///
+  /// In en, this message translates to:
+  /// **'Buyer'**
+  String get supportBuyer;
+
+  /// No description provided for @supportEstateAgent.
+  ///
+  /// In en, this message translates to:
+  /// **'Estate Agent'**
+  String get supportEstateAgent;
+
+  /// No description provided for @supportSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Find answers to common questions or reach out directly to our dedicated support team.'**
+  String get supportSubtitle;
+
+  /// No description provided for @supportEmailCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Support email address copied'**
+  String get supportEmailCopied;
 }
 
 class _AppLocalizationsDelegate

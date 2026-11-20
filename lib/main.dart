@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+
 import 'app.dart';
-import 'core/di/injection_container.dart' as di;
+import 'core/di/dependency_injection.dart' as di;
 import 'core/services/firebase_service.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  // Initialize Firebase (single source of truth with DefaultFirebaseOptions)
+  
   await FirebaseService.initialize();
 
-  // Initialize dependency injection
   await di.initDependencies();
-  // await seedEstates();
+  
   runApp(const RealEstateApp());
 }

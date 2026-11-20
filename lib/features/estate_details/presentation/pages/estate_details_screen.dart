@@ -52,21 +52,26 @@ class _EstateDetailsScreenState extends State<EstateDetailsScreen> {
   }
 
   Future<void> _contactAgent() async {
-    final conversationId = await context
+    final launchRequest = await context
         .read<EstateDetailsCubit>()
         .startConversationWithAgent();
-    if (!mounted || conversationId == null) return;
+    if (!mounted || launchRequest == null) return;
 
     try {
       await context.pushNamed(
         AppRoutes.chatConversationName,
-        pathParameters: {'conversationId': conversationId},
+        pathParameters: {'conversationId': launchRequest.conversationId},
+        queryParameters: {
+          'agentUserUid': launchRequest.agentUserUid,
+          'agentId': launchRequest.agentId,
+          'estateId': launchRequest.estateId,
+        },
       );
     } catch (_) {
       if (!mounted) return;
       AppFeedback.error(
         context,
-        'The conversation was created, but could not be opened.',
+        'Could not open the conversation. Please try again.',
       );
     }
   }

@@ -16,6 +16,7 @@ import 'package:real_estate_app/features/search/presentation/pages/search_screen
 import 'package:real_estate_app/features/chat/presentation/pages/chat_screen.dart';
 import 'package:real_estate_app/features/chat/presentation/pages/conversation_screen.dart';
 import 'package:real_estate_app/features/chat/presentation/cubit/chat_cubit.dart';
+import 'package:real_estate_app/features/chat/domain/entities/chat_launch_request.dart';
 import 'package:real_estate_app/features/profile/presentation/pages/profile_screen.dart';
 import 'package:real_estate_app/features/profile/presentation/pages/settings_screen.dart';
 import 'package:real_estate_app/features/profile/presentation/pages/edit_profile_screen.dart';
@@ -33,12 +34,14 @@ import 'package:real_estate_app/features/booking/presentation/pages/book_tour_sc
 import 'package:real_estate_app/features/booking/presentation/pages/booking_details_screen.dart';
 import 'package:real_estate_app/features/booking/presentation/pages/booking_history_screen.dart';
 import 'package:real_estate_app/features/notifications/presentation/pages/notifications_screen.dart';
-
-import '../di/injection_container.dart';
+import '../di/dependency_injection.dart';
 import '../navigation/main_navigation_shell.dart';
 import 'route_names.dart';
 import '../../features/estate/domain/entities/estate_entity.dart';
+import '../../features/estate/presentation/cubit/my_properties_cubit.dart';
 import '../../features/estate/presentation/pages/add_property_screen.dart';
+import '../../features/estate/presentation/pages/property_management_screen.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 // Splash & Onboarding
 import '../../features/splash/screens/splash_screen.dart';
@@ -222,15 +225,43 @@ class AppRouter {
         path: AppRoutes.chatConversation,
         name: AppRoutes.chatConversationName,
         parentNavigatorKey: rootNavigatorKey,
-        builder: (context, state) => BlocProvider(
-          create: (_) => sl<ChatCubit>(),
-          child: ConversationScreen(
-            conversationId: state.pathParameters['conversationId'] ?? '',
-            title: state.uri.queryParameters['title'] ?? 'Agent',
-            estateId: state.uri.queryParameters['estateId'],
-            currentUserUid: FirebaseAuth.instance.currentUser?.uid,
-          ),
-        ),
+        builder: (context, state) {
+          final l10n = AppLocalizations.of(context);
+          final query = state.uri.queryParameters;
+          final currentUserUid = FirebaseAuth.instance.currentUser?.uid;
+          final agentUserUid = query['agentUserUid']?.trim();
+          final agentId = query['agentId']?.trim();
+          final estateId = query['estateId']?.trim();
+          final launchRequest =
+              currentUserUid != null &&
+                  currentUserUid.isNotEmpty &&
+                  agentUserUid?.isNotEmpty == true &&
+                  agentId?.isNotEmpty == true &&
+                  estateId?.isNotEmpty == true
+              ? ChatLaunchRequest(
+                  customerUid: currentUserUid,
+                  agentUserUid: agentUserUid!,
+                  agentId: agentId!,
+                  estateId: estateId!,
+                )
+              : null;
+          return BlocProvider(
+            create: (_) => sl<ChatCubit>(),
+            child: ConversationScreen(
+              conversationId:
+                  launchRequest?.conversationId ??
+                  state.pathParameters['conversationId'] ??
+                  '',
+              title:
+                  state.uri.queryParameters['title'] ??
+                  l10n?.chatAgentLabel ??
+                  'Agent',
+              estateId: estateId,
+              currentUserUid: currentUserUid,
+              launchRequest: launchRequest,
+            ),
+          );
+        },
       ),
       GoRoute(
         path: AppRoutes.favorites,
@@ -411,6 +442,15 @@ class AppRouter {
         path: AppRoutes.addProperty,
         name: 'add-property',
         builder: (context, state) => const AddPropertyScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.myProperties,
+        name: AppRoutes.myPropertiesName,
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => BlocProvider(
+          create: (_) => sl<MyPropertiesCubit>(),
+          child: const PropertyManagementScreen(),
+        ),
       ),
       GoRoute(
         path: AppRoutes.bookTour,

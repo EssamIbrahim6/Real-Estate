@@ -50,6 +50,8 @@
 
   "searchTitle": "Search properties",
   "searchHint": "Search estates...",
+  "searchInitialTitle": "Find your next home",
+  "searchInitialHint": "Search by keyword or use filters to explore available properties.",
   "searchAiTitle": "AI-powered search",
   "searchAiHint": "AI search understands everyday phrases. Try “2 bedrooms near Giza”.",
   "searchVoiceSearch": "Voice search",
@@ -138,6 +140,26 @@
   "detailsContactAgent": "Contact Agent",
   "detailsReviews": "Reviews",
   "detailsWriteReview": "Write a Review",
+  "detailsExperiencePrompt": "How was your experience?",
+  "detailsEditReview": "Edit Your Review",
+  "detailsSubmitReview": "Submit Review",
+  "detailsUpdateReview": "Update Review",
+  "detailsRatingSemantics": "Rating: {rating} out of 5",
+  "@detailsRatingSemantics": {
+    "placeholders": {
+      "rating": {
+        "type": "int"
+      }
+    }
+  },
+  "detailsStarRatingTooltip": "Select a {rating}-star rating",
+  "@detailsStarRatingTooltip": {
+    "placeholders": {
+      "rating": {
+        "type": "int"
+      }
+    }
+  },
   "detailsYourRating": "Your Rating",
   "detailsReviewCommentHint": "Share details about this property...",
   "detailsNoReviews": "No reviews yet. Be the first to review!",
@@ -146,6 +168,7 @@
 
   "mapExploreTitle": "Explore on Map",
   "mapSearchTitle": "Search Map",
+  "mapLoading": "Loading properties on map...",
   "mapZoomIn": "Zoom in",
   "mapZoomOut": "Zoom out",
   "mapFitAll": "Fit all properties",
@@ -153,9 +176,19 @@
   "mapNoValidCoordsTitle": "No properties with valid coordinates found.",
   "mapNoValidCoordsMessage": "The selected properties do not have geographic coordinates available to pin on the map.",
   "mapLoadAllButton": "Load All Properties",
+  "mapLoadError": "Failed to load properties on the map.",
+  "mapClosePreview": "Close preview",
   "mapServicesDisabled": "Location services are disabled on this device.",
   "mapPermissionRequired": "Location permission is required to center on your position.",
   "mapLocationError": "Could not determine location.",
+  "mapLocationFailure": "Could not determine location: {error}",
+  "@mapLocationFailure": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "mapViewDetails": "View details",
 
   "favoritesTitle": "Favorites",
@@ -194,6 +227,9 @@
   "chatEmptyMessage": "Start a conversation with an agent from a property.",
   "chatAuthRequired": "Sign in to view your conversations.",
   "chatInquiry": "Property inquiry",
+  "chatAgentLabel": "Agent",
+  "chatCustomerLabel": "Customer",
+  "chatLoadError": "Could not load conversations. Please try again.",
 
   "settingsTitle": "Settings",
   "settingsAccountSection": "ACCOUNT & SECURITY",
@@ -338,6 +374,8 @@
   "chatMessageHint": "Write a message...",
   "chatSignInToSend": "Sign in to send a message",
   "chatSendTooltip": "Send message",
+  "chatSentMessageSemantics": "Sent message",
+  "chatReceivedMessageSemantics": "Received message",
 
   "galleryViewAll": "View all photos",
   "galleryEmpty": "No photos available",
@@ -363,6 +401,10 @@
   "commonTermsAndPrivacy": "Terms of Service & Privacy Policy",
 
   "offlineNotice": "No internet connection. Some features may be unavailable.",
+  "offlineTitle": "You are offline",
+  "offlineDescription": "Connect to the internet to continue using the app.",
+  "connectionChecking": "Checking connection",
+  "connectionCheckingDescription": "Please wait while we check your internet connection.",
 
   "bookingTitle": "Book a Visit",
   "bookingSuccess": "Visit booked successfully!",
@@ -426,5 +468,76 @@
   "notificationsHoursAgo": "{count}h ago",
   "notificationsYesterday": "Yesterday",
   "notificationsDaysAgo": "{count}d ago",
-  "profileNotificationsSubtitle": "View your activity and updates"
+  "profileNotificationsSubtitle": "View your activity and updates",
+
+  "profileYourProperties": "Your Properties",
+  "profileYourPropertiesSubtitle": "View and manage your listed properties",
+  "myPropertiesTitle": "Your Properties",
+  "myPropertiesEmpty": "No properties listed yet.",
+  "myPropertiesEmptySubtitle": "Publish your first property to reach thousands of buyers.",
+  "myPropertiesAddNew": "Add New Property",
+  "myPropertiesDeleteTitle": "Delete Property?",
+  "myPropertiesDeleteMessage": "Are you sure you want to permanently delete this property listing? This action cannot be undone.",
+  "myPropertiesDeleteButton": "Delete",
+  "myPropertiesDeleteSuccess": "Property deleted successfully.",
+  "myPropertiesDeleteError": "Failed to delete property. Please try again.",
+  "myPropertiesStatusPending": "Pending Review",
+  "myPropertiesStatusApproved": "Approved",
+  "myPropertiesStatusActive": "Active",
+  "myPropertiesStatusRejected": "Rejected",
+  "myPropertiesPickImages": "Select Images",
+  "myPropertiesCoverImageTag": "Cover",
+  "myPropertiesSetAsCover": "Set as cover",
+  "myPropertiesRemoveImage": "Remove image",
+  "myPropertiesUploadProgress": "Uploading property...",
+  "myPropertiesMinImagesError": "Please select at least one property image.",
+  "myPropertiesSelectLocation": "Pick location on map",
+  "myPropertiesLocationPicked": "Coordinates selected",
+  "myPropertiesLocationRequired": "Property location is required",
+  "propertyLocationPickerTitle": "Select property location",
+  "propertyLocationPickerHint": "Tap the map or move it and select its center.",
+  "propertyLocationSelectMapCenter": "Select map center",
+  "propertyLocationSelectionReady": "Location selected. Confirm to use it for this property.",
+  "propertyLocationAddressUnavailable": "Address lookup is unavailable; the selected map location will still be saved.",
+  "propertyLocationConfirm": "Confirm location",
+  "propertyMapLoadingError": "Map tiles are unavailable. Check your connection or retry.",
+  "propertyMapRetry": "Retry map",
+
+  "chatDeleteConversation": "Delete conversation",
+  "chatDeleteConversationConfirm": "Are you sure you want to remove this conversation from your chat list?",
+  "chatDeleteConversationButton": "Delete",
+  "chatConversationDeleted": "Conversation removed",
+  "chatDeleteMessage": "Delete message",
+  "chatDeleteMessageForMe": "Delete for me",
+  "chatDeleteMessageForMeConfirm": "Remove this message from your view?",
+  "chatDeleteForEveryoneNotAllowed": "Messages cannot be deleted for everyone to ensure account security and record keeping.",
+  "chatMessageDeleted": "Message deleted",
+  "chatDeleteForMe": "Delete for me",
+  "chatDeleteMessageConfirm": "Hide this message from your chat only?",
+  "chatMessageHiddenForMe": "Message hidden from your chat.",
+  "chatArchiveConversation": "Archive",
+  "chatConversationArchived": "Conversation archived.",
+  "chatArchiveFailed": "Conversation could not be archived.",
+  "chatCopyMessage": "Copy text",
+  "chatMessageCopied": "Text copied to clipboard",
+  "chatPropertyInquiryPrefix": "Inquiry regarding:",
+
+  "categoryApartment": "Apartment",
+  "categoryVilla": "Villa",
+  "categoryHouse": "House",
+  "categoryOffice": "Office",
+  "categoryStudio": "Studio",
+  "categoryCommercial": "Commercial",
+  "categoryTownhouse": "Townhouse",
+  "categoryPenthouse": "Penthouse",
+  "categoryLand": "Land",
+  "categoryChalet": "Chalet",
+
+  "supportWebsite": "Website",
+  "supportEmailUs": "Email Us",
+  "supportTerms": "Terms",
+  "supportBuyer": "Buyer",
+  "supportEstateAgent": "Estate Agent",
+  "supportSubtitle": "Find answers to common questions or reach out directly to our dedicated support team.",
+  "supportEmailCopied": "Support email address copied"
 }

@@ -4,12 +4,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'core/constants/app_strings.dart';
 import 'core/cubits/connectivity/connectivity_cubit.dart';
-import 'core/di/injection_container.dart' as di;
+import 'core/di/dependency_injection.dart' as di;
 import 'core/localization/locale_cubit.dart';
 import 'core/localization/locale_state.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_cubit.dart';
+import 'core/widgets/connectivity_gate.dart';
 import 'features/notifications/presentation/cubit/notifications_cubit.dart';
 import 'l10n/generated/app_localizations.dart';
 
@@ -48,43 +49,23 @@ class RealEstateApp extends StatelessWidget {
                     builder: (context, child) =>
                         BlocBuilder<ConnectivityCubit, ConnectivityState>(
                           buildWhen: (previous, current) =>
-                              previous.isConnected != current.isConnected,
+                              previous.status != current.status,
                           builder: (context, state) {
-                            final l10n = AppLocalizations.of(context);
-                            final offlineMsg = l10n?.offlineNotice ??
-                                'No internet connection. Some features may be unavailable.';
-
-                            return Column(
+                            return Stack(
+                              fit: StackFit.expand,
                               children: [
+                                child ?? const SizedBox.shrink(),
                                 if (!state.isConnected)
-                                  Material(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .errorContainer,
-                                    child: SafeArea(
-                                      bottom: false,
-                                      child: SizedBox(
-                                        width: double.infinity,
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 16,
-                                            vertical: 10,
-                                          ),
-                                          child: Text(
-                                            offlineMsg,
-                                            style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onErrorContainer,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
+                                  Positioned.fill(
+                                    child: ConnectivityGate(
+                                      isChecking:
+                                          state.status ==
+                                          ConnectivityStatus.checking,
+                                      onRetry: () => context
+                                          .read<ConnectivityCubit>()
+                                          .retryConnectivity(),
                                     ),
                                   ),
-                                Expanded(
-                                  child: child ?? const SizedBox.shrink(),
-                                ),
                               ],
                             );
                           },

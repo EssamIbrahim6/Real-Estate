@@ -39,11 +39,33 @@ void main() {
 
     expect(cubit.state.isConnected, isFalse);
   });
+
+  test(
+    'retry blocks while checking and unlocks when internet returns',
+    () async {
+      final service = _FakeConnectivityService()..checkResult.complete(false);
+      final cubit = ConnectivityCubit(service: service);
+      await Future<void>.delayed(Duration.zero);
+      expect(cubit.state.isConnected, isFalse);
+
+      final reconnectResult = Completer<bool>();
+      service.nextCheckResult = reconnectResult;
+      final retry = cubit.retryConnectivity();
+      expect(cubit.state.status, ConnectivityStatus.checking);
+      reconnectResult.complete(true);
+      await retry;
+      expect(cubit.state.isConnected, isTrue);
+
+      await cubit.close();
+      await service.close();
+    },
+  );
 }
 
 class _FakeConnectivityService implements ConnectivityService {
   final statuses = StreamController<bool>.broadcast(sync: true);
-  final checkResult = Completer<bool>();
+  Completer<bool> checkResult = Completer<bool>();
+  Completer<bool>? nextCheckResult;
 
   @override
   bool get isConnected => true;
@@ -52,7 +74,14 @@ class _FakeConnectivityService implements ConnectivityService {
   Stream<bool> get onStatusChange => statuses.stream;
 
   @override
-  Future<bool> checkConnectivity() => checkResult.future;
+  Future<bool> checkConnectivity() {
+    final next = nextCheckResult;
+    if (next != null) {
+      nextCheckResult = null;
+      return next.future;
+    }
+    return checkResult.future;
+  }
 
   Future<void> close() => statuses.close();
 }
